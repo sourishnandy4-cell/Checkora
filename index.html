@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Checkora — A premium stark offline-first desktop chess app with monochrome, forest, ocean, crimson, and aurora themes." />
+    <meta name="color-scheme" content="light dark" />
+    <title>Checkora — Desktop Chess Mono</title>
+    
+    <!-- Anti-FOUC theme blocker script -->
+    <script>
+      (function() {
+        try {
+          const themeStr = localStorage.getItem('checkora-theme');
+          if (themeStr) {
+            const theme = JSON.parse(themeStr);
+            document.documentElement.setAttribute('data-theme', theme);
+          } else {
+            document.documentElement.setAttribute('data-theme', 'mono');
+          }
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'mono');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

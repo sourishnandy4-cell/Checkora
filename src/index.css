@@ -1,0 +1,397 @@
+/* ══════════════════════════════════════════════════════════════
+   GOOGLE FONTS
+   ══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-void: var(--bg-void);
+  --color-base: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-border: var(--bg-border);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  
+  --color-board-light: var(--board-light);
+  --color-board-dark: var(--board-dark);
+  
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-green: var(--accent-green);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-red: var(--accent-red);
+  
+  --color-move-brilliant: var(--move-brilliant);
+  --color-move-best: var(--move-best);
+  --color-move-good: var(--move-good);
+  --color-move-inaccuracy: var(--move-inaccuracy);
+  --color-move-mistake: var(--move-mistake);
+  --color-move-blunder: var(--move-blunder);
+  
+  --color-nav-bg: var(--nav-bg);
+  --color-sidebar-bg: var(--sidebar-bg);
+
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEMES & COLOR VARIABLES
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Default font declarations mapped to Tailwind font families */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Theme Transitions */
+  --transition-speed: 0.25s;
+}
+
+/* Fallback for un-themed root to Mono theme */
+html:not([data-theme]),
+html[data-theme="mono"] {
+  --bg-void:       #000000;
+  --bg-base:       #0A0A0A;
+  --bg-surface:    #111111;
+  --bg-elevated:   #1A1A1A;
+  --bg-border:     #2A2A2A;
+  --text-primary:  #F5F5F5;
+  --text-secondary:#999999;
+  --text-muted:    #555555;
+  
+  --board-light:   #E8E8E8;
+  --board-dark:    #1E1E1E;
+  
+  --accent-primary:#E8E8E8;
+  --accent-green:  #4ADE80;
+  --accent-cyan:   #22D3EE;
+  --accent-amber:  #FBBF24;
+  --accent-red:    #F87171;
+  --nav-bg:        #000000;
+  --sidebar-bg:    #0D0D0D;
+  
+  --move-brilliant:  #22D3EE;
+  --move-best:       #4ADE80;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FBBF24;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #F87171;
+
+  --glow-sm: 0 0 8px rgba(232,232,232,0.12);
+  --glow-md: 0 0 20px rgba(232,232,232,0.08);
+}
+
+html[data-theme="forest"] {
+  --bg-void:       #0A1008;
+  --bg-base:       #0F160D;
+  --bg-surface:    #162013;
+  --bg-elevated:   #1E2D1A;
+  --bg-border:     #2D4427;
+  --text-primary:  #E8F5E0;
+  --text-secondary:#8AAF7E;
+  --text-muted:    #4A6B42;
+  
+  --board-light:   #F0E6C8;   /* warm parchment */
+  --board-dark:    #2D5A27;   /* pine green */
+  
+  --accent-primary:#6FCF5A;   /* leaf green */
+  --accent-green:  #4ADE80;
+  --accent-cyan:   #34D399;
+  --accent-amber:  #FCD34D;
+  --accent-red:    #F87171;
+  --nav-bg:        #0A1008;
+  --sidebar-bg:    #0D1A0B;
+
+  --move-brilliant:  #34D399;
+  --move-best:       #4ADE80;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FCD34D;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #F87171;
+
+  --glow-sm: 0 0 8px rgba(111,207,90,0.12);
+  --glow-md: 0 0 20px rgba(111,207,90,0.08);
+}
+
+html[data-theme="ocean"] {
+  --bg-void:       #020B18;
+  --bg-base:       #060F1E;
+  --bg-surface:    #0B1929;
+  --bg-elevated:   #112338;
+  --bg-border:     #1A3550;
+  --text-primary:  #DCF0FF;
+  --text-secondary:#5B9AC4;
+  --text-muted:    #2D5A7A;
+  
+  --board-light:   #BFDDEE;   /* ice blue */
+  --board-dark:    #143054;   /* midnight navy */
+  
+  --accent-primary:#38BDF8;   /* ocean blue */
+  --accent-green:  #34D399;
+  --accent-cyan:   #22D3EE;
+  --accent-amber:  #FBBF24;
+  --accent-red:    #F87171;
+  --nav-bg:        #020B18;
+  --sidebar-bg:    #060F1E;
+
+  --move-brilliant:  #22D3EE;
+  --move-best:       #34D399;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FBBF24;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #F87171;
+
+  --glow-sm: 0 0 8px rgba(56,189,248,0.12);
+  --glow-md: 0 0 20px rgba(56,189,248,0.08);
+}
+
+html[data-theme="crimson"] {
+  --bg-void:       #110608;
+  --bg-base:       #180A0C;
+  --bg-surface:    #220E10;
+  --bg-elevated:   #321418;
+  --bg-border:     #501C22;
+  --text-primary:  #FDEAEA;
+  --text-secondary:#C07070;
+  --text-muted:    #7A3C3C;
+  
+  --board-light:   #F5E8D8;   /* bone / aged ivory */
+  --board-dark:    #6B1A22;   /* deep burgundy */
+  
+  --accent-primary:#F87171;   /* crimson red */
+  --accent-green:  #4ADE80;
+  --accent-cyan:   #22D3EE;
+  --accent-amber:  #FBBF24;
+  --accent-red:    #EF4444;
+  --nav-bg:        #110608;
+  --sidebar-bg:    #160A0C;
+
+  --move-brilliant:  #22D3EE;
+  --move-best:       #4ADE80;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FBBF24;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #EF4444;
+
+  --glow-sm: 0 0 8px rgba(248,113,113,0.12);
+  --glow-md: 0 0 20px rgba(248,113,113,0.08);
+}
+
+html[data-theme="aurora"] {
+  --bg-void:       #080612;
+  --bg-base:       #0D0A1C;
+  --bg-surface:    #130F28;
+  --bg-elevated:   #1C1638;
+  --bg-border:     #2E2555;
+  --text-primary:  #EDE8FF;
+  --text-secondary:#8B78CC;
+  --text-muted:    #4E3D88;
+  
+  --board-light:   #DDD6F3;   /* pale lavender */
+  --board-dark:    #2B1D5E;   /* deep indigo */
+  
+  --accent-primary:#A78BFA;   /* violet */
+  --accent-green:  #4ADE80;
+  --accent-cyan:   #22D3EE;
+  --accent-amber:  #FBBF24;
+  --accent-red:    #F87171;
+  --nav-bg:        #080612;
+  --sidebar-bg:    #0A0818;
+
+  --move-brilliant:  #22D3EE;
+  --move-best:       #4ADE80;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FBBF24;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #F87171;
+
+  --glow-sm: 0 0 8px rgba(167,139,250,0.12);
+  --glow-md: 0 0 20px rgba(167,139,250,0.08);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL STYLES & INTERACTION STYLES
+   ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  transition:
+    background-color var(--transition-speed) ease,
+    border-color var(--transition-speed) ease,
+    color 0.15s ease,
+    box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Exclude chessboard active pieces, animations and square highlights from transition to avoid jumpiness */
+.cg-wrap, .cg-wrap *,
+.cm-square, .cm-piece,
+.react-chessboard-container, .react-chessboard-container * { 
+  transition: none !important; 
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p, blockquote {
+  text-wrap: pretty;
+}
+
+/* Draggable area for custom title bar */
+.draggable {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Custom Typography classes */
+.font-serif-header {
+  font-family: var(--font-serif);
+}
+.font-mono-clock {
+  font-family: var(--font-mono);
+}
+
+/* Premium Custom Scrollbars */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-border) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--bg-border);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+}
+
+/* Glassmorphism utility */
+.glassmorphism {
+  background: rgba(17, 17, 17, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--bg-border);
+}
+
+/* Navigation items active effect */
+.nav-item-active {
+  border-left: 2px solid var(--accent-primary);
+  background-color: var(--bg-elevated);
+}
+
+/* Custom buttons micro-animations */
+.premium-btn {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--bg-border);
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.premium-btn:hover:not(:disabled) {
+  background-color: var(--bg-elevated);
+  border-color: var(--text-muted);
+  box-shadow: var(--glow-sm);
+  transform: translateY(-1px);
+}
+
+.premium-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.premium-btn-primary {
+  background-color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  color: var(--bg-void);
+  font-weight: 600;
+}
+
+.premium-btn-primary:hover:not(:disabled) {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+  box-shadow: var(--glow-md);
+}
+
+/* Discrete modern entry/exit animations for popovers & tooltips */
+.popover-reveal {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: 
+    display 0.2s allow-discrete, 
+    opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@starting-style {
+  .popover-reveal {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+.popover-reveal:where(.hidden, [hidden]) {
+  display: none;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+}
+
+/* Move list table highlighters */
+.notation-row-active {
+  background-color: var(--bg-elevated);
+  border-left: 2px solid var(--accent-primary);
+}
+
+/* Dot overlay for chess moves */
+.legal-dot-dark {
+  background-color: rgba(245, 245, 245, 0.25);
+}
+.legal-dot-light {
+  background-color: rgba(10, 10, 10, 0.2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOM ANIMATIONS
+   ══════════════════════════════════════════════════════════════ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

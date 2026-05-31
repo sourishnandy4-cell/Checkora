@@ -1,0 +1,59 @@
+{
+  "name": "checkora",
+  "version": "1.0.0",
+  "description": "A premium offline-first desktop chess application with Stockfish AI, multiple themes, interactive puzzles, and a full ELO rating system. Built with React, TypeScript, and Electron.",
+  "main": "dist-electron/main.js",
+  "homepage": "https://github.com/sourishnandy4-cell/Checkora",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sourishnandy4-cell/Checkora.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sourishnandy4-cell/Checkora/issues"
+  },
+  "keywords": [
+    "chess",
+    "electron",
+    "stockfish",
+    "react",
+    "typescript",
+    "offline",
+    "desktop",
+    "puzzles",
+    "elo-rating",
+    "chess-engine"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"npm run dev:electron\"",
+    "dev:electron": "tsc electron/main.ts electron/preload.ts --outDir dist-electron --target es2022 --module commonjs --skipLibCheck && electron .",
+    "build:renderer": "vite build",
+    "build:main": "tsc electron/main.ts electron/preload.ts --outDir dist-electron --target es2022 --module commonjs --skipLibCheck",
+    "build": "npm run build:renderer && npm run build:main",
+    "start": "npm run build && electron ."
+  },
+  "dependencies": {
+    "chess.js": "^1.0.0-beta.6",
+    "electron-store": "^8.2.0",
+    "framer-motion": "^11.2.10",
+    "lucide-react": "^0.395.0",
+    "react": "^18.3.1",
+    "react-chessboard": "^4.6.0",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "recharts": "^2.12.7",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0-alpha.18",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^8.2.2",
+    "electron": "^31.0.0",
+    "tailwindcss": "^4.0.0-alpha.18",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  },
+  "author": "sourishnandy4-cell",
+  "license": "GPL-3.0"
+}

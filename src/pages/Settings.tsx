@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSettingsStore, ThemeId, PieceSetId } from '../store/settingsStore';
+import { useGameStore } from '../store/gameStore';
 import { 
   Palette, 
   Gamepad2, 
@@ -17,6 +18,7 @@ const THEMES = [
 ] as const;
 
 export const Settings: React.FC = () => {
+  const resetElo = useGameStore(state => state.resetElo);
   const {
     theme,
     pieceSet,
@@ -233,6 +235,33 @@ export const Settings: React.FC = () => {
                   <span className="font-mono-clock text-xs w-8 text-right font-bold">{soundVolume}%</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Danger Zone: Reset ELO panel */}
+          <div className="bg-bg-surface border border-accent-red/35 p-5 rounded-sm flex flex-col gap-4 shadow-lg shadow-accent-red/5">
+            <h2 className="font-serif-header text-sm font-bold uppercase tracking-wider text-accent-red flex items-center gap-2">
+              ⚠️ Danger Zone
+            </h2>
+            
+            <div className="flex flex-col gap-1 text-xs">
+              <span className="font-medium text-text-primary">Reset ELO Ratings</span>
+              <span className="text-[10px] text-text-muted leading-relaxed mb-3">
+                This will permanently reset all your ratings (Rapid, Blitz, and Bullet) back to the base rating floor of **100 ELO**. This action cannot be undone.
+              </span>
+              
+              <button
+                onClick={() => {
+                  const confirmReset = window.confirm("Are you absolutely sure you want to reset all your ELO ratings back to 100? This cannot be undone.");
+                  if (confirmReset) {
+                    resetElo();
+                    alert("Your ELO ratings have been successfully reset to 100.");
+                  }
+                }}
+                className="py-2.5 px-4 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red hover:text-bg-void hover:border-accent-red transition-all duration-200 cursor-pointer font-bold rounded-sm text-center"
+              >
+                Reset ELO Ratings
+              </button>
             </div>
           </div>
 

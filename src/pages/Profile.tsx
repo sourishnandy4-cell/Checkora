@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { User, Trophy, MapPin, BarChart2, Shield, LogOut, Upload, Camera, Sparkles, TrendingUp } from 'lucide-react';
+import { User, Trophy, MapPin, BarChart2, Shield, LogOut, Upload, Camera, Sparkles, TrendingUp, Edit2 } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 
@@ -27,8 +27,12 @@ export const Profile: React.FC = () => {
     playerEmail, 
     playerAvatar, 
     setPlayerAvatar, 
+    setPlayerName,
     logout 
   } = useSettingsStore();
+
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState(playerName);
 
   const totalGames = gameHistory.length;
   const totalWins = gameHistory.filter(g => g.result === 'W').length;
@@ -130,7 +134,7 @@ export const Profile: React.FC = () => {
       </div>
 
       {/* Main Profile Info Card */}
-      <div className="bg-bg-surface border border-bg-border p-6 rounded-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+      <div className="bg-bg-surface border border-bg-border py-10 px-6 rounded-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
         {/* Decorative corner accent */}
         <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-accent-primary" />
         
@@ -150,7 +154,61 @@ export const Profile: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-1.5 overflow-hidden">
-            <h2 className="font-serif-header text-2xl font-bold text-text-primary truncate" title={playerName}>{playerName}</h2>
+            {isEditingName ? (
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (tempName.trim()) {
+                    setPlayerName(tempName.trim());
+                    setIsEditingName(false);
+                  }
+                }}
+                className="flex items-center gap-2 select-none"
+              >
+                <input
+                  type="text"
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  className="bg-bg-void border border-bg-border focus:border-text-muted focus:outline-none rounded-sm px-2 py-1 text-sm font-semibold text-text-primary max-w-[200px]"
+                  placeholder="Enter name..."
+                  autoFocus
+                  maxLength={20}
+                />
+                <button
+                  type="submit"
+                  className="py-1 px-2.5 bg-accent-green/20 border border-accent-green hover:bg-accent-green hover:text-bg-void transition-all text-[10px] font-mono-clock uppercase font-bold rounded-sm cursor-pointer"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTempName(playerName);
+                    setIsEditingName(false);
+                  }}
+                  className="py-1 px-2.5 bg-bg-border border border-bg-border hover:bg-bg-elevated transition-all text-[10px] font-mono-clock uppercase font-bold rounded-sm cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h2 className="font-serif-header text-2xl font-bold text-text-primary truncate max-w-[240px]" title={playerName}>
+                  {playerName}
+                </h2>
+                <button
+                  onClick={() => {
+                    setTempName(playerName);
+                    setIsEditingName(true);
+                  }}
+                  className="p-1 hover:bg-bg-elevated border border-transparent hover:border-bg-border rounded-sm transition-all text-text-secondary hover:text-text-primary cursor-pointer"
+                  title="Change Name"
+                >
+                  <Edit2 size={13} />
+                </button>
+              </div>
+            )}
+            
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-secondary justify-center sm:justify-start">
               <span className="flex items-center gap-1"><MapPin size={12} /> Offline App</span>
               <span className="text-bg-border font-mono-clock">|</span>

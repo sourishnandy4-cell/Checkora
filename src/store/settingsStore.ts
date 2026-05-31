@@ -34,6 +34,7 @@ interface SettingsState {
   login: (name: string, isGuest: boolean, email?: string) => void;
   logout: () => void;
   setPlayerAvatar: (avatar: string) => void;
+  setPlayerName: (name: string) => void;
   
   // Initialize
   initSettings: () => Promise<void>;
@@ -157,6 +158,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setPlayerAvatar: async (avatar) => {
     set({ playerAvatar: avatar });
     await setStoredVal('playerAvatar', avatar);
+  },
+
+  setPlayerName: async (name) => {
+    set({ playerName: name });
+    await setStoredVal('playerName', name);
   },
 
   initSettings: async () => {

@@ -89,6 +89,14 @@ export const Play: React.FC = () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState(504);
 
+  // Chat scroll reference
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll chat log to bottom as bot (or player) speaks
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
   // Initialize engine on start
   useEffect(() => {
     engineRef.current = new StockfishEngine();
@@ -102,14 +110,23 @@ export const Play: React.FC = () => {
   useEffect(() => {
     const el = boardContainerRef.current;
     if (!el) return;
+
+    const initialWidth = el.getBoundingClientRect().width;
+    if (initialWidth > 0) {
+      setBoardSize(Math.floor(initialWidth));
+    }
+
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
-        setBoardSize(Math.floor(entry.contentRect.width));
+        const width = Math.floor(entry.contentRect.width);
+        if (width > 0) {
+          setBoardSize(width);
+        }
       }
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [isGameActive, gameResult]);
 
   // Clock Ticking Interval Setup
   useEffect(() => {
@@ -209,8 +226,8 @@ export const Play: React.FC = () => {
                 playSound.play('move');
               }
 
-              // Simulated bot comment probability
-              if (Math.random() < 0.25) {
+              // Simulated bot comment probability (Increased to 55% for highly active chat)
+              if (Math.random() < 0.55) {
                 const chatPool = isCapture ? activeBot.chatPools.capture : activeBot.chatPools.win;
                 const msg = chatPool[Math.floor(Math.random() * chatPool.length)];
                 sendChatMessage(activeBot.name, msg);
@@ -253,6 +270,26 @@ export const Play: React.FC = () => {
           }
         }
       }, 1000);
+    } else if (activeBot) {
+      // 35% chance for bot to talk/react to player's check or capture
+      if (Math.random() < 0.35) {
+        setTimeout(() => {
+          let msg = '';
+          if (isCheck) {
+            const pool = [...activeBot.chatPools.blunder, ...activeBot.chatPools.lose];
+            msg = pool[Math.floor(Math.random() * pool.length)];
+          } else if (isCapture) {
+            const pool = activeBot.chatPools.blunder;
+            msg = pool[Math.floor(Math.random() * pool.length)];
+          } else {
+            const pool = [...activeBot.chatPools.lose, ...activeBot.chatPools.blunder];
+            msg = pool[Math.floor(Math.random() * pool.length)];
+          }
+          if (msg) {
+            sendChatMessage(activeBot.name, msg);
+          }
+        }, 1000);
+      }
     }
   };
 
@@ -723,6 +760,7 @@ export const Play: React.FC = () => {
                   </p>
                 </div>
               ))}
+              <div ref={chatEndRef} />
             </div>
 
             {/* Chat Send Form */}
@@ -899,26 +937,50 @@ export const Play: React.FC = () => {
             <div className="flex flex-col gap-3 mb-5">
               <label className="text-xs font-mono-clock text-text-muted uppercase tracking-wider">Time Control Presets</label>
               <div className="grid grid-cols-3 gap-2">
-                {[
-                  { id: '1+0', name: 'Bullet 1m' },
-                  { id: '3+0', name: 'Blitz 3m' },
-                  { id: '5+0', name: 'Blitz 5m' },
-                  { id: '10+0', name: 'Rapid 10m' },
-                  { id: '15+10', name: 'Rapid 15+10' },
-                  { id: 'custom', name: 'Custom' }
-                ].map(tc => (
-                  <button
-                    key={tc.id}
-                    onClick={() => setTimePreset(tc.id as any)}
-                    className={`py-2 px-3 border rounded-sm text-xs font-mono-clock uppercase transition-all ${
-                      timePreset === tc.id
-                        ? 'bg-text-primary text-bg-void border-text-primary font-bold'
-                        : 'bg-bg-void border-bg-border text-text-secondary hover:text-text-primary'
-                    }`}
-                  >
-                    {tc.name}
-                  </button>
-                ))}
+                {(() => {
+                  const standardPresets = [
+                    { id: '1+0', name: 'Bullet 1m' },
+                    { id: '3+0', name: 'Blitz 3m' },
+                    { id: '5+0', name: 'Blitz 5m' },
+                    { id: '10+0', name: 'Rapid 10m' },
+                    { id: '15+10', name: 'Rapid 15+10' }
+                  ];
+                  
+                  // Check if recommended time is standard
+                  const recommended = selectedBot.recommendedTime || '10+0';
+                  const isStandard = standardPresets.some(p => p.id === recommended);
+                  
+                  const presetsToRender = [...standardPresets];
+                  if (!isStandard && recommended !== 'custom') {
+                    const parts = recommended.split('+');
+                    const min = parseInt(parts[0], 10) || 10;
+                    const inc = parseInt(parts[1], 10) || 0;
+                    let cat = 'Blitz';
+                    if (min < 3) cat = 'Bullet';
+                    else if (min >= 10) cat = 'Rapid';
+                    
+                    presetsToRender.push({
+                      id: recommended,
+                      name: `Rec: ${cat} ${min}+${inc}`
+                    });
+                  }
+                  
+                  presetsToRender.push({ id: 'custom', name: 'Custom' });
+                  
+                  return presetsToRender.map(tc => (
+                    <button
+                      key={tc.id}
+                      onClick={() => setTimePreset(tc.id as any)}
+                      className={`py-2 px-3 border rounded-sm text-xs font-mono-clock uppercase transition-all ${
+                        timePreset === tc.id
+                          ? 'bg-text-primary text-bg-void border-text-primary font-bold'
+                          : 'bg-bg-void border-bg-border text-text-secondary hover:text-text-primary'
+                      }`}
+                    >
+                      {tc.name}
+                    </button>
+                  ));
+                })()}
               </div>
 
               {/* Custom Time inputs */}

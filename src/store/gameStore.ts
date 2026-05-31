@@ -118,6 +118,7 @@ interface GameState {
   flipBoard: () => void;
   resetAll: () => void;
   undoMove: () => boolean;
+  resetElo: () => void;
 
   // Analysis Mode actions
   loadFEN: (fen: string) => boolean;
@@ -233,15 +234,13 @@ export const useGameStore = create<GameState>((set, get) => {
       let minutes = 10;
       let inc = 0;
 
-      if (timeControl === '1+0') { minutes = 1; inc = 0; }
-      else if (timeControl === '3+0') { minutes = 3; inc = 0; }
-      else if (timeControl === '5+0') { minutes = 5; inc = 0; }
-      else if (timeControl === '10+0') { minutes = 10; inc = 0; }
-      else if (timeControl === '15+10') { minutes = 15; inc = 10; }
-      else if (timeControl === '30+0') { minutes = 30; inc = 0; }
-      else if (timeControl === 'custom') {
+      if (timeControl === 'custom') {
         minutes = customMinutes || 10;
         inc = customIncrement || 0;
+      } else if (timeControl.includes('+')) {
+        const parts = timeControl.split('+');
+        minutes = parseInt(parts[0], 10) || 10;
+        inc = parseInt(parts[1], 10) || 0;
       }
 
       const totalSec = minutes * 60;
@@ -573,6 +572,17 @@ export const useGameStore = create<GameState>((set, get) => {
         isGameActive: false,
         chatMessages: []
       });
+    },
+
+    resetElo: () => {
+      set({
+        userEloBlitz: 100,
+        userEloRapid: 100,
+        userEloBullet: 100
+      });
+      setStoredVal('userEloBlitz', 100);
+      setStoredVal('userEloRapid', 100);
+      setStoredVal('userEloBullet', 100);
     },
 
     undoMove: () => {

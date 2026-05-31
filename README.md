@@ -69,6 +69,19 @@ Built with React • TypeScript • Electron • Stockfish AI
 
 ---
 
+## Screenshots
+
+<img width="1465" height="852" alt="Screenshot 2026-05-31 at 11 41 31 PM" src="https://github.com/user-attachments/assets/4475ca10-cc8a-4dde-9c86-1bea8289c75d" />
+<img width="1464" height="854" alt="Screenshot 2026-05-31 at 11 43 16 PM" src="https://github.com/user-attachments/assets/45286183-0fe1-4dad-9498-2398105c279e" />
+<img width="1466" height="857" alt="Screenshot 2026-05-31 at 11 42 53 PM" src="https://github.com/user-attachments/assets/31a0224b-9ee4-407e-b8ac-e9fd8c152e10" />
+
+
+
+
+
+
+---
+
 ## 🏗️ Tech Stack
 
 | Layer | Technology |

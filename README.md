@@ -201,12 +201,14 @@ This project is licensed under the **GNU General Public License v3.0** — see t
 
 ## 🙏 Acknowledgments
 
+- Google Antigravity 
 - [Stockfish](https://stockfishchess.org/) — the world's strongest open-source chess engine
 - [chess.js](https://github.com/jhlywa/chess.js) — chess move validation and game logic
 - [react-chessboard](https://github.com/Clariity/react-chessboard) — beautiful React chessboard component
 - [Lucide](https://lucide.dev/) — premium open-source icons
 - [Google Fonts](https://fonts.google.com/) — Playfair Display, DM Sans, JetBrains Mono
-
+- https://github.com/satiricalguru
+- https://github.com/sourishnandy4-cell
 ---
 
 <div align="center">

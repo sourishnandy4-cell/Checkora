@@ -34,15 +34,6 @@ export const Learn: React.FC = () => {
     speechSynth.setGender(voiceGender);
   }, [voiceGender]);
 
-  useEffect(() => {
-    speechSynth.onLoadingStateChange = (loading) => {
-      setIsVoiceLoading(loading);
-    };
-    return () => {
-      speechSynth.onLoadingStateChange = null;
-    };
-  }, []);
-
   // Stop speech immediately when voice is disabled
   useEffect(() => {
     if (!isVoiceEnabled) {
@@ -487,11 +478,6 @@ export const Learn: React.FC = () => {
                       <span className="text-accent-red font-bold font-serif-header">Watch Out: </span>
                       {activeLesson.commonBlunder}
                     </p>
-                  </div>
-                )}
-                {isVoiceLoading && (
-                  <div className="text-[9px] text-accent-cyan animate-pulse mt-2 font-mono-clock">
-                    LOADING NEURAL VOICE MODEL... THIS MAY TAKE A MINUTE
                   </div>
                 )}
               </div>

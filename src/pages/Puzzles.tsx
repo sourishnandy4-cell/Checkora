@@ -4,6 +4,7 @@ import { Chess } from 'chess.js';
 import { Puzzle as PuzzleIcon, Flame, Heart, Clock, Check, AlertCircle, ArrowRight, RefreshCw, Layers, CheckCircle2, Lightbulb } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { playSound } from '../utils/audio';
+import { useChessOptions } from '../utils/useChessOptions';
 
 interface TacticalPuzzle {
   id: string;
@@ -112,9 +113,10 @@ export const Puzzles: React.FC = () => {
   useEffect(() => {
     setPuzzleChess(new Chess(currentPuzzle.fen));
     setPuzzleFen(currentPuzzle.fen);
+    setPuzzleFen(currentPuzzle.fen);
     setPuzzleStatus('solving');
     setHintActive(false);
-  }, [puzzleIndex, activeTab]);
+  }, [puzzleIndex, activeTab, currentPuzzle.fen]);
 
   // Puzzle Rush Timer Interval
   useEffect(() => {
@@ -196,6 +198,12 @@ export const Puzzles: React.FC = () => {
     return false;
   };
 
+  const { optionSquares, onSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(puzzleChess, onPieceDrop, puzzleStatus === 'solving');
+
+  useEffect(() => {
+    clearOptions();
+  }, [puzzleIndex, activeTab]);
+
   const handleNextPuzzle = () => {
     // Adaptive difficulty: find next unsolved puzzle with >= difficulty
     const unsolved = LOCAL_PUZZLES.filter(p => !solvedPuzzles.includes(p.id) && p.id !== currentPuzzle.id);
@@ -228,7 +236,7 @@ export const Puzzles: React.FC = () => {
     customDarkSquareStyle: { backgroundColor: 'var(--board-dark)' }
   };
 
-  const dynamicSquareStyles: any = {};
+  const dynamicSquareStyles: any = { ...optionSquares };
   if (hintActive && puzzleStatus === 'solving') {
     const fromSquare = currentPuzzle.solution.slice(0, 2);
     dynamicSquareStyles[fromSquare] = { backgroundColor: 'rgba(56, 189, 248, 0.45)' };
@@ -291,6 +299,9 @@ export const Puzzles: React.FC = () => {
                 boardWidth={452}
                 boardOrientation={currentPuzzle.playerColor}
                 arePiecesDraggable={puzzleStatus === 'solving'}
+                onSquareClick={onSquareClick}
+                onPieceDragBegin={onPieceDragBegin}
+                onPieceDragEnd={onPieceDragEnd}
                 customSquareStyles={dynamicSquareStyles}
                 customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                 customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
@@ -443,6 +454,9 @@ export const Puzzles: React.FC = () => {
                   boardWidth={412}
                   boardOrientation={currentPuzzle.playerColor}
                   arePiecesDraggable={puzzleStatus === 'solving'}
+                  onSquareClick={onSquareClick}
+                  onPieceDragBegin={onPieceDragBegin}
+                  onPieceDragEnd={onPieceDragEnd}
                   customSquareStyles={dynamicSquareStyles}
                   customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                   customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}

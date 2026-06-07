@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { BookOpen, Compass, ArrowLeft, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Compass, ArrowLeft, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { playSound } from '../utils/audio';
+import { useChessOptions } from '../utils/useChessOptions';
 
 interface LessonStep {
   num: number;
@@ -23,6 +24,8 @@ interface ChessLesson {
   percentCompleted: number;
   startFen?: string; // Optional custom starting board position
   playerColor?: 'white' | 'black'; // The side the user plays from
+  funFact?: string;
+  commonBlunder?: string;
 }
 
 const LESSON_DATABASE: ChessLesson[] = [
@@ -32,6 +35,8 @@ const LESSON_DATABASE: ChessLesson[] = [
     category: 'openings',
     difficulty: 'Beginner',
     description: 'Learn the oldest and most classic opening. Target the weak kingside f7 square.',
+    funFact: 'Also known as the Giuoco Piano, it dates back to the 16th century!',
+    commonBlunder: 'Beware of playing Ng5 too early without preparation; black can defend with d5 and counterattack.',
     stepsCount: 3,
     percentCompleted: 0,
     steps: [
@@ -46,6 +51,8 @@ const LESSON_DATABASE: ChessLesson[] = [
     category: 'openings',
     difficulty: 'Intermediate',
     description: 'Learn the Spanish Opening. Direct pressure on black\'s defending knight.',
+    funFact: 'Named after a 16th-century Spanish priest Ruy López de Segura, it is the most heavily analyzed opening.',
+    commonBlunder: 'Trading the bishop on b5 immediately for the c6 knight often just gives black the bishop pair advantage without enough compensation.',
     stepsCount: 3,
     percentCompleted: 0,
     steps: [
@@ -60,6 +67,8 @@ const LESSON_DATABASE: ChessLesson[] = [
     category: 'openings',
     difficulty: 'Advanced',
     description: 'Sacrifice a flank pawn to secure absolute control of the center.',
+    funFact: 'Popularized by the hit Netflix series \'The Queen\'s Gambit\', it is one of the oldest known openings.',
+    commonBlunder: 'Black shouldn\'t try to desperately hang onto the sacrificed c4 pawn with b5, as White can completely shatter their queenside.',
     stepsCount: 2,
     percentCompleted: 0,
     steps: [
@@ -73,6 +82,8 @@ const LESSON_DATABASE: ChessLesson[] = [
     category: 'openings',
     difficulty: 'Intermediate',
     description: 'The most popular and aggressive response to 1. e4 as Black.',
+    funFact: 'Statistically, the Sicilian scores better for Black than any other response to 1.e4.',
+    commonBlunder: 'Failing to control the d4 square as black can let white build an unstoppable central attack.',
     stepsCount: 3,
     percentCompleted: 0,
     playerColor: 'black',
@@ -89,6 +100,8 @@ const LESSON_DATABASE: ChessLesson[] = [
     category: 'openings',
     difficulty: 'Intermediate',
     description: 'A solid, resilient opening for Black that immediately challenges the center.',
+    funFact: 'It\'s named after a match played in 1834 between London and Paris!',
+    commonBlunder: 'Allowing white\'s light-squared bishop to freely attack the kingside can lead to a quick checkmate.',
     stepsCount: 2,
     percentCompleted: 0,
     playerColor: 'black',
@@ -189,15 +202,14 @@ const LESSON_DATABASE: ChessLesson[] = [
 export const Learn: React.FC = () => {
   const { completedLessons, markLessonCompleted } = useGameStore();
 
-  // Tabs: 'all' | 'openings' | 'tactics' | 'strategy'
   const [activeTab, setActiveTab] = useState<string>('all');
   
-  // Selected Lesson state (null if list mode, lesson object if active)
   const [activeLesson, setActiveLesson] = useState<ChessLesson | null>(null);
   const [activeStepIdx, setActiveStepIdx] = useState<number>(0);
   const [lessonChess, setLessonChess] = useState<Chess>(new Chess());
   const [lessonFen, setLessonFen] = useState<string>('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
   const [feedbackStatus, setFeedbackStatus] = useState<'solving' | 'correct' | 'complete'>('solving');
+  const [pendingOpponentMove, setPendingOpponentMove] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeLesson) {
@@ -206,21 +218,18 @@ export const Learn: React.FC = () => {
       setLessonFen(chess.fen());
       setActiveStepIdx(0);
       setFeedbackStatus('solving');
+      setPendingOpponentMove(null);
     }
   }, [activeLesson]);
 
-  const handleStartLesson = (lesson: ChessLesson) => {
-    setActiveLesson(lesson);
-  };
-
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
-    if (!activeLesson || feedbackStatus !== 'solving') return false;
+    if (!activeLesson || feedbackStatus !== 'solving' || pendingOpponentMove) return false;
 
     const currentStep = activeLesson.steps[activeStepIdx];
     const moveUci = `${sourceSquare}${targetSquare}`;
 
     if (moveUci.toLowerCase() !== currentStep.expectedMove.toLowerCase()) {
-      playSound.play('alarm'); // error pulse
+      playSound.play('alarm'); 
       return false;
     }
 
@@ -233,45 +242,21 @@ export const Learn: React.FC = () => {
       });
 
       if (moveResult) {
-        // Correct move made by player
         playSound.play('move');
         setLessonChess(tempChess);
         setLessonFen(tempChess.fen());
 
-        // Process opponent move (if exists in step)
         if (currentStep.opponentMove) {
-          setTimeout(() => {
-            const oppFrom = currentStep.opponentMove!.slice(0, 2);
-            const oppTo = currentStep.opponentMove!.slice(2, 4);
-            
-            tempChess.move({ from: oppFrom, to: oppTo });
-            
-            setLessonChess(new Chess(tempChess.fen()));
-            setLessonFen(tempChess.fen());
-            
-            playSound.play('move');
-
-            // Move to next step if possible
-            if (activeStepIdx + 1 < activeLesson.steps.length) {
-              setActiveStepIdx(prev => prev + 1);
-            } else {
-              setFeedbackStatus('complete');
-              playSound.play('win');
-              markLessonCompleted(activeLesson.id);
-            }
-          }, 900);
+          setPendingOpponentMove(currentStep.opponentMove);
         } else {
-          // If no opponent move, check if there are subsequent steps
           if (activeStepIdx + 1 < activeLesson.steps.length) {
             setActiveStepIdx(prev => prev + 1);
           } else {
-            // Final step of the lesson
             setFeedbackStatus('complete');
             playSound.play('win');
             markLessonCompleted(activeLesson.id);
           }
         }
-
         return true;
       }
     } catch (err) {
@@ -280,6 +265,43 @@ export const Learn: React.FC = () => {
 
     return false;
   };
+
+  const { optionSquares, onSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(lessonChess, onPieceDrop, feedbackStatus === 'solving' && !pendingOpponentMove);
+
+  useEffect(() => {
+    if (activeLesson) clearOptions();
+  }, [activeLesson]);
+
+  useEffect(() => {
+    if (pendingOpponentMove && activeLesson) {
+      const timer = setTimeout(() => {
+        const oppFrom = pendingOpponentMove.slice(0, 2);
+        const oppTo = pendingOpponentMove.slice(2, 4);
+        
+        try {
+          const tempChess = new Chess(lessonFen);
+          tempChess.move({ from: oppFrom, to: oppTo });
+          
+          setLessonChess(new Chess(tempChess.fen()));
+          setLessonFen(tempChess.fen());
+          playSound.play('move');
+
+          if (activeStepIdx + 1 < activeLesson.steps.length) {
+            setActiveStepIdx(prev => prev + 1);
+          } else {
+            setFeedbackStatus('complete');
+            playSound.play('win');
+            markLessonCompleted(activeLesson.id);
+          }
+        } catch (e) {
+          console.error('Opponent move failed', e);
+        }
+
+        setPendingOpponentMove(null);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingOpponentMove, lessonFen, activeStepIdx, activeLesson, markLessonCompleted]);
 
   const handleCloseLesson = () => {
     setActiveLesson(null);
@@ -402,9 +424,13 @@ export const Learn: React.FC = () => {
                   id="CoachBoard"
                   position={lessonFen}
                   onPieceDrop={onPieceDrop}
+                  onSquareClick={onSquareClick}
+                  onPieceDragBegin={onPieceDragBegin}
+                  onPieceDragEnd={onPieceDragEnd}
                   boardWidth={432}
                   boardOrientation={activeLesson.playerColor || 'white'}
-                  arePiecesDraggable={feedbackStatus === 'solving'}
+                  arePiecesDraggable={feedbackStatus === 'solving' && !pendingOpponentMove}
+                  customSquareStyles={optionSquares}
                   customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                   customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
                 />
@@ -472,6 +498,26 @@ export const Learn: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+                {activeLesson.funFact && (
+                  <div className="mt-2 bg-accent-amber/10 border border-accent-amber/30 p-3 rounded-sm flex items-start gap-2">
+                    <Lightbulb size={16} className="text-accent-amber shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                      <span className="text-accent-amber font-bold font-serif-header">Fun Fact: </span>
+                      {activeLesson.funFact}
+                    </p>
+                  </div>
+                )}
+                
+                {activeLesson.commonBlunder && (
+                  <div className="bg-accent-red/10 border border-accent-red/30 p-3 rounded-sm flex items-start gap-2">
+                    <AlertTriangle size={16} className="text-accent-red shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                      <span className="text-accent-red font-bold font-serif-header">Watch Out: </span>
+                      {activeLesson.commonBlunder}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Retry button */}

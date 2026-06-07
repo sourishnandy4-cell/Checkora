@@ -27,6 +27,7 @@ import { ambientAudio } from '../utils/ambientAudio';
 import { playSound } from '../utils/audio';
 import { useCampaignStore } from '../store/campaignStore';
 import { useMultiplayerStore } from '../store/multiplayerStore';
+import { useChessOptions } from '../utils/useChessOptions';
 
 export const Play: React.FC = () => {
   const navigate = useNavigate();
@@ -97,8 +98,7 @@ export const Play: React.FC = () => {
   const [promoMove, setPromoMove] = useState<{ from: string; to: string } | null>(null);
 
   // Square highlighting states
-  const [moveSquares, setMoveSquares] = useState<{ [square: string]: React.CSSProperties }>({});
-  const [rightClickedSquares, setRightClickedSquares] = useState<{ [square: string]: React.CSSProperties }>({});
+  const [rightClickedSquares, setRightClickedSquares] = useState<{ [square: string]: React.CSSProperties | undefined }>({});
   const [clickedSquare, setClickedSquare] = useState<string | null>(null);
 
   // Engine references
@@ -375,8 +375,7 @@ export const Play: React.FC = () => {
 
   // Handlers for piece drops
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
-    setMoveSquares({});
-    setClickedSquare(null);
+    clearOptions();
 
     if (!isGameActive || gameResult) return false;
     
@@ -451,54 +450,17 @@ export const Play: React.FC = () => {
     setPendingMove(null);
   };
 
-  function getMoveOptions(square: string) {
-    if (!showLegalMoves) return false;
-    const moves = chess.moves({ square, verbose: true });
-    if (moves.length === 0) {
-      setMoveSquares({});
-      return false;
-    }
+  const { optionSquares, onSquareClick: defaultSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
+    chess,
+    onPieceDrop,
+    !botThinkingRef.current && !gameResult && !pendingMove,
+    showLegalMoves
+  );
 
-    const newSquares: { [square: string]: React.CSSProperties } = {};
-    moves.map((move) => {
-      newSquares[move.to] = {
-        background:
-          chess.get(move.to as any) && chess.get(move.to as any)?.color !== chess.get(square as any)?.color
-            ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
-            : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
-        borderRadius: "50%"
-      };
-      return move;
-    });
-    newSquares[square] = {
-      background: "rgba(255, 255, 0, 0.4)",
-    };
-    setMoveSquares(newSquares);
-    return true;
-  }
-
-  function onSquareClick(square: string) {
-    if (botThinkingRef.current || gameResult || pendingMove) return;
+  const onSquareClick = (square: string) => {
     setRightClickedSquares({});
-
-    // From square
-    if (clickedSquare === null) {
-      const hasMoves = getMoveOptions(square);
-      if (hasMoves) setClickedSquare(square);
-      return;
-    }
-
-    // To square
-    const success = onPieceDrop(clickedSquare, square);
-    
-    if (!success) {
-      const hasMoves = getMoveOptions(square);
-      setClickedSquare(hasMoves ? square : null);
-    } else {
-      setClickedSquare(null);
-      setMoveSquares({});
-    }
-  }
+    defaultSquareClick(square);
+  };
 
   function onSquareRightClick(square: string) {
     const colour = "rgba(239, 68, 68, 0.8)";
@@ -715,8 +677,9 @@ export const Play: React.FC = () => {
                 onPieceDrop={onPieceDrop}
                 onPieceDragBegin={(piece, sourceSquare) => {
                   setRightClickedSquares({});
-                  getMoveOptions(sourceSquare);
+                  onPieceDragBegin(piece, sourceSquare);
                 }}
+                onPieceDragEnd={onPieceDragEnd}
                 onSquareClick={onSquareClick}
                 onSquareRightClick={onSquareRightClick}
                 boardWidth={boardSize}
@@ -759,7 +722,7 @@ export const Play: React.FC = () => {
                         ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
                       }
                     : {}),
-                  ...moveSquares,
+                  ...optionSquares,
                   ...rightClickedSquares
                 }}
               />

@@ -19,6 +19,7 @@ import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
+import { useChessOptions } from '../utils/useChessOptions';
 
 interface ChartPoint {
   move: number;
@@ -139,6 +140,18 @@ export const Analysis: React.FC = () => {
     }
     return false;
   };
+
+  const { optionSquares, onSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
+    analysisChess,
+    onPieceDrop,
+    true, // always allow in analysis
+    true
+  );
+
+  // Clear highlights if board state manually jumps
+  useEffect(() => {
+    clearOptions();
+  }, [fen]);
 
   // Navigations [◀◀] [◀] [▶] [▶▶]
   const handleJumpStart = () => {
@@ -378,10 +391,14 @@ export const Analysis: React.FC = () => {
                 id="AnalysisBoard"
                 position={fen}
                 onPieceDrop={onPieceDrop}
+                onSquareClick={onSquareClick}
+                onPieceDragBegin={onPieceDragBegin}
+                onPieceDragEnd={onPieceDragEnd}
                 boardWidth={boardSize}
                 boardOrientation={boardFlipped ? 'black' : 'white'}
                 arePiecesDraggable={true}
                 showBoardNotation={showCoordinates}
+                customSquareStyles={optionSquares}
                 customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                 customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
               />

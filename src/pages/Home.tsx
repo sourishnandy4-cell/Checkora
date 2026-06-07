@@ -145,8 +145,27 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* CENTER COLUMN: Quick play presets & daily puzzle (6 cols) */}
+        {/* CENTER COLUMN: Story mode, Quick play presets & daily puzzle (6 cols) */}
         <div className="lg:col-span-6 flex flex-col gap-6">
+          {/* Story Mode Banner */}
+          <div className="bg-bg-surface border border-bg-border p-6 rounded-sm relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6 group shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/10 via-transparent to-transparent pointer-events-none" />
+            <div className="z-10 text-center sm:text-left">
+              <h2 className="font-serif-header text-xl font-bold mb-1 flex items-center justify-center sm:justify-start gap-2 text-text-primary">
+                <Trophy size={20} className="text-accent-primary" /> Time Travel Campaign
+              </h2>
+              <p className="text-xs text-text-secondary max-w-sm leading-relaxed">
+                Battle through history against legends like Alexander the Great, Genghis Khan, and modern Masters!
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/campaign')}
+              className="premium-btn text-xs uppercase font-mono-clock py-3 px-6 z-10 shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 border-accent-primary transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+            >
+               Enter Story Mode <ArrowRight size={14} />
+            </button>
+          </div>
+
           {/* Quick Play Presets */}
           <div className="bg-bg-surface border border-bg-border p-6 rounded-sm">
             <h2 className="font-serif-header text-lg font-bold mb-4 flex items-center gap-2">

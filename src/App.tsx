@@ -17,6 +17,7 @@ import { Train } from './pages/Train';
 import { Analysis } from './pages/Analysis';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
+import { Campaign } from './pages/Campaign';
 
 const pageVariants = {
   initial: { opacity: 0, y: 10, scale: 0.99 },
@@ -81,6 +82,11 @@ const AnimatedRoutes: React.FC = () => {
         <Route path="/play" element={
           <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} className="absolute inset-0">
             <Play />
+          </motion.div>
+        } />
+        <Route path="/campaign" element={
+          <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} className="absolute inset-0">
+            <Campaign />
           </motion.div>
         } />
         <Route path="/puzzles" element={

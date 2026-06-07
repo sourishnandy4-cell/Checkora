@@ -86,6 +86,7 @@ interface GameState {
   gameOverReason: string; // 'checkmate', 'stalemate', 'draw-agreement', 'resignation', 'timeout'
   isGameActive: boolean;
   chatMessages: { sender: string; text: string; time: string }[];
+  campaignNodeId?: string; // Optional ID for campaign mode tracking
 
   // Statistics & History
   gameHistory: GameHistoryEntry[];
@@ -109,7 +110,7 @@ interface GameState {
 
   // Actions
   initGameStore: () => Promise<void>;
-  startNewGame: (bot: BotDefinition | null, timeControl: TimeControl, color: 'white' | 'black' | 'random', customMinutes?: number, customIncrement?: number) => void;
+  startNewGame: (bot: BotDefinition | null, timeControl: TimeControl, color: 'white' | 'black' | 'random', customMinutes?: number, customIncrement?: number, campaignNodeId?: string) => void;
   makeMove: (from: string, to: string, promotion?: string) => boolean;
   tickClocks: () => void;
   resignGame: () => void;
@@ -189,6 +190,7 @@ export const useGameStore = create<GameState>((set, get) => {
     gameOverReason: '',
     isGameActive: false,
     chatMessages: [],
+    campaignNodeId: undefined,
 
     gameHistory: [],
     userEloBlitz: 100,
@@ -225,7 +227,7 @@ export const useGameStore = create<GameState>((set, get) => {
       });
     },
 
-    startNewGame: (bot, timeControl, color, customMinutes, customIncrement) => {
+    startNewGame: (bot, timeControl, color, customMinutes, customIncrement, campaignNodeId) => {
       const chess = new Chess();
       let selectedColor: 'white' | 'black' = color === 'random' 
         ? (Math.random() < 0.5 ? 'white' : 'black') 
@@ -263,7 +265,8 @@ export const useGameStore = create<GameState>((set, get) => {
         gameResult: null,
         gameOverReason: '',
         isGameActive: true,
-        chatMessages: initialChat
+        chatMessages: initialChat,
+        campaignNodeId
       });
     },
 
@@ -570,7 +573,8 @@ export const useGameStore = create<GameState>((set, get) => {
         gameResult: null,
         gameOverReason: '',
         isGameActive: false,
-        chatMessages: []
+        chatMessages: [],
+        campaignNodeId: undefined
       });
     },
 

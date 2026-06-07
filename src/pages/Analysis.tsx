@@ -26,7 +26,7 @@ interface ChartPoint {
 }
 
 export const Analysis: React.FC = () => {
-  const { showCoordinates } = useSettingsStore();
+  const { showCoordinates, pieceSet } = useSettingsStore();
 
   // Chess Board state
   const [analysisChess, setAnalysisChess] = useState<Chess>(new Chess());
@@ -373,7 +373,7 @@ export const Analysis: React.FC = () => {
           <div className="w-full max-w-[500px] flex flex-col gap-4">
             
             {/* Chessboard frame */}
-            <div ref={boardContainerRef} className="w-full aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
                 id="AnalysisBoard"
                 position={fen}

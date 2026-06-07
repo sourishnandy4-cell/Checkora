@@ -15,6 +15,8 @@ const THEMES = [
   { id: 'ocean',   name: 'Ocean',   preview: ['#060F1E', '#BFDDEE', '#143054', '#38BDF8'] },
   { id: 'crimson', name: 'Crimson', preview: ['#180A0C', '#F5E8D8', '#6B1A22', '#F87171'] },
   { id: 'aurora',  name: 'Aurora',  preview: ['#0D0A1C', '#DDD6F3', '#2B1D5E', '#A78BFA'] },
+  { id: 'wooden',  name: 'Wooden',  preview: ['#1C1511', '#E1C699', '#965D37', '#D4A373'] },
+  { id: 'walnut',  name: 'Walnut',  preview: ['#110E0C', '#D2B48C', '#5C4033', '#A67B5B'] },
 ] as const;
 
 export const Settings: React.FC = () => {
@@ -107,7 +109,7 @@ export const Settings: React.FC = () => {
               <Gamepad2 size={14} /> Board Piece Sets
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-              {(['classic', 'neo', 'alpha', 'maya', 'bases'] as PieceSetId[]).map((set) => (
+              {(['classic', 'neo', 'alpha', 'maya', 'bases', 'wooden-pieces'] as PieceSetId[]).map((set) => (
                 <button
                   key={set}
                   onClick={() => setPieceSet(set)}

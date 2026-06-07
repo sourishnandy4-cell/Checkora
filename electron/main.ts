@@ -18,6 +18,7 @@ function createWindow() {
     minHeight: 650,
     frame: false, // frameless window
     backgroundColor: '#000000',
+    icon: path.join(__dirname, '../public/icon.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,

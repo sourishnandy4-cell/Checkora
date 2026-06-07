@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
-export type ThemeId = 'mono' | 'forest' | 'ocean' | 'crimson' | 'aurora';
-export type PieceSetId = 'classic' | 'neo' | 'alpha' | 'maya' | 'bases';
+export type ThemeId = 'mono' | 'forest' | 'ocean' | 'crimson' | 'aurora' | 'wooden' | 'walnut';
+export type PieceSetId = 'classic' | 'neo' | 'alpha' | 'maya' | 'bases' | 'wooden-pieces';
 
 interface SettingsState {
   theme: ThemeId;

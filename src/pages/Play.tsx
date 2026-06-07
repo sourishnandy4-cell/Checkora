@@ -16,12 +16,14 @@ import {
   Undo2
 } from 'lucide-react';
 import { useGameStore, TimeControl, getTcCategory } from '../store/gameStore';
+import { useNavigate } from 'react-router-dom';
 import { useSettingsStore } from '../store/settingsStore';
 import { BOTS, BotDefinition } from '../data/bots';
-import { StockfishEngine } from '../engine/stockfish';
+import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
 
 export const Play: React.FC = () => {
+  const navigate = useNavigate();
   // Navigation & Screen Control
   const { 
     chess,
@@ -57,7 +59,8 @@ export const Play: React.FC = () => {
     playerName,
     confirmMoves,
     autoPromoteToQueen,
-    playerAvatar
+    playerAvatar,
+    pieceSet
   } = useSettingsStore();
 
   // Local Pre-game Picker states
@@ -84,6 +87,42 @@ export const Play: React.FC = () => {
   const engineRef = useRef<StockfishEngine | null>(null);
   const clockIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const botThinkingRef = useRef(false);
+
+  // Engine evaluation states for the real-time Eval Bar
+  const evalEngineRef = useRef<StockfishEngine | null>(null);
+  const [evalData, setEvalData] = useState<EngineEvaluation>({ depth: 0, score: 0 });
+
+  useEffect(() => {
+    evalEngineRef.current = new StockfishEngine();
+    return () => {
+      if (evalEngineRef.current) evalEngineRef.current.terminate();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isGameActive || !evalEngineRef.current) return;
+    evalEngineRef.current.stop();
+    evalEngineRef.current.evaluatePosition(fen, 14, (evaluation) => {
+      setEvalData(evaluation);
+    });
+  }, [fen, isGameActive]);
+
+  const getEvalBarPercentage = () => {
+    if (evalData.mateIn) {
+      return evalData.mateIn > 0 ? 100 : 0;
+    }
+    const score = evalData.score;
+    const percentage = 50 + (score * 10);
+    return Math.min(100, Math.max(0, percentage));
+  };
+  const whitePercent = getEvalBarPercentage();
+  const formatEvalText = () => {
+    if (evalData.mateIn) {
+      return `M${Math.abs(evalData.mateIn)}`;
+    }
+    const val = evalData.score;
+    return val >= 0 ? `+${val.toFixed(1)}` : val.toFixed(1);
+  };
 
   // Responsive board size
   const boardContainerRef = useRef<HTMLDivElement>(null);
@@ -403,10 +442,7 @@ export const Play: React.FC = () => {
 
   // Bot Filtering
   const filteredBots = BOTS.filter(bot => {
-    const isCelebrity = bot.isImageAvatar === true;
-    const matchesTier = activeTier === 'All' 
-      || (activeTier === 'Celebrity' && isCelebrity)
-      || (!isCelebrity && bot.tier === activeTier);
+    const matchesTier = activeTier === 'All' || bot.tier === activeTier;
     const matchesSearch = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           bot.style.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
                           bot.tier.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -512,8 +548,22 @@ export const Play: React.FC = () => {
               </div>
             </div>
 
+            {/* EVAL BAR + BOARD WRAPPER */}
+            <div className="flex w-full gap-2 lg:gap-4 relative">
+              {/* EVAL BAR */}
+              <div className="w-4 lg:w-6 rounded-sm bg-bg-surface border border-bg-border relative flex flex-col items-center justify-center select-none shrink-0 overflow-hidden shadow-xl hidden md:flex">
+                <div className="absolute inset-0 bg-zinc-900" />
+                <div 
+                  style={{ height: `${whitePercent}%` }}
+                  className="absolute bottom-0 left-0 right-0 bg-zinc-100 transition-all duration-500 ease-out" 
+                />
+                <span className="z-10 font-mono-clock text-[9px] font-bold px-1 py-0.5 rounded-sm mix-blend-difference text-white absolute top-2">
+                  {formatEvalText()}
+                </span>
+              </div>
+
             {/* INTERACTIVE CHESS BOARD */}
-            <div ref={boardContainerRef} className="w-full aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+            <div ref={boardContainerRef} data-pieces={pieceSet} className="flex-1 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}
@@ -597,17 +647,30 @@ export const Play: React.FC = () => {
                       Rematch
                     </button>
                     <button
-                      onClick={() => useGameStore.getState().resetAll()}
-                      className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase bg-bg-border"
-                    >
-                      Bot Picker
-                    </button>
+              onClick={() => {
+                useGameStore.getState().resetAll();
+              }}
+              className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock"
+            >
+              Play Again
+            </button>
+            <button
+              onClick={() => {
+                const currentPgn = chess.pgn();
+                useGameStore.getState().loadPGN(currentPgn);
+                navigate('/analysis');
+              }}
+              className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock mt-2 bg-bg-surface hover:text-accent-cyan transition-colors"
+            >
+              Review Game
+            </button>
                   </div>
                 </div>
               )}
             </div>
+            </div>
 
-            {/* WHITE PLAYER BAR */}
+            {/* OPPONENT BAR (BOTTOM) */}
             <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
               isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
             }`}>
@@ -786,7 +849,7 @@ export const Play: React.FC = () => {
   }
 
   // PRE-GAME BOT PICKER SCREEN
-  const botTiers = ['All', 'Celebrity', 'Beginner', 'Casual', 'Intermediate', 'Advanced', 'Expert', 'Master', 'Legend'];
+  const botTiers = ['All', 'Celebrity', 'Leaders', 'Luminaries', 'Beginner', 'Casual', 'Intermediate', 'Advanced', 'Expert', 'Master', 'Legend'];
 
   return (
     <div className="w-full h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
@@ -865,7 +928,7 @@ export const Play: React.FC = () => {
               <div>
                 <h3 className="font-serif-header text-md font-bold tracking-tight text-text-primary">{bot.name}</h3>
                 <span className="text-[10px] font-mono-clock uppercase text-text-muted tracking-wider">
-                  {bot.isImageAvatar ? '⭐ Celebrity' : bot.tier} Opponent
+                  {bot.tier} Opponent
                 </span>
               </div>
 

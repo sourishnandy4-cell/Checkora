@@ -221,6 +221,70 @@ html[data-theme="aurora"] {
   --glow-md: 0 0 20px rgba(167,139,250,0.08);
 }
 
+html[data-theme="wooden"] {
+  --bg-void:       #130E0B;
+  --bg-base:       #1C1511;
+  --bg-surface:    #261D18;
+  --bg-elevated:   #342921;
+  --bg-border:     #4D3D32;
+  --text-primary:  #F2EBE5;
+  --text-secondary:#BFA997;
+  --text-muted:    #806E61;
+  
+  --board-light:   #E1C699;   /* light oak */
+  --board-dark:    #965D37;   /* dark oak */
+  
+  --accent-primary:#D4A373;   /* wood accent */
+  --accent-green:  #4ADE80;
+  --accent-cyan:   #38BDF8;
+  --accent-amber:  #FBBF24;
+  --accent-red:    #F87171;
+  --nav-bg:        #130E0B;
+  --sidebar-bg:    #18120E;
+
+  --move-brilliant:  #38BDF8;
+  --move-best:       #4ADE80;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FBBF24;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #F87171;
+
+  --glow-sm: 0 0 8px rgba(212,163,115,0.12);
+  --glow-md: 0 0 20px rgba(212,163,115,0.08);
+}
+
+html[data-theme="walnut"] {
+  --bg-void:       #0A0807;
+  --bg-base:       #110E0C;
+  --bg-surface:    #1A1513;
+  --bg-elevated:   #251E1A;
+  --bg-border:     #3B312B;
+  --text-primary:  #E8E4E1;
+  --text-secondary:#A69B95;
+  --text-muted:    #69605A;
+  
+  --board-light:   #D2B48C;   /* tan / light walnut */
+  --board-dark:    #5C4033;   /* dark brown walnut */
+  
+  --accent-primary:#A67B5B;   /* walnut accent */
+  --accent-green:  #4ADE80;
+  --accent-cyan:   #22D3EE;
+  --accent-amber:  #FBBF24;
+  --accent-red:    #F87171;
+  --nav-bg:        #0A0807;
+  --sidebar-bg:    #0F0C0B;
+
+  --move-brilliant:  #22D3EE;
+  --move-best:       #4ADE80;
+  --move-good:       #86EFAC;
+  --move-inaccuracy: #FBBF24;
+  --move-mistake:    #FB923C;
+  --move-blunder:    #F87171;
+
+  --glow-sm: 0 0 8px rgba(166,123,91,0.12);
+  --glow-md: 0 0 20px rgba(166,123,91,0.08);
+}
+
 /* ══════════════════════════════════════════════════════════════
    GLOBAL STYLES & INTERACTION STYLES
    ══════════════════════════════════════════════════════════════ */
@@ -400,4 +464,15 @@ p, blockquote {
 
 .animate-fade-in {
   animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Custom Piece Sets */
+[data-pieces="wooden-pieces"] .cm-piece {
+  filter: sepia(0.7) saturate(2.5) hue-rotate(-25deg) contrast(1.2) brightness(0.85);
+}
+[data-pieces="neo"] .cm-piece {
+  filter: hue-rotate(180deg) saturate(1.5);
+}
+[data-pieces="maya"] .cm-piece {
+  filter: sepia(0.5) hue-rotate(30deg) saturate(2);
 }

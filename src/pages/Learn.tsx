@@ -21,6 +21,7 @@ interface ChessLesson {
   steps: LessonStep[];
   percentCompleted: number;
   startFen?: string; // Optional custom starting board position
+  playerColor?: 'white' | 'black'; // The side the user plays from
 }
 
 const LESSON_DATABASE: ChessLesson[] = [
@@ -63,6 +64,67 @@ const LESSON_DATABASE: ChessLesson[] = [
     steps: [
       { num: 1, expectedMove: 'd2d4', instruction: 'Play d4 to claim central control of d4/e5 squares.' },
       { num: 2, expectedMove: 'c2c4', opponentMove: 'd7d5', instruction: 'Black matches with d5. Offer your c4 pawn in sacrifice to draw away black\'s center control!' }
+    ]
+  },
+  {
+    id: 'l8',
+    name: 'Sicilian Defense',
+    category: 'openings',
+    difficulty: 'Intermediate',
+    description: 'The most popular and aggressive response to 1. e4 as Black.',
+    stepsCount: 3,
+    percentCompleted: 0,
+    playerColor: 'black',
+    startFen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+    steps: [
+      { num: 1, expectedMove: 'c7c5', opponentMove: 'g1f3', instruction: 'White opened with e4. Respond with c5 to fight for the d4 square from the flank!' },
+      { num: 2, expectedMove: 'd7d6', opponentMove: 'd2d4', instruction: 'White develops their knight. Play d6 to control squares and prepare development.' },
+      { num: 3, expectedMove: 'c5d4', instruction: 'White strikes in the center with d4! Capture it with your c-pawn to eliminate their central pawn.' }
+    ]
+  },
+  {
+    id: 'l9',
+    name: 'French Defense',
+    category: 'openings',
+    difficulty: 'Intermediate',
+    description: 'A solid, resilient opening for Black that immediately challenges the center.',
+    stepsCount: 2,
+    percentCompleted: 0,
+    playerColor: 'black',
+    startFen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+    steps: [
+      { num: 1, expectedMove: 'e7e6', opponentMove: 'd2d4', instruction: 'White plays e4. Play e6 to prepare a solid pawn chain and support d5.' },
+      { num: 2, expectedMove: 'd7d5', opponentMove: 'e4e5', instruction: 'White claims more space with d4. Strike back immediately in the center with d5!' }
+    ]
+  },
+  {
+    id: 'l10',
+    name: 'Caro-Kann Defense',
+    category: 'openings',
+    difficulty: 'Advanced',
+    description: 'Similar to the French, but allows your light-squared bishop to remain active.',
+    stepsCount: 2,
+    percentCompleted: 0,
+    playerColor: 'black',
+    startFen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+    steps: [
+      { num: 1, expectedMove: 'c7c6', opponentMove: 'd2d4', instruction: 'White plays e4. Play c6 to prepare d5 without blocking your light-squared bishop.' },
+      { num: 2, expectedMove: 'd7d5', opponentMove: 'b1c3', instruction: 'White plays d4. Challenge the center with d5!' }
+    ]
+  },
+  {
+    id: 'l11',
+    name: 'London System',
+    category: 'openings',
+    difficulty: 'Beginner',
+    description: 'A solid, systematic opening for White that can be played against almost anything.',
+    stepsCount: 3,
+    percentCompleted: 0,
+    playerColor: 'white',
+    steps: [
+      { num: 1, expectedMove: 'd2d4', opponentMove: 'd7d5', instruction: 'Start by claiming the center with your d-pawn.' },
+      { num: 2, expectedMove: 'c1f4', opponentMove: 'g8f6', instruction: 'Develop your dark-squared bishop to f4 outside the pawn chain. This is the hallmark of the London System.' },
+      { num: 3, expectedMove: 'e2e3', opponentMove: 'e7e6', instruction: 'Solidify your center with e3. You now have a very difficult structure to break!' }
     ]
   },
   {
@@ -335,7 +397,7 @@ export const Learn: React.FC = () => {
                   position={lessonFen}
                   onPieceDrop={onPieceDrop}
                   boardWidth={432}
-                  boardOrientation="white"
+                  boardOrientation={activeLesson.playerColor || 'white'}
                   arePiecesDraggable={feedbackStatus === 'solving'}
                   customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                   customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}

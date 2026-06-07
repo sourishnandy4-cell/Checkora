@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import * as path from 'path';
 
 // Import electron-store dynamically to avoid potential ESM/CJS transpilation issues
@@ -50,6 +51,11 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
+
+  // Check for auto-updates when app is ready (only in packaged mode)
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

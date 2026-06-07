@@ -29,11 +29,16 @@
     "build:renderer": "vite build",
     "build:main": "tsc electron/main.ts electron/preload.ts --outDir dist-electron --target es2022 --module commonjs --skipLibCheck",
     "build": "npm run build:renderer && npm run build:main",
-    "start": "npm run build && electron ."
+    "start": "npm run build && electron .",
+    "make": "npm run build && electron-builder"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/ios": "^8.4.0",
     "chess.js": "^1.0.0-beta.6",
     "electron-store": "^8.2.0",
+    "electron-updater": "^6.8.9",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",
     "peerjs": "^1.5.5",
@@ -45,16 +50,48 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.0",
     "@tailwindcss/vite": "^4.0.0-alpha.18",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "concurrently": "^8.2.2",
     "electron": "^31.0.0",
+    "electron-builder": "^26.15.0",
     "tailwindcss": "^4.0.0-alpha.18",
     "typescript": "^5.4.5",
     "vite": "^5.2.11"
   },
   "author": "sourishnandy4-cell",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "build": {
+    "appId": "com.checkora.app",
+    "productName": "Checkora",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "sourishnandy4-cell",
+        "repo": "Checkora"
+      }
+    ]
+  }
 }

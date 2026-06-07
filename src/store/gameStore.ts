@@ -468,13 +468,13 @@ export const useGameStore = create<GameState>()(
         else if (tcCat === 'blitz') currentElo = get().userEloBlitz;
         else if (tcCat === 'bullet') currentElo = get().userEloBullet;
 
-        const change = calculateEloChange(currentElo, activeElo, 'D', get().gameHistory.length);
+        const change = calculateEloChange(currentElo, oppElo, 'D', get().gameHistory.length);
 
         const newHistoryEntry: GameHistoryEntry = {
           id: Date.now().toString(),
           date: new Date().toISOString().split('T')[0],
           opponent: activeOpponent,
-          opponentElo: activeElo,
+          opponentElo: oppElo,
           timeControl: get().timeControl,
           playerColor,
           result: 'D',

@@ -6,6 +6,7 @@ import { TitleBar } from './components/TitleBar';
 import { NavigationRail } from './components/NavigationRail';
 import { BottomNavigation } from './components/BottomNavigation';
 import { StatusBar } from './components/StatusBar';
+import { MultiplayerModal } from './components/MultiplayerModal';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Page Imports
@@ -173,6 +174,7 @@ export const App: React.FC = () => {
             </div>
           </div>
           <StatusBar />
+          <MultiplayerModal />
         </div>
       </HashRouter>
     </ErrorBoundary>

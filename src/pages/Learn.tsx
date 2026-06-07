@@ -5,6 +5,8 @@ import { BookOpen, Compass, ArrowLeft, ArrowRight, RefreshCw, CheckCircle2, Aler
 import { useGameStore } from '../store/gameStore';
 import { playSound } from '../utils/audio';
 import { useChessOptions } from '../utils/useChessOptions';
+import { StockfishEngine } from '../engine/stockfish';
+import { speechSynth } from '../utils/speech';
 
 import { ChessLesson, LESSON_DATABASE } from '../data/lessons';
 
@@ -21,6 +23,41 @@ export const Learn: React.FC = () => {
   const [lessonFen, setLessonFen] = useState<string>('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
   const [feedbackStatus, setFeedbackStatus] = useState<'solving' | 'correct' | 'complete'>('solving');
   const [pendingOpponentMove, setPendingOpponentMove] = useState<string | null>(null);
+  
+  const engineRef = React.useRef<StockfishEngine | null>(null);
+  const [coachMessage, setCoachMessage] = useState<string | null>(null);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [voiceGender, setVoiceGender] = useState<'male' | 'female'>('female');
+  const [isVoiceLoading, setIsVoiceLoading] = useState(false);
+
+  useEffect(() => {
+    speechSynth.setGender(voiceGender);
+  }, [voiceGender]);
+
+  useEffect(() => {
+    speechSynth.onLoadingStateChange = (loading) => {
+      setIsVoiceLoading(loading);
+    };
+    return () => {
+      speechSynth.onLoadingStateChange = null;
+    };
+  }, []);
+
+  // Stop speech immediately when voice is disabled
+  useEffect(() => {
+    if (!isVoiceEnabled) {
+      speechSynth.stop();
+    }
+  }, [isVoiceEnabled]);
+
+  // Initialize analysis engine
+  useEffect(() => {
+    engineRef.current = new StockfishEngine();
+    return () => {
+      if (engineRef.current) engineRef.current.terminate();
+      speechSynth.stop();
+    };
+  }, []);
 
   useEffect(() => {
     if (activeLesson) {
@@ -30,8 +67,14 @@ export const Learn: React.FC = () => {
       setActiveStepIdx(0);
       setFeedbackStatus('solving');
       setPendingOpponentMove(null);
+      setCoachMessage(null);
+      speechSynth.stop();
+      
+      if (isVoiceEnabled && activeLesson.steps.length > 0) {
+        setTimeout(() => speechSynth.speak(activeLesson.steps[0].instruction), 500);
+      }
     }
-  }, [activeLesson]);
+  }, [activeLesson]); // Re-run if activeLesson changes, intentionally left out isVoiceEnabled to avoid re-speaking on toggle
 
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
     if (!activeLesson || feedbackStatus !== 'solving' || pendingOpponentMove) return false;
@@ -41,6 +84,42 @@ export const Learn: React.FC = () => {
 
     if (moveUci.toLowerCase() !== currentStep.expectedMove.toLowerCase()) {
       playSound.play('alarm'); 
+      
+      try {
+        const tempChess = new Chess(lessonFen);
+        const moveResult = tempChess.move({
+          from: sourceSquare,
+          to: targetSquare,
+          promotion: 'q'
+        });
+
+        if (moveResult && engineRef.current) {
+          setCoachMessage('Analyzing your move...');
+          
+          engineRef.current.stop();
+          // Give Stockfish depth 10 to evaluate quickly
+          engineRef.current.evaluatePosition(tempChess.fen(), 10, (evaluation) => {
+            if (evaluation.depth >= 10 || evaluation.mateIn) {
+              engineRef.current?.stop();
+              
+              const evalText = evaluation.mateIn 
+                ? `Mate in ${Math.abs(evaluation.mateIn)}` 
+                : `${evaluation.score > 0 ? '+' : ''}${evaluation.score.toFixed(1)}`;
+                
+              const msg = `You played ${moveResult.san}. Stockfish evaluates this at ${evalText}. This is incorrect! The expected move was ${currentStep.expectedMove.slice(0, 2)} to ${currentStep.expectedMove.slice(2, 4)}.`;
+              
+              setCoachMessage(msg);
+              if (isVoiceEnabled) {
+                speechSynth.speak(`You played ${moveResult.san}. This is incorrect. ${currentStep.instruction}`);
+              }
+            }
+          });
+        }
+      } catch (err) {
+        setCoachMessage("That is an illegal move.");
+        if (isVoiceEnabled) speechSynth.speak("That is an illegal move.");
+      }
+
       return false;
     }
 
@@ -56,16 +135,24 @@ export const Learn: React.FC = () => {
         playSound.play('move');
         setLessonChess(tempChess);
         setLessonFen(tempChess.fen());
+        setCoachMessage(null);
+        speechSynth.stop();
 
         if (currentStep.opponentMove) {
           setPendingOpponentMove(currentStep.opponentMove);
         } else {
           if (activeStepIdx + 1 < activeLesson.steps.length) {
             setActiveStepIdx(prev => prev + 1);
+            if (isVoiceEnabled) {
+              speechSynth.speak(activeLesson.steps[activeStepIdx + 1].instruction);
+            }
           } else {
             setFeedbackStatus('complete');
             playSound.play('win');
             markLessonCompleted(activeLesson.id);
+            if (isVoiceEnabled) {
+              speechSynth.speak("Outstanding! You have completed the lesson.");
+            }
           }
         }
         return true;
@@ -100,10 +187,16 @@ export const Learn: React.FC = () => {
 
           if (activeStepIdx + 1 < activeLesson.steps.length) {
             setActiveStepIdx(prev => prev + 1);
+            if (isVoiceEnabled) {
+              speechSynth.speak(activeLesson.steps[activeStepIdx + 1].instruction);
+            }
           } else {
             setFeedbackStatus('complete');
             playSound.play('win');
             markLessonCompleted(activeLesson.id);
+            if (isVoiceEnabled) {
+              speechSynth.speak("Outstanding! You have completed the lesson.");
+            }
           }
         } catch (e) {
           console.error('Opponent move failed', e);
@@ -126,6 +219,11 @@ export const Learn: React.FC = () => {
       setLessonFen(chess.fen());
       setActiveStepIdx(0);
       setFeedbackStatus('solving');
+      setCoachMessage(null);
+      speechSynth.stop();
+      if (isVoiceEnabled && activeLesson.steps.length > 0) {
+        setTimeout(() => speechSynth.speak(activeLesson.steps[0].instruction), 500);
+      }
     }
   };
 
@@ -303,16 +401,45 @@ export const Learn: React.FC = () => {
             {/* Right side: Instructions card */}
             <div className="lg:col-span-5 bg-bg-surface border border-bg-border p-6 rounded-sm self-stretch flex flex-col justify-between">
               <div className="flex flex-col gap-5">
-                <div className="flex items-center gap-1.5">
-                  <Compass size={16} className="text-accent-cyan" />
-                  <span className="text-[10px] font-mono-clock uppercase text-text-muted tracking-wider">Coach Instructions</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Compass size={16} className="text-accent-cyan" />
+                    <span className="text-[10px] font-mono-clock uppercase text-text-muted tracking-wider">Coach Instructions</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setVoiceGender(voiceGender === 'male' ? 'female' : 'male')}
+                      className="text-[10px] uppercase font-mono-clock px-2 py-1 rounded-sm border bg-bg-void text-text-muted border-bg-border hover:text-text-primary transition-colors"
+                    >
+                      {voiceGender === 'male' ? 'Male Voice' : 'Female Voice'}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (isVoiceEnabled) speechSynth.stop();
+                        setIsVoiceEnabled(!isVoiceEnabled);
+                      }}
+                      className={`text-[10px] uppercase font-mono-clock px-2 py-1 rounded-sm border transition-colors ${isVoiceEnabled ? 'bg-accent-green/10 text-accent-green border-accent-green/30' : 'bg-bg-void text-text-muted border-bg-border'}`}
+                    >
+                      Voice: {isVoiceEnabled ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="w-full border-t border-bg-border" />
 
-                <p className="text-xs text-text-primary leading-relaxed bg-bg-void/50 border border-bg-border p-4 rounded-sm">
+                <p className="text-xs text-text-primary leading-relaxed bg-bg-void/50 border border-bg-border p-4 rounded-sm shadow-inner">
                   {activeLesson.steps[activeStepIdx].instruction}
                 </p>
+
+                {coachMessage && (
+                  <div className="bg-accent-amber/10 border border-accent-amber/30 p-3 rounded-sm flex items-start gap-2 animate-fade-in">
+                    <AlertTriangle size={16} className="text-accent-amber shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                      <span className="text-accent-amber font-bold font-serif-header">Feedback: </span>
+                      {coachMessage}
+                    </p>
+                  </div>
+                )}
 
                 {/* Progress Dot Indicators */}
                 <div className="flex flex-col gap-2 mt-4 select-none">
@@ -360,6 +487,11 @@ export const Learn: React.FC = () => {
                       <span className="text-accent-red font-bold font-serif-header">Watch Out: </span>
                       {activeLesson.commonBlunder}
                     </p>
+                  </div>
+                )}
+                {isVoiceLoading && (
+                  <div className="text-[9px] text-accent-cyan animate-pulse mt-2 font-mono-clock">
+                    LOADING NEURAL VOICE MODEL... THIS MAY TAKE A MINUTE
                   </div>
                 )}
               </div>

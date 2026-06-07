@@ -788,7 +788,7 @@ export const Play: React.FC = () => {
               onClick={() => {
                 const currentPgn = chess.pgn();
                 useGameStore.getState().loadPGN(currentPgn);
-                navigate('/analysis');
+                navigate('/analysis', { state: { pgn: currentPgn } });
               }}
               className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock mt-2 bg-bg-surface hover:text-accent-cyan transition-colors"
             >

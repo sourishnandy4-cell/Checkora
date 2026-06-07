@@ -1,3 +1,5 @@
+import { EXTENDED_LESSONS } from './extendedLessons';
+
 export interface LessonStep {
   num: number;
   instruction: string;
@@ -209,5 +211,80 @@ export const LESSON_DATABASE: ChessLesson[] = [
       { num: 4, expectedMove: 'g8f6', opponentMove: 'g1e2', instruction: 'White retreats the Queen to f3, renewing the threat of checkmate on f7. Develop your Kingside Knight to f6, physically blocking the Queen\'s path to f7.' },
       { num: 5, expectedMove: 'f8g7', instruction: 'White gives up on the cheap tricks and develops a Knight. Play Bg7. You have successfully defended, gained free development tempos, and White\'s Queen looks incredibly silly on f3!' }
     ]
-  }
+  },
+  {
+    id: 'l10',
+    name: 'Evans Gambit: Accepted',
+    category: 'openings',
+    difficulty: 'Advanced',
+    description: 'Sacrifice a wing pawn in the Italian Game to build an overwhelming center and vicious attack.',
+    funFact: 'Garry Kasparov used the Evans Gambit to crush Vishy Anand in 25 moves during a famous 1995 game.',
+    commonBlunder: 'Do not rush the attack. The point of the gambit is long-term compensation through central control and open lines, not necessarily a quick checkmate.',
+    stepsCount: 12,
+    percentCompleted: 0,
+    steps: [
+      { num: 1, expectedMove: 'e2e4', opponentMove: 'e7e5', instruction: 'Start with e4, claiming the center.' },
+      { num: 2, expectedMove: 'g1f3', opponentMove: 'b8c6', instruction: 'Develop your Knight, attacking e5.' },
+      { num: 3, expectedMove: 'f1c4', opponentMove: 'f8c5', instruction: 'The Italian Game. Aim your Bishop at f7.' },
+      { num: 4, expectedMove: 'b2b4', opponentMove: 'c5b4', instruction: 'BOOM! The Evans Gambit! You sacrifice a pawn to draw Black\'s Bishop to a vulnerable square.' },
+      { num: 5, expectedMove: 'c2c3', opponentMove: 'b4a5', instruction: 'Kick the Bishop with c3. You gain a tempo to prepare a massive center.' },
+      { num: 6, expectedMove: 'd2d4', opponentMove: 'e5d4', instruction: 'Strike in the center immediately with d4!' },
+      { num: 7, expectedMove: 'e1g1', opponentMove: 'd4c3', instruction: 'Ignore the pawn! Castle to safety. Let Black be greedy.' },
+      { num: 8, expectedMove: 'd1b3', opponentMove: 'd8e7', instruction: 'Develop your Queen to b3. You now have a terrifying double attack on f7!' },
+      { num: 9, expectedMove: 'b1c3', opponentMove: 'a5b6', instruction: 'Finally develop your Queenside Knight, preparing Nd5.' },
+      { num: 10, expectedMove: 'c3d5', opponentMove: 'e7d8', instruction: 'Jump the Knight into the center at d5, attacking the Queen and dominating the board.' },
+      { num: 11, expectedMove: 'c1g5', opponentMove: 'g8e7', instruction: 'Develop your dark-squared Bishop to g5, pinning the Knight and increasing the pressure.' },
+      { num: 12, expectedMove: 'a1d1', instruction: 'Bring your final piece into the game. Black is completely paralyzed, your pieces are perfectly placed, and you have devastating attacking potential!' }
+    ]
+  },
+  {
+    id: 'l11',
+    name: 'Sicilian Dragon: Yugoslav Attack',
+    category: 'openings',
+    difficulty: 'Advanced',
+    description: 'The sharpest opening in chess. Both sides race to checkmate each other in a chaotic double-edged battle.',
+    funFact: 'Bobby Fischer famously said about the Dragon: "Pry open the h-file, sac, sac... mate!"',
+    commonBlunder: 'Failing to generate counterplay on the Queenside fast enough means White will simply checkmate you on the Kingside without resistance.',
+    stepsCount: 11,
+    percentCompleted: 0,
+    playerColor: 'black',
+    startFen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+    steps: [
+      { num: 1, expectedMove: 'c7c5', opponentMove: 'g1f3', instruction: 'Respond to e4 with the Sicilian Defense, c5.' },
+      { num: 2, expectedMove: 'd7d6', opponentMove: 'd2d4', instruction: 'Play d6 to clamp down on e5.' },
+      { num: 3, expectedMove: 'c5d4', opponentMove: 'f3d4', instruction: 'The Open Sicilian. Capture on d4.' },
+      { num: 4, expectedMove: 'g8f6', opponentMove: 'b1c3', instruction: 'Develop your Knight, attacking e4.' },
+      { num: 5, expectedMove: 'g7g6', opponentMove: 'c1e3', instruction: 'The Dragon Variation! Prepare to fianchetto your Bishop on g7 where it will breathe fire down the long diagonal.' },
+      { num: 6, expectedMove: 'f8g7', opponentMove: 'f2f3', instruction: 'Complete the fianchetto. White plays f3 to solidify the center and prepare the Yugoslav Attack.' },
+      { num: 7, expectedMove: 'e8g8', opponentMove: 'd1d2', instruction: 'Castle quickly. White prepares to castle Queenside and attack your King.' },
+      { num: 8, expectedMove: 'b8c6', opponentMove: 'f1c4', instruction: 'Develop your Queenside Knight. White brings out the Bishop to prevent you from playing d5.' },
+      { num: 9, expectedMove: 'c8d7', opponentMove: 'e1c1', instruction: 'Develop your Bishop to d7. White casts Queenside. The battle lines are drawn: opposite-side castling!' },
+      { num: 10, expectedMove: 'a8c8', opponentMove: 'h2h4', instruction: 'Bring your Rook to the half-open c-file, pointing directly at White\'s King. White starts the pawn storm with h4.' },
+      { num: 11, expectedMove: 'c6e5', instruction: 'Jump your Knight to e5, centralizing it and preparing to attack the c4 Bishop. The race to checkmate has officially begun!' }
+    ]
+  },
+  {
+    id: 'l12',
+    name: 'Fried Liver Attack',
+    category: 'tactics',
+    difficulty: 'Intermediate',
+    description: 'A terrifying, sacrificial attack against the Two Knights Defense that draws Black\'s King into the center of the board.',
+    funFact: 'The name "Fried Liver" comes from the Italian "Fegatello", which means putting the opponent\'s King on a grill!',
+    commonBlunder: 'If Black knows the Traxler Counterattack (Bc5 instead of d5), you must be extremely well-prepared or you will be mated yourself!',
+    stepsCount: 10,
+    percentCompleted: 0,
+    steps: [
+      { num: 1, expectedMove: 'e2e4', opponentMove: 'e7e5', instruction: 'Open with e4.' },
+      { num: 2, expectedMove: 'g1f3', opponentMove: 'b8c6', instruction: 'Develop the Knight.' },
+      { num: 3, expectedMove: 'f1c4', opponentMove: 'g8f6', instruction: 'The Italian Game. Black plays the Two Knights Defense, inviting complications.' },
+      { num: 4, expectedMove: 'f3g5', opponentMove: 'd7d5', instruction: 'Immediately jump your Knight to g5! This directly threatens the weak f7 pawn with two pieces. Black blocks with d5.' },
+      { num: 5, expectedMove: 'e4d5', opponentMove: 'f6d5', instruction: 'Capture the pawn. Black makes the critical mistake of recapturing with the Knight!' },
+      { num: 6, expectedMove: 'g5f7', opponentMove: 'e8f7', instruction: 'BOOM! Sacrifice the Knight on f7! You fork the Queen and Rook, forcing the King to capture.' },
+      { num: 7, expectedMove: 'd1f3', opponentMove: 'f7e6', instruction: 'Check the King with your Queen, simultaneously attacking the d5 Knight. Black\'s King MUST march forward to e6 to defend the Knight!' },
+      { num: 8, expectedMove: 'b1c3', opponentMove: 'c6b4', instruction: 'Develop your Knight, adding a third attacker to the pinned d5 Knight. Black tries to counterattack with Nb4.' },
+      { num: 9, expectedMove: 'a2a3', opponentMove: 'b4c2', instruction: 'Ignore the threat! Play a3 to kick the Knight. Black forks your King and Rook with Nxc2+.' },
+      { num: 10, expectedMove: 'e1d1', instruction: 'Simply step your King to d1. Even though you are down a Rook, Black\'s King is completely stranded in the center of the board, and you will soon launch a crushing mating net!' }
+    ]
+  },
+  ...EXTENDED_LESSONS
 ];

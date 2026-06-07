@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import { useLocation } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { 
   Play, 
@@ -28,6 +29,7 @@ interface ChartPoint {
 
 export const Analysis: React.FC = () => {
   const { showCoordinates, pieceSet } = useSettingsStore();
+  const location = useLocation();
 
   // Chess Board state
   const [analysisChess, setAnalysisChess] = useState<Chess>(new Chess());
@@ -60,6 +62,30 @@ export const Analysis: React.FC = () => {
       if (engineRef.current) engineRef.current.terminate();
     };
   }, []);
+
+  // Load passed PGN from state if available
+  useEffect(() => {
+    if (location.state?.pgn) {
+      try {
+        const testChess = new Chess();
+        testChess.loadPgn(location.state.pgn);
+        setAnalysisChess(testChess);
+        setFen(testChess.fen());
+        
+        const fullHistory = testChess.history();
+        setHistory(fullHistory);
+        setCurrentMoveIdx(fullHistory.length - 1);
+        
+        const initChart = Array.from({ length: fullHistory.length + 1 }).map((_, idx) => ({
+          move: idx,
+          eval: 0
+        }));
+        setEvalHistory(initChart);
+      } catch (e) {
+        console.error('Failed to load PGN from state:', e);
+      }
+    }
+  }, [location.state]);
 
   // Responsive board size via ResizeObserver
   useEffect(() => {

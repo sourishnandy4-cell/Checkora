@@ -35,6 +35,7 @@
     "chess.js": "^1.0.0-beta.6",
     "electron-store": "^8.2.0",
     "framer-motion": "^11.2.10",
+    "kokoro-js": "^1.2.1",
     "lucide-react": "^0.395.0",
     "peerjs": "^1.5.5",
     "react": "^18.3.1",

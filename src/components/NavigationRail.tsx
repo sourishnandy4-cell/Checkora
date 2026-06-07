@@ -14,8 +14,11 @@ import {
   ChevronRight,
   ChevronLeft,
   LayoutDashboard,
-  Map
+  Map,
+  Users
 } from 'lucide-react';
+
+import { useMultiplayerStore } from '../store/multiplayerStore';
 
 interface NavItem {
   icon: React.ReactNode;
@@ -29,8 +32,11 @@ export const NavigationRail: React.FC = () => {
   const location = useLocation();
   const [showScaffoldModal, setShowScaffoldModal] = useState<string | null>(null);
 
+  const { setShowModal } = useMultiplayerStore();
+
   const navItems: NavItem[] = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/' },
+    { icon: <Users size={20} />, label: 'Play a Friend', path: '#multiplayer' },
     { icon: <Play size={20} />, label: 'Play Now', path: '/play' },
     { icon: <Map size={20} />, label: 'Story Mode', path: '/campaign' },
     { icon: <Puzzle size={20} />, label: 'Puzzles', path: '/puzzles' },
@@ -73,6 +79,24 @@ export const NavigationRail: React.FC = () => {
             </span>
           )}
         </a>
+      );
+    }
+
+    if (item.path === '#multiplayer') {
+      return (
+        <button
+          key={item.label}
+          onClick={() => setShowModal(true)}
+          className={`flex items-center gap-4 px-4 py-3.5 mx-2 rounded-md relative group transition-all duration-150 my-0.5 w-[calc(100%-16px)] text-left text-text-secondary hover:text-text-primary hover:bg-bg-elevated`}
+          title={!isExpanded ? item.label : undefined}
+        >
+          <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-105 z-10">
+            {item.icon}
+          </div>
+          {isExpanded && (
+            <span className="text-sm font-medium whitespace-nowrap tracking-wide z-10">{item.label}</span>
+          )}
+        </button>
       );
     }
 

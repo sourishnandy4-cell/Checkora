@@ -19,6 +19,8 @@ interface MultiplayerState {
   joinGame: (hostId: string) => Promise<boolean>;
   sendMessage: (msg: MultiplayerMessage) => void;
   disconnect: () => void;
+  showModal: boolean;
+  setShowModal: (show: boolean) => void;
 }
 
 function handleIncomingMessage(data: MultiplayerMessage) {
@@ -51,6 +53,9 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   isHost: false,
   isConnected: false,
   isConnecting: false,
+  showModal: false,
+
+  setShowModal: (show) => set({ showModal: show }),
 
   initPeer: () => {
     if (get().peer) return; // already initialized

@@ -37,13 +37,14 @@ jobs:
         run: npm run build:renderer
 
       - name: Sync Capacitor
-        run: |
-          chmod +x android/gradlew
-          npx cap sync android --verbose
+        run: npx cap copy android
 
       - name: Build APK
         working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: |
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2

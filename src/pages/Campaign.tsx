@@ -11,16 +11,22 @@ const CAMPAIGN_ERAS = [
     description: 'Face the greatest conquerors of the old world.',
     nodes: [
       { id: 'alexander-the-great', prerequisite: null },
-      { id: 'julius-caesar', prerequisite: 'alexander-the-great' },
-      { id: 'emperor-ashoka', prerequisite: 'julius-caesar' },
-      { id: 'genghis-khan', prerequisite: 'emperor-ashoka' },
+      { id: 'chanakya', prerequisite: 'alexander-the-great' },
+      { id: 'chandragupta-maurya', prerequisite: 'chanakya' },
+      { id: 'emperor-ashoka', prerequisite: 'chandragupta-maurya' },
+      { id: 'julius-caesar', prerequisite: 'emperor-ashoka' },
+      { id: 'raja-raja-chola-i', prerequisite: 'julius-caesar' },
+      { id: 'genghis-khan', prerequisite: 'raja-raja-chola-i' },
+      { id: 'akbar-the-great', prerequisite: 'genghis-khan' },
+      { id: 'chhatrapati-shivaji', prerequisite: 'akbar-the-great' },
     ]
   },
   {
     name: 'Industrial & Modern History',
     description: 'Challenge the visionaries of the 19th and 20th centuries.',
     nodes: [
-      { id: 'abraham-lincoln', prerequisite: 'genghis-khan' },
+      { id: 'napoleon-bonaparte', prerequisite: 'chhatrapati-shivaji' },
+      { id: 'abraham-lincoln', prerequisite: 'napoleon-bonaparte' },
       { id: 'winston-churchill', prerequisite: 'abraham-lincoln' },
       { id: 'queen-elizabeth-ii', prerequisite: 'winston-churchill' },
       { id: 'nelson-mandela', prerequisite: 'queen-elizabeth-ii' },

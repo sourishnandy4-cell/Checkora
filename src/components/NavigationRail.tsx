@@ -12,7 +12,9 @@ import {
   User, 
   Settings,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  LayoutDashboard,
+  Map
 } from 'lucide-react';
 
 interface NavItem {
@@ -28,7 +30,9 @@ export const NavigationRail: React.FC = () => {
   const [showScaffoldModal, setShowScaffoldModal] = useState<string | null>(null);
 
   const navItems: NavItem[] = [
+    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/' },
     { icon: <Play size={20} />, label: 'Play Now', path: '/play' },
+    { icon: <Map size={20} />, label: 'Story Mode', path: '/campaign' },
     { icon: <Puzzle size={20} />, label: 'Puzzles', path: '/puzzles' },
     { icon: <GraduationCap size={20} />, label: 'Learn Rules', path: '/learn' },
     { icon: <Zap size={20} />, label: 'Coordinates', path: '/train' },

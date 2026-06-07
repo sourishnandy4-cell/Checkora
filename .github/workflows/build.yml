@@ -1,0 +1,35 @@
+name: Build Desktop Installer
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger only on tags matching v*, e.g. v1.0.0
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    # Needs permissions to create GitHub Releases
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build and Publish Installer
+        run: npm run build
+
+      - name: Publish Installer
+        env:
+          # This token is automatically provided by GitHub Actions
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --publish always

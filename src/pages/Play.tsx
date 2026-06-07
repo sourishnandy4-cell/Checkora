@@ -12,6 +12,9 @@ import {
   ArrowLeft,
   X,
   Play as PlayIcon,
+  Trophy,
+  Maximize,
+  Minimize,
   Check,
   Undo2
 } from 'lucide-react';
@@ -20,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSettingsStore } from '../store/settingsStore';
 import { BOTS, BotDefinition } from '../data/bots';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
+import { ambientAudio } from '../utils/ambientAudio';
 import { playSound } from '../utils/audio';
 
 export const Play: React.FC = () => {
@@ -60,7 +64,12 @@ export const Play: React.FC = () => {
     confirmMoves,
     autoPromoteToQueen,
     playerAvatar,
-    pieceSet
+    pieceSet,
+    zenMode,
+    toggleZenMode,
+    theme,
+    enableAmbientSound,
+    ambientVolume
   } = useSettingsStore();
 
   // Local Pre-game Picker states
@@ -127,6 +136,16 @@ export const Play: React.FC = () => {
   // Responsive board size
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState(504);
+
+  // Manage ambient sound lifecycle
+  useEffect(() => {
+    if (isGameActive && zenMode && enableAmbientSound) {
+      ambientAudio.start(theme);
+    } else {
+      ambientAudio.stop();
+    }
+    return () => ambientAudio.stop();
+  }, [isGameActive, zenMode, theme, enableAmbientSound, ambientVolume]);
 
   // Chat scroll reference
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -500,53 +519,67 @@ export const Play: React.FC = () => {
     const isBlackActive = turn === 'b';
 
     return (
-      <div className="w-full h-full flex flex-col lg:flex-row bg-base overflow-hidden">
+      <div className="w-full h-full flex flex-col lg:flex-row bg-base overflow-hidden relative">
+        {zenMode && (
+          <button 
+            onClick={toggleZenMode}
+            className="absolute top-4 right-4 z-50 p-3 bg-bg-surface/80 glassmorphism border border-bg-border rounded-full text-text-secondary hover:text-text-primary hover:scale-110 transition-all shadow-2xl"
+            title="Exit Zen Mode"
+          >
+            <Minimize size={18} />
+          </button>
+        )}
+        
         {/* LEFT COLUMN: Board and info cards */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-6 overflow-y-auto">
+        <div className={`flex-1 flex flex-col items-center justify-center p-4 lg:p-6 overflow-y-auto ${zenMode ? 'max-w-none' : ''}`}>
           {/* Back button */}
-          <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
-            <button 
-              onClick={() => useGameStore.getState().resetAll()}
-              className="text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary flex items-center gap-1 cursor-pointer"
-            >
-              <ArrowLeft size={14} /> Back to Bot Selection
-            </button>
-          </div>
+          {!zenMode && (
+            <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
+              <button 
+                onClick={() => useGameStore.getState().resetAll()}
+                className="text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary flex items-center gap-1 cursor-pointer"
+              >
+                <ArrowLeft size={14} /> Back to Bot Selection
+              </button>
+            </div>
+          )}
 
-          <div className="w-full max-w-[540px] flex flex-col gap-3">
+          <div className={`w-full flex flex-col gap-3 ${zenMode ? 'max-w-[70vh]' : 'max-w-[540px]'}`}>
             {/* BLACK PLAYER BAR */}
-            <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-              isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-            }`}>
-              <div className="flex items-center gap-3">
-                {playerColor === 'black' 
-                  ? playerAvatar
-                    ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
-                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
-                  : activeBot && activeBot.isImageAvatar
-                    ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
-                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
-                }
-                <div>
-                  <div className="text-xs font-semibold flex items-center gap-1.5">
-                    {blackPlayerName} 
-                    <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
-                      {blackPlayerElo}
-                    </span>
+            {!zenMode && (
+              <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+                isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+              }`}>
+                <div className="flex items-center gap-3">
+                  {playerColor === 'black' 
+                    ? playerAvatar
+                      ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
+                      : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                    : activeBot && activeBot.isImageAvatar
+                      ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                      : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
+                  }
+                  <div>
+                    <div className="text-xs font-semibold flex items-center gap-1.5">
+                      {blackPlayerName} 
+                      <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                        {blackPlayerElo}
+                      </span>
+                    </div>
+                    {isBotTurn && playerColor === 'white' && botThinkingRef.current && (
+                      <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
+                    )}
                   </div>
-                  {isBotTurn && playerColor === 'white' && botThinkingRef.current && (
-                    <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
-                  )}
+                </div>
+
+                {/* CLOCK */}
+                <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                  blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                  {formatTime(blackTime)}
                 </div>
               </div>
-
-              {/* CLOCK */}
-              <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-              } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
-                {formatTime(blackTime)}
-              </div>
-            </div>
+            )}
 
             {/* EVAL BAR + BOARD WRAPPER */}
             <div className="flex w-full gap-2 lg:gap-4 relative">
@@ -671,6 +704,7 @@ export const Play: React.FC = () => {
             </div>
 
             {/* OPPONENT BAR (BOTTOM) */}
+            {!zenMode && (
             <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
               isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
             }`}>
@@ -702,7 +736,7 @@ export const Play: React.FC = () => {
               } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
                 {formatTime(whiteTime)}
               </div>
-            </div>
+            )}
 
             {/* CONTROLS OR CONFIRMATION STRIP */}
             {pendingMove ? (
@@ -720,7 +754,7 @@ export const Play: React.FC = () => {
                   <X size={14} /> Cancel Move
                 </button>
               </div>
-            ) : (
+            ) : !zenMode ? (
               <div className="flex gap-2 w-full mt-1">
                 <button
                   onClick={offerDraw}
@@ -756,12 +790,20 @@ export const Play: React.FC = () => {
                 >
                   <FlipHorizontal size={14} />
                 </button>
+                <button
+                  onClick={toggleZenMode}
+                  className="p-2 bg-bg-surface border border-bg-border text-text-secondary hover:text-accent-cyan premium-btn"
+                  title="Enter Zen Mode"
+                >
+                  <Maximize size={14} />
+                </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 
         {/* RIGHT COLUMN: Sidebar (Move log, Chat) (320px width) */}
+        {!zenMode && (
         <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface">
           {/* Active Opponent Info */}
           {activeBot && (
@@ -844,6 +886,7 @@ export const Play: React.FC = () => {
             </form>
           </div>
         </div>
+        )}
       </div>
     );
   }

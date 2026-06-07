@@ -13,6 +13,9 @@ interface SettingsState {
   confirmMoves: boolean;
   autoPromoteToQueen: boolean;
   boardFlipped: boolean;
+  zenMode: boolean;
+  enableAmbientSound: boolean;
+  ambientVolume: number;
 
   // Auth State
   isLoggedIn: boolean;
@@ -31,6 +34,9 @@ interface SettingsState {
   toggleConfirmMoves: () => void;
   toggleAutoPromote: () => void;
   toggleBoardFlipped: () => void;
+  toggleZenMode: () => void;
+  toggleAmbientSound: () => void;
+  setAmbientVolume: (volume: number) => void;
   login: (name: string, isGuest: boolean, email?: string) => void;
   logout: () => void;
   setPlayerAvatar: (avatar: string) => void;
@@ -79,6 +85,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   confirmMoves: false,
   autoPromoteToQueen: true,
   boardFlipped: false,
+  zenMode: false,
+  enableAmbientSound: true,
+  ambientVolume: 50,
 
   isLoggedIn: false,
   isGuest: false,
@@ -138,6 +147,23 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await setStoredVal('boardFlipped', nextVal);
   },
 
+  toggleZenMode: async () => {
+    const nextVal = !get().zenMode;
+    set({ zenMode: nextVal });
+    await setStoredVal('zenMode', nextVal);
+  },
+
+  toggleAmbientSound: async () => {
+    const nextVal = !get().enableAmbientSound;
+    set({ enableAmbientSound: nextVal });
+    await setStoredVal('enableAmbientSound', nextVal);
+  },
+
+  setAmbientVolume: async (ambientVolume) => {
+    set({ ambientVolume });
+    await setStoredVal('ambientVolume', ambientVolume);
+  },
+
   login: async (name, isGuest, email = '') => {
     set({ isLoggedIn: true, isGuest, playerName: name, playerEmail: email });
     await setStoredVal('isLoggedIn', true);
@@ -175,6 +201,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const confirmMoves = await getStoredVal('confirmMoves', false);
     const autoPromoteToQueen = await getStoredVal('autoPromoteToQueen', true);
     const boardFlipped = await getStoredVal('boardFlipped', false);
+    const zenMode = await getStoredVal('zenMode', false);
+    const enableAmbientSound = await getStoredVal('enableAmbientSound', true);
+    const ambientVolume = await getStoredVal('ambientVolume', 50);
 
     const isLoggedIn = await getStoredVal('isLoggedIn', false);
     const isGuest = await getStoredVal('isGuest', false);
@@ -194,6 +223,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       confirmMoves,
       autoPromoteToQueen,
       boardFlipped,
+      zenMode,
+      enableAmbientSound,
+      ambientVolume,
       isLoggedIn,
       isGuest,
       playerName,

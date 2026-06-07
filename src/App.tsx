@@ -156,7 +156,16 @@ export const App: React.FC = () => {
           <TitleBar />
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
             <NavigationRail />
-            <main className="flex-1 h-full bg-base overflow-hidden flex flex-col relative">
+            <main 
+              className="flex-1 h-full overflow-hidden flex flex-col relative"
+              style={{
+                backgroundColor: 'var(--bg-base)',
+                backgroundImage: 'var(--bg-watermark, none)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundBlendMode: 'overlay'
+              }}
+            >
               <AnimatedRoutes />
             </main>
             <div className="block md:hidden shrink-0 pb-safe pb-4">

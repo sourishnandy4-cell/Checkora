@@ -26,6 +26,7 @@ import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { ambientAudio } from '../utils/ambientAudio';
 import { playSound } from '../utils/audio';
 import { useCampaignStore } from '../store/campaignStore';
+import { useMultiplayerStore } from '../store/multiplayerStore';
 
 export const Play: React.FC = () => {
   const navigate = useNavigate();
@@ -54,7 +55,8 @@ export const Play: React.FC = () => {
     userEloRapid,
     userEloBullet,
     undoMove,
-    campaignNodeId
+    campaignNodeId,
+    playMode
   } = useGameStore();
 
   const { 
@@ -103,6 +105,9 @@ export const Play: React.FC = () => {
   const engineRef = useRef<StockfishEngine | null>(null);
   const clockIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const botThinkingRef = useRef(false);
+
+  // Multiplayer Hook
+  const { sendMessage } = useMultiplayerStore();
 
   // Engine evaluation states for the real-time Eval Bar
   const evalEngineRef = useRef<StockfishEngine | null>(null);
@@ -377,7 +382,7 @@ export const Play: React.FC = () => {
     
     // Check if it's the player's turn
     const isPlayerTurn = (turn === 'w' && playerColor === 'white') || (turn === 'b' && playerColor === 'black');
-    if (!isPlayerTurn || botThinkingRef.current) return false;
+    if (!isPlayerTurn || (playMode === 'bot' && botThinkingRef.current)) return false;
 
     // Check if we already have a pending move that needs confirmation
     if (pendingMove) return false;
@@ -415,6 +420,9 @@ export const Play: React.FC = () => {
 
         const success = makeMove(sourceSquare, targetSquare);
         if (success) {
+          if (playMode === 'multiplayer') {
+            sendMessage({ type: 'move', payload: { from: sourceSquare, to: targetSquare } });
+          }
           handlePostMoveSoundAndGameEnding(isCapture);
           return true;
         }
@@ -435,6 +443,9 @@ export const Play: React.FC = () => {
 
     const success = makeMove(pendingMove.from, pendingMove.to, pendingMove.promotion);
     if (success) {
+      if (playMode === 'multiplayer') {
+        sendMessage({ type: 'move', payload: { from: pendingMove.from, to: pendingMove.to, promotion: pendingMove.promotion } });
+      }
       handlePostMoveSoundAndGameEnding(isCapture);
     }
     setPendingMove(null);
@@ -519,6 +530,11 @@ export const Play: React.FC = () => {
     if (!chatInput.trim()) return;
 
     sendChatMessage('You', chatInput);
+    
+    if (playMode === 'multiplayer') {
+      sendMessage({ type: 'chat', payload: { text: chatInput } });
+    }
+
     const userText = chatInput;
     setChatInput('');
 
@@ -591,9 +607,9 @@ export const Play: React.FC = () => {
     };
     const activeUserElo = getActiveUserElo();
 
-    const blackPlayerName = playerColor === 'black' ? playerName : (activeBot ? activeBot.name : 'Stockfish Bot');
+    const blackPlayerName = playerColor === 'black' ? playerName : (playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Stockfish Bot'));
     const blackPlayerElo = playerColor === 'black' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
-    const whitePlayerName = playerColor === 'white' ? playerName : (activeBot ? activeBot.name : 'Stockfish Bot');
+    const whitePlayerName = playerColor === 'white' ? playerName : (playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Stockfish Bot'));
     const whitePlayerElo = playerColor === 'white' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
 
     const isWhiteActive = turn === 'w';
@@ -843,14 +859,20 @@ export const Play: React.FC = () => {
             ) : !zenMode ? (
               <div className="flex gap-2 w-full mt-1">
                 <button
-                  onClick={offerDraw}
+                  onClick={() => {
+                    offerDraw();
+                    if (playMode === 'multiplayer') sendMessage({ type: 'draw_offer' });
+                  }}
                   disabled={!!gameResult}
                   className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
                 >
                   <Handshake size={14} /> Offer Draw
                 </button>
                 <button
-                  onClick={resignGame}
+                  onClick={() => {
+                    resignGame();
+                    if (playMode === 'multiplayer') sendMessage({ type: 'resign' });
+                  }}
                   disabled={!!gameResult}
                   className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-accent-red disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
                 >

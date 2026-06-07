@@ -87,6 +87,7 @@ interface GameState {
   isGameActive: boolean;
   chatMessages: { sender: string; text: string; time: string }[];
   campaignNodeId?: string; // Optional ID for campaign mode tracking
+  playMode: 'bot' | 'multiplayer';
 
   // Statistics & History
   gameHistory: GameHistoryEntry[];
@@ -110,8 +111,8 @@ interface GameState {
 
   // Actions
   initGameStore: () => Promise<void>;
-  startNewGame: (bot: BotDefinition | null, timeControl: TimeControl, color: 'white' | 'black' | 'random', customMinutes?: number, customIncrement?: number, campaignNodeId?: string) => void;
-  makeMove: (from: string, to: string, promotion?: string) => boolean;
+  startNewGame: (bot: BotDefinition | null, timeControl: TimeControl, color: 'white' | 'black' | 'random', customMinutes?: number, customIncrement?: number, campaignNodeId?: string, playMode?: 'bot' | 'multiplayer') => void;
+  makeMove: (from: string, to: string, promotion?: string, isPeerMove?: boolean) => boolean;
   tickClocks: () => void;
   resignGame: () => void;
   offerDraw: () => void;
@@ -191,6 +192,7 @@ export const useGameStore = create<GameState>((set, get) => {
     isGameActive: false,
     chatMessages: [],
     campaignNodeId: undefined,
+    playMode: 'bot',
 
     gameHistory: [],
     userEloBlitz: 100,
@@ -227,7 +229,7 @@ export const useGameStore = create<GameState>((set, get) => {
       });
     },
 
-    startNewGame: (bot, timeControl, color, customMinutes, customIncrement, campaignNodeId) => {
+    startNewGame: (bot, timeControl, color, customMinutes, customIncrement, campaignNodeId, playMode = 'bot') => {
       const chess = new Chess();
       let selectedColor: 'white' | 'black' = color === 'random' 
         ? (Math.random() < 0.5 ? 'white' : 'black') 
@@ -266,13 +268,14 @@ export const useGameStore = create<GameState>((set, get) => {
         gameOverReason: '',
         isGameActive: true,
         chatMessages: initialChat,
-        campaignNodeId
+        campaignNodeId,
+        playMode
       });
     },
 
-    makeMove: (from, to, promotion) => {
-      const { chess, turn, playerColor, activeBot, isGameActive, increment, whiteTime, blackTime } = get();
-      if (!isGameActive) return false;
+    makeMove: (from, to, promotion, isPeerMove = false) => {
+      const { chess, turn, playerColor, activeBot, isGameActive, increment, whiteTime, blackTime, gameResult, playMode } = get();
+      if (!isGameActive || gameResult) return false;
 
       try {
         // Auto promotion fallback if option enabled but parameter omitted
@@ -337,8 +340,8 @@ export const useGameStore = create<GameState>((set, get) => {
                 ? 'W'
                 : 'L';
 
-            const activeOpponent = activeBot ? activeBot.name : 'Chess Engine';
-            const activeElo = activeBot ? activeBot.elo : 1500;
+            const activeOpponent = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
+            const oppElo = activeBot ? activeBot.elo : 1500;
             
             const tcCat = getTcCategory(get().timeControl);
             let currentElo = 100;
@@ -346,13 +349,13 @@ export const useGameStore = create<GameState>((set, get) => {
             else if (tcCat === 'blitz') currentElo = get().userEloBlitz;
             else if (tcCat === 'bullet') currentElo = get().userEloBullet;
 
-            const change = calculateEloChange(currentElo, activeElo, historyResult, get().gameHistory.length);
+            const change = calculateEloChange(currentElo, oppElo, historyResult, get().gameHistory.length);
             
             const newHistoryEntry: GameHistoryEntry = {
               id: Date.now().toString(),
               date: new Date().toISOString().split('T')[0],
               opponent: activeOpponent,
-              opponentElo: activeElo,
+              opponentElo: oppElo,
               timeControl: get().timeControl,
               playerColor,
               result: historyResult,
@@ -389,7 +392,7 @@ export const useGameStore = create<GameState>((set, get) => {
     },
 
     tickClocks: () => {
-      const { isGameActive, turn, whiteTime, blackTime, playerColor, activeBot } = get();
+      const { isGameActive, turn, whiteTime, blackTime } = get();
       if (!isGameActive) return;
 
       if (turn === 'w') {
@@ -422,12 +425,12 @@ export const useGameStore = create<GameState>((set, get) => {
     },
 
     resignGame: () => {
-      const { playerColor, activeBot, isGameActive } = get();
+      const { playerColor, activeBot, isGameActive, playMode } = get();
       if (!isGameActive) return;
 
       const result: GameResult = playerColor === 'white' ? 'b' : 'w';
-      const activeOpponent = activeBot ? activeBot.name : 'Chess Engine';
-      const activeElo = activeBot ? activeBot.elo : 1500;
+      const activeOpponent = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
+      const oppElo = activeBot ? activeBot.elo : 1500;
       
       const tcCat = getTcCategory(get().timeControl);
       let currentElo = 100;
@@ -435,13 +438,13 @@ export const useGameStore = create<GameState>((set, get) => {
       else if (tcCat === 'blitz') currentElo = get().userEloBlitz;
       else if (tcCat === 'bullet') currentElo = get().userEloBullet;
 
-      const change = calculateEloChange(currentElo, activeElo, 'L', get().gameHistory.length);
+      const change = calculateEloChange(currentElo, oppElo, 'L', get().gameHistory.length);
 
       const newHistoryEntry: GameHistoryEntry = {
         id: Date.now().toString(),
         date: new Date().toISOString().split('T')[0],
         opponent: activeOpponent,
-        opponentElo: activeElo,
+        opponentElo: oppElo,
         timeControl: get().timeControl,
         playerColor,
         result: 'L',
@@ -475,7 +478,7 @@ export const useGameStore = create<GameState>((set, get) => {
     },
 
     offerDraw: () => {
-      const { activeBot, isGameActive, playerColor } = get();
+      const { activeBot, isGameActive, playerColor, playMode } = get();
       if (!isGameActive) return;
 
       // Draw acceptance depends on Bot ELO & material balance
@@ -493,8 +496,8 @@ export const useGameStore = create<GameState>((set, get) => {
       }
 
       if (botAccepts) {
-        const activeOpponent = activeBot ? activeBot.name : 'Chess Engine';
-        const activeElo = activeBot ? activeBot.elo : 1500;
+        const activeOpponent = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
+        const oppElo = activeBot ? activeBot.elo : 1500;
         
         const tcCat = getTcCategory(get().timeControl);
         let currentElo = 100;

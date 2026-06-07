@@ -62,6 +62,7 @@
 /* Fallback for un-themed root to Mono theme */
 html:not([data-theme]),
 html[data-theme="mono"] {
+  --bg-watermark: none;
   --bg-void:       #000000;
   --bg-base:       #0A0A0A;
   --bg-surface:    #111111;
@@ -286,6 +287,7 @@ html[data-theme="walnut"] {
 }
 
 html[data-theme="mauryan"] {
+  --bg-watermark:  url('/mauryan_watermark.png');
   --bg-void:       #0A0604;
   --bg-base:       #120B08;
   --bg-surface:    #1A100B;
@@ -318,6 +320,7 @@ html[data-theme="mauryan"] {
 }
 
 html[data-theme="roman"] {
+  --bg-watermark:  url('/roman_watermark.png');
   --bg-void:       #0A0A0C;
   --bg-base:       #0F0F14;
   --bg-surface:    #16161D;
@@ -350,6 +353,7 @@ html[data-theme="roman"] {
 }
 
 html[data-theme="spartan"] {
+  --bg-watermark:  url('/spartan_watermark.png');
   --bg-void:       #080404;
   --bg-base:       #110808;
   --bg-surface:    #1A0C0C;
@@ -403,6 +407,12 @@ html[data-theme="spartan"] {
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-void);
+  background-image: var(--bg-watermark, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
+  background-attachment: fixed;
   color: var(--text-primary);
   margin: 0;
   padding: 0;

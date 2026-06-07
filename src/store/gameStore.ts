@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Chess } from 'chess.js';
 import { BotDefinition } from '../data/bots';
 import { useSettingsStore } from './settingsStore';
@@ -94,6 +95,8 @@ interface GameState {
   userEloBlitz: number;
   userEloRapid: number;
   userEloBullet: number;
+  solvedPuzzles: string[];
+  completedLessons: string[];
 
   // Puzzle Rush State
   puzzleRushActive: boolean;
@@ -137,31 +140,11 @@ interface GameState {
   endCoordsTrainer: () => void;
   tickCoordsTrainer: () => void;
   submitCoordsAnswer: (square: string) => void;
+
+  // Tracking
+  markPuzzleSolved: (id: string) => void;
+  markLessonCompleted: (id: string) => void;
 }
-
-const getStoredVal = async (key: string, defaultVal: any) => {
-  if (window.electronAPI?.store) {
-    try {
-      const val = await window.electronAPI.store.get(key);
-      if (val !== undefined && val !== null) return val;
-    } catch {}
-  }
-  const localVal = localStorage.getItem(`checkora-${key}`);
-  if (localVal !== null) {
-    try { return JSON.parse(localVal); } catch { return localVal; }
-  }
-  return defaultVal;
-};
-
-const setStoredVal = async (key: string, val: any) => {
-  if (window.electronAPI?.store) {
-    try {
-      await window.electronAPI.store.set(key, val);
-      return;
-    } catch {}
-  }
-  localStorage.setItem(`checkora-${key}`, JSON.stringify(val));
-};
 
 // Generate default mock recent games to make profile look stunning initially
 const MOCK_GAMES: GameHistoryEntry[] = [
@@ -171,10 +154,12 @@ const MOCK_GAMES: GameHistoryEntry[] = [
   { id: '4', date: '2026-05-31', opponent: 'Cobra Bot', opponentElo: 1350, timeControl: '3+0', playerColor: 'black', result: 'L', ratingChange: -2 }
 ];
 
-export const useGameStore = create<GameState>((set, get) => {
-  const defaultChess = new Chess();
+export const useGameStore = create<GameState>()(
+  persist(
+    (set, get) => {
+      const defaultChess = new Chess();
 
-  return {
+      return {
     // Initial States
     chess: defaultChess,
     fen: defaultChess.fen(),
@@ -194,10 +179,12 @@ export const useGameStore = create<GameState>((set, get) => {
     campaignNodeId: undefined,
     playMode: 'bot',
 
-    gameHistory: [],
+    gameHistory: MOCK_GAMES,
     userEloBlitz: 100,
     userEloRapid: 100,
     userEloBullet: 100,
+    solvedPuzzles: [],
+    completedLessons: [],
 
     puzzleRushActive: false,
     puzzleRushScore: 0,
@@ -212,21 +199,7 @@ export const useGameStore = create<GameState>((set, get) => {
     coordsHighscore: 0,
 
     initGameStore: async () => {
-      const history = await getStoredVal('gameHistory', MOCK_GAMES);
-      const userEloBlitz = await getStoredVal('userEloBlitz', 100);
-      const userEloRapid = await getStoredVal('userEloRapid', 100);
-      const userEloBullet = await getStoredVal('userEloBullet', 100);
-      const puzzleRushHighscore = await getStoredVal('puzzleRushHighscore', 18);
-      const coordsHighscore = await getStoredVal('coordsHighscore', 24);
-
-      set({
-        gameHistory: history,
-        userEloBlitz,
-        userEloRapid,
-        userEloBullet,
-        puzzleRushHighscore,
-        coordsHighscore
-      });
+      // Kept for compatibility with App.tsx, but state is loaded via persist middleware
     },
 
     startNewGame: (bot, timeControl, color, customMinutes, customIncrement, campaignNodeId, playMode = 'bot') => {
@@ -376,11 +349,6 @@ export const useGameStore = create<GameState>((set, get) => {
               userEloBlitz: newBlitz,
               userEloBullet: newBullet,
             });
-
-            setStoredVal('gameHistory', updatedHistory);
-            setStoredVal('userEloRapid', newRapid);
-            setStoredVal('userEloBlitz', newBlitz);
-            setStoredVal('userEloBullet', newBullet);
           }
 
           return true;
@@ -466,11 +434,6 @@ export const useGameStore = create<GameState>((set, get) => {
         userEloBullet: newBullet,
       });
 
-      setStoredVal('gameHistory', updatedHistory);
-      setStoredVal('userEloRapid', newRapid);
-      setStoredVal('userEloBlitz', newBlitz);
-      setStoredVal('userEloBullet', newBullet);
-
       get().sendChatMessage('System', 'Resigned. Match ended.');
       if (activeBot) {
         get().sendChatMessage(activeBot.name, 'A wise decision. Better luck next time!');
@@ -533,11 +496,6 @@ export const useGameStore = create<GameState>((set, get) => {
           userEloBullet: newBullet,
         });
 
-        setStoredVal('gameHistory', updatedHistory);
-        setStoredVal('userEloRapid', newRapid);
-        setStoredVal('userEloBlitz', newBlitz);
-        setStoredVal('userEloBullet', newBullet);
-
         get().sendChatMessage('System', 'Draw accepted by agreement.');
         if (activeBot) {
           get().sendChatMessage(activeBot.name, 'Very well, let us call it a draw.');
@@ -587,9 +545,6 @@ export const useGameStore = create<GameState>((set, get) => {
         userEloRapid: 100,
         userEloBullet: 100
       });
-      setStoredVal('userEloBlitz', 100);
-      setStoredVal('userEloRapid', 100);
-      setStoredVal('userEloBullet', 100);
     },
 
     undoMove: () => {
@@ -691,7 +646,6 @@ export const useGameStore = create<GameState>((set, get) => {
       const { puzzleRushScore, puzzleRushHighscore } = get();
       if (puzzleRushScore > puzzleRushHighscore) {
         set({ puzzleRushHighscore: puzzleRushScore });
-        setStoredVal('puzzleRushHighscore', puzzleRushScore);
       }
       set({ puzzleRushActive: false });
     },
@@ -742,7 +696,6 @@ export const useGameStore = create<GameState>((set, get) => {
       const { coordsScore, coordsHighscore } = get();
       if (coordsScore > coordsHighscore) {
         set({ coordsHighscore: coordsScore });
-        setStoredVal('coordsHighscore', coordsScore);
       }
       set({ coordsActive: false });
     },
@@ -782,6 +735,33 @@ export const useGameStore = create<GameState>((set, get) => {
           coordsTarget: nextTarget
         });
       }
+    },
+
+    markPuzzleSolved: (id) => {
+      set((state) => ({
+        solvedPuzzles: state.solvedPuzzles.includes(id) ? state.solvedPuzzles : [...state.solvedPuzzles, id]
+      }));
+    },
+
+    markLessonCompleted: (id) => {
+      set((state) => ({
+        completedLessons: state.completedLessons.includes(id) ? state.completedLessons : [...state.completedLessons, id]
+      }));
     }
   };
-});
+    },
+    {
+      name: 'checkora-game-store',
+      partialize: (state) => ({
+        gameHistory: state.gameHistory,
+        userEloBlitz: state.userEloBlitz,
+        userEloRapid: state.userEloRapid,
+        userEloBullet: state.userEloBullet,
+        puzzleRushHighscore: state.puzzleRushHighscore,
+        coordsHighscore: state.coordsHighscore,
+        solvedPuzzles: state.solvedPuzzles,
+        completedLessons: state.completedLessons
+      })
+    }
+  )
+);

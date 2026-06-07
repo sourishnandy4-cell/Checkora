@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { GraduationCap, BookOpen, Compass, ArrowLeft, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Compass, ArrowLeft, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { useGameStore } from '../store/gameStore';
 import { playSound } from '../utils/audio';
 
 interface LessonStep {
@@ -186,6 +187,8 @@ const LESSON_DATABASE: ChessLesson[] = [
 ];
 
 export const Learn: React.FC = () => {
+  const { completedLessons, markLessonCompleted } = useGameStore();
+
   // Tabs: 'all' | 'openings' | 'tactics' | 'strategy'
   const [activeTab, setActiveTab] = useState<string>('all');
   
@@ -254,6 +257,7 @@ export const Learn: React.FC = () => {
             } else {
               setFeedbackStatus('complete');
               playSound.play('win');
+              markLessonCompleted(activeLesson.id);
             }
           }, 900);
         } else {
@@ -264,6 +268,7 @@ export const Learn: React.FC = () => {
             // Final step of the lesson
             setFeedbackStatus('complete');
             playSound.play('win');
+            markLessonCompleted(activeLesson.id);
           }
         }
 
@@ -356,8 +361,9 @@ export const Learn: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="font-serif-header text-lg font-bold text-text-primary group-hover:text-accent-primary transition-colors">
+                  <h3 className="font-serif-header text-lg font-bold text-text-primary group-hover:text-accent-primary transition-colors flex items-center gap-2">
                     {lesson.name}
+                    {completedLessons.includes(lesson.id) && <CheckCircle2 size={16} className="text-accent-green" />}
                   </h3>
                   <p className="text-xs text-text-secondary mt-2 leading-relaxed min-h-[40px]">
                     {lesson.description}

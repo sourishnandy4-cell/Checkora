@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { Puzzle as PuzzleIcon, Flame, Heart, Clock, Check, AlertCircle, ArrowRight, RefreshCw, Layers } from 'lucide-react';
+import { Puzzle as PuzzleIcon, Flame, Heart, Clock, Check, AlertCircle, ArrowRight, RefreshCw, Layers, CheckCircle2, Lightbulb } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { playSound } from '../utils/audio';
 
@@ -89,7 +89,9 @@ export const Puzzles: React.FC = () => {
     startPuzzleRush,
     endPuzzleRush,
     tickPuzzleRush,
-    submitPuzzleAnswer
+    submitPuzzleAnswer,
+    solvedPuzzles,
+    markPuzzleSolved
   } = useGameStore();
 
   // Local modes: 'daily' | 'rush' | 'themes'
@@ -100,6 +102,7 @@ export const Puzzles: React.FC = () => {
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [puzzleFen, setPuzzleFen] = useState(LOCAL_PUZZLES[0].fen);
   const [puzzleStatus, setPuzzleStatus] = useState<'solving' | 'correct' | 'wrong'>('solving');
+  const [hintActive, setHintActive] = useState(false);
 
   const rushIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -110,6 +113,7 @@ export const Puzzles: React.FC = () => {
     setPuzzleChess(new Chess(currentPuzzle.fen));
     setPuzzleFen(currentPuzzle.fen);
     setPuzzleStatus('solving');
+    setHintActive(false);
   }, [puzzleIndex, activeTab]);
 
   // Puzzle Rush Timer Interval
@@ -158,6 +162,7 @@ export const Puzzles: React.FC = () => {
           setPuzzleChess(tempChess);
           setPuzzleFen(tempChess.fen());
           setPuzzleStatus('correct');
+          markPuzzleSolved(currentPuzzle.id);
           
           playSound.play('win');
 
@@ -192,8 +197,18 @@ export const Puzzles: React.FC = () => {
   };
 
   const handleNextPuzzle = () => {
-    const nextIdx = (puzzleIndex + 1) % LOCAL_PUZZLES.length;
-    setPuzzleIndex(nextIdx);
+    // Adaptive difficulty: find next unsolved puzzle with >= difficulty
+    const unsolved = LOCAL_PUZZLES.filter(p => !solvedPuzzles.includes(p.id) && p.id !== currentPuzzle.id);
+    let nextPuzzle = unsolved.find(p => p.difficulty >= currentPuzzle.difficulty);
+    
+    if (!nextPuzzle) {
+      nextPuzzle = unsolved[0]; // fallback to any unsolved
+    }
+    if (!nextPuzzle) {
+      nextPuzzle = LOCAL_PUZZLES[(puzzleIndex + 1) % LOCAL_PUZZLES.length]; // fallback loop if all solved
+    }
+    
+    setPuzzleIndex(LOCAL_PUZZLES.findIndex(p => p.id === nextPuzzle.id));
   };
 
   const handleRetryPuzzle = () => {
@@ -212,6 +227,12 @@ export const Puzzles: React.FC = () => {
     customLightSquareStyle: { backgroundColor: 'var(--board-light)' },
     customDarkSquareStyle: { backgroundColor: 'var(--board-dark)' }
   };
+
+  const dynamicSquareStyles: any = {};
+  if (hintActive && puzzleStatus === 'solving') {
+    const fromSquare = currentPuzzle.solution.slice(0, 2);
+    dynamicSquareStyles[fromSquare] = { backgroundColor: 'rgba(56, 189, 248, 0.45)' };
+  }
 
   return (
     <div className="w-full h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
@@ -270,6 +291,7 @@ export const Puzzles: React.FC = () => {
                 boardWidth={452}
                 boardOrientation={currentPuzzle.playerColor}
                 arePiecesDraggable={puzzleStatus === 'solving'}
+                customSquareStyles={dynamicSquareStyles}
                 customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                 customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
               />
@@ -329,8 +351,9 @@ export const Puzzles: React.FC = () => {
                 </span>
               </div>
 
-              <h2 className="font-serif-header text-xl font-bold mt-1 text-text-primary">
+              <h2 className="font-serif-header text-xl font-bold mt-1 text-text-primary flex items-center gap-2">
                 Daily Tactical Quiz
+                {solvedPuzzles.includes(currentPuzzle.id) && <CheckCircle2 size={18} className="text-accent-green" />}
               </h2>
               
               <p className="text-xs text-text-secondary leading-relaxed bg-bg-void/50 border border-bg-border p-4 rounded-sm">
@@ -339,6 +362,14 @@ export const Puzzles: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-3 mt-8">
+              {puzzleStatus === 'solving' && (
+                <button
+                  onClick={() => setHintActive(true)}
+                  className="premium-btn w-full py-2.5 text-xs font-mono-clock uppercase flex items-center justify-center gap-1.5"
+                >
+                  <Lightbulb size={14} className="text-accent-amber" /> Show Hint
+                </button>
+              )}
               <button
                 onClick={handleNextPuzzle}
                 className="premium-btn w-full py-2.5 text-xs font-mono-clock uppercase flex items-center justify-center gap-1.5"
@@ -412,6 +443,7 @@ export const Puzzles: React.FC = () => {
                   boardWidth={412}
                   boardOrientation={currentPuzzle.playerColor}
                   arePiecesDraggable={puzzleStatus === 'solving'}
+                  customSquareStyles={dynamicSquareStyles}
                   customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                   customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
                 />

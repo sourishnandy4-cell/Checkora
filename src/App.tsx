@@ -4,6 +4,7 @@ import { useSettingsStore } from './store/settingsStore';
 import { useGameStore } from './store/gameStore';
 import { TitleBar } from './components/TitleBar';
 import { NavigationRail } from './components/NavigationRail';
+import { BottomNavigation } from './components/BottomNavigation';
 import { StatusBar } from './components/StatusBar';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -153,11 +154,14 @@ export const App: React.FC = () => {
       <HashRouter>
         <div className="w-screen h-screen flex flex-col bg-void text-text-primary overflow-hidden">
           <TitleBar />
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
             <NavigationRail />
             <main className="flex-1 h-full bg-base overflow-hidden flex flex-col relative">
               <AnimatedRoutes />
             </main>
+            <div className="block md:hidden shrink-0 pb-safe pb-4">
+              <BottomNavigation />
+            </div>
           </div>
           <StatusBar />
         </div>

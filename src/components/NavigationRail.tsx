@@ -105,7 +105,7 @@ export const NavigationRail: React.FC = () => {
   };
 
   return (
-    <div className="py-4 pl-4 pr-2 bg-void z-40">
+    <div className="py-4 pl-4 pr-2 bg-void z-40 hidden md:block">
       <div 
         className={`h-full glassmorphism rounded-xl flex flex-col justify-between select-none transition-all duration-300 ease-in-out shadow-2xl overflow-hidden border border-bg-border/50 ${
           isExpanded ? 'w-[220px]' : 'w-14'

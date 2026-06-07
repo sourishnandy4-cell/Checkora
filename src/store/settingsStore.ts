@@ -228,7 +228,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const isGuest = await getStoredVal('isGuest', false);
     const playerName = await getStoredVal('playerName', 'Guest');
     const playerEmail = await getStoredVal('playerEmail', '');
-    const playerAvatar = await getStoredVal('playerAvatar', './avatars/preset_pawn.png');
+    let playerAvatar = await getStoredVal('playerAvatar', './avatars/preset_pawn.png');
+
+    // Migration for previously stored absolute paths
+    if (typeof playerAvatar === 'string' && playerAvatar.startsWith('/avatars/')) {
+      playerAvatar = '.' + playerAvatar;
+      await setStoredVal('playerAvatar', playerAvatar);
+    }
 
     document.documentElement.setAttribute('data-theme', theme);
 

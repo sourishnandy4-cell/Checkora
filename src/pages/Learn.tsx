@@ -8,6 +8,7 @@ import { useChessOptions } from '../utils/useChessOptions';
 import { StockfishEngine } from '../engine/stockfish';
 import { speechSynth } from '../utils/speech';
 
+import { useSettingsStore } from '../store/settingsStore';
 import { ChessLesson, LESSON_DATABASE } from '../data/lessons';
 
 export const Learn: React.FC = () => {
@@ -26,9 +27,8 @@ export const Learn: React.FC = () => {
   
   const engineRef = React.useRef<StockfishEngine | null>(null);
   const [coachMessage, setCoachMessage] = useState<string | null>(null);
-  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
-  const [voiceGender, setVoiceGender] = useState<'male' | 'female'>('female');
-  const [isVoiceLoading, setIsVoiceLoading] = useState(false);
+  
+  const { isVoiceEnabled, voiceGender, toggleVoiceEnabled, setVoiceGender } = useSettingsStore();
 
   useEffect(() => {
     speechSynth.setGender(voiceGender);
@@ -397,22 +397,28 @@ export const Learn: React.FC = () => {
                     <Compass size={16} className="text-accent-cyan" />
                     <span className="text-[10px] font-mono-clock uppercase text-text-muted tracking-wider">Coach Instructions</span>
                   </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setVoiceGender(voiceGender === 'male' ? 'female' : 'male')}
-                      className="text-[10px] uppercase font-mono-clock px-2 py-1 rounded-sm border bg-bg-void text-text-muted border-bg-border hover:text-text-primary transition-colors"
-                    >
-                      {voiceGender === 'male' ? 'Male Voice' : 'Female Voice'}
-                    </button>
-                    <button 
-                      onClick={() => {
-                        if (isVoiceEnabled) speechSynth.stop();
-                        setIsVoiceEnabled(!isVoiceEnabled);
-                      }}
-                      className={`text-[10px] uppercase font-mono-clock px-2 py-1 rounded-sm border transition-colors ${isVoiceEnabled ? 'bg-accent-green/10 text-accent-green border-accent-green/30' : 'bg-bg-void text-text-muted border-bg-border'}`}
-                    >
-                      Voice: {isVoiceEnabled ? 'ON' : 'OFF'}
-                    </button>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-[10px] text-text-secondary uppercase tracking-wider font-mono-clock">Voice:</span>
+                    <div className="flex bg-void p-1 rounded border border-bg-border">
+                      <button
+                        onClick={() => setVoiceGender('female')}
+                        className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded ${voiceGender === 'female' ? 'bg-accent-primary text-void' : 'text-text-muted hover:text-text-primary'}`}
+                      >
+                        Female
+                      </button>
+                      <button
+                        onClick={() => setVoiceGender('male')}
+                        className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded ${voiceGender === 'male' ? 'bg-accent-primary text-void' : 'text-text-muted hover:text-text-primary'}`}
+                      >
+                        Male
+                      </button>
+                      <button
+                        onClick={toggleVoiceEnabled}
+                        className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded border-l border-bg-border ml-1 pl-2 ${!isVoiceEnabled ? 'text-accent-secondary font-bold' : 'text-text-muted hover:text-text-primary'}`}
+                      >
+                        {isVoiceEnabled ? 'ON' : 'OFF'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

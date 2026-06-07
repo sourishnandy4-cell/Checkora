@@ -16,6 +16,8 @@ interface SettingsState {
   zenMode: boolean;
   enableAmbientSound: boolean;
   ambientVolume: number;
+  isVoiceEnabled: boolean;
+  voiceGender: 'male' | 'female';
 
   // Auth State
   isLoggedIn: boolean;
@@ -37,6 +39,8 @@ interface SettingsState {
   toggleZenMode: () => void;
   toggleAmbientSound: () => void;
   setAmbientVolume: (volume: number) => void;
+  toggleVoiceEnabled: () => void;
+  setVoiceGender: (gender: 'male' | 'female') => void;
   login: (name: string, isGuest: boolean, email?: string) => void;
   logout: () => void;
   setPlayerAvatar: (avatar: string) => void;
@@ -88,6 +92,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   zenMode: false,
   enableAmbientSound: true,
   ambientVolume: 50,
+  isVoiceEnabled: true,
+  voiceGender: 'female',
 
   isLoggedIn: false,
   isGuest: false,
@@ -164,6 +170,17 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await setStoredVal('ambientVolume', ambientVolume);
   },
 
+  toggleVoiceEnabled: async () => {
+    const nextVal = !get().isVoiceEnabled;
+    set({ isVoiceEnabled: nextVal });
+    await setStoredVal('isVoiceEnabled', nextVal);
+  },
+
+  setVoiceGender: async (voiceGender) => {
+    set({ voiceGender });
+    await setStoredVal('voiceGender', voiceGender);
+  },
+
   login: async (name, isGuest, email = '') => {
     set({ isLoggedIn: true, isGuest, playerName: name, playerEmail: email });
     await setStoredVal('isLoggedIn', true);
@@ -204,6 +221,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const zenMode = await getStoredVal('zenMode', false);
     const enableAmbientSound = await getStoredVal('enableAmbientSound', true);
     const ambientVolume = await getStoredVal('ambientVolume', 50);
+    const isVoiceEnabled = await getStoredVal('isVoiceEnabled', true);
+    const voiceGender = await getStoredVal('voiceGender', 'female');
 
     const isLoggedIn = await getStoredVal('isLoggedIn', false);
     const isGuest = await getStoredVal('isGuest', false);
@@ -226,6 +245,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       zenMode,
       enableAmbientSound,
       ambientVolume,
+      isVoiceEnabled,
+      voiceGender,
       isLoggedIn,
       isGuest,
       playerName,

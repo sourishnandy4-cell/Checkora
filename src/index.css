@@ -287,7 +287,7 @@ html[data-theme="walnut"] {
 }
 
 html[data-theme="mauryan"] {
-  --bg-watermark:  url('/mauryan_watermark.png');
+  --bg-watermark:  url('./mauryan_watermark.png');
   --bg-void:       #0A0604;
   --bg-base:       #120B08;
   --bg-surface:    #1A100B;
@@ -320,7 +320,7 @@ html[data-theme="mauryan"] {
 }
 
 html[data-theme="roman"] {
-  --bg-watermark:  url('/roman_watermark.png');
+  --bg-watermark:  url('./roman_watermark.png');
   --bg-void:       #0A0A0C;
   --bg-base:       #0F0F14;
   --bg-surface:    #16161D;
@@ -353,7 +353,7 @@ html[data-theme="roman"] {
 }
 
 html[data-theme="spartan"] {
-  --bg-watermark:  url('/spartan_watermark.png');
+  --bg-watermark:  url('./spartan_watermark.png');
   --bg-void:       #080404;
   --bg-base:       #110808;
   --bg-surface:    #1A0C0C;

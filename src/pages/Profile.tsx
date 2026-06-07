@@ -5,12 +5,12 @@ import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 
 const PRESETS = [
-  { name: 'Pawn', path: '/avatars/preset_pawn.png' },
-  { name: 'Knight', path: '/avatars/preset_knight.png' },
-  { name: 'Bishop', path: '/avatars/preset_bishop.png' },
-  { name: 'Rook', path: '/avatars/preset_rook.png' },
-  { name: 'Queen', path: '/avatars/preset_queen.png' },
-  { name: 'King', path: '/avatars/preset_king.png' },
+  { name: 'Pawn', path: './avatars/preset_pawn.png' },
+  { name: 'Knight', path: './avatars/preset_knight.png' },
+  { name: 'Bishop', path: './avatars/preset_bishop.png' },
+  { name: 'Rook', path: './avatars/preset_rook.png' },
+  { name: 'Queen', path: './avatars/preset_queen.png' },
+  { name: 'King', path: './avatars/preset_king.png' },
 ];
 
 export const Profile: React.FC = () => {
@@ -389,7 +389,7 @@ export const Profile: React.FC = () => {
                 </label>
                 {playerAvatar && !PRESETS.some(p => p.path === playerAvatar) && (
                   <button
-                    onClick={() => setPlayerAvatar('/avatars/preset_pawn.png')}
+                    onClick={() => setPlayerAvatar('./avatars/preset_pawn.png')}
                     className="text-[10px] font-mono text-accent-red hover:underline uppercase transition-all select-none cursor-pointer w-full sm:w-auto text-center py-1"
                   >
                     Reset Preset

@@ -1,0 +1,51 @@
+name: Build Android APK
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger only on tags matching v*, e.g. v1.0.0
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Build Web App
+        run: npm run build:renderer
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: ./android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

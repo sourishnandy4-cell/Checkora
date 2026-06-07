@@ -133,6 +133,8 @@ export const Learn: React.FC = () => {
     setActiveLessonId(lesson.id);
   };
 
+  const [hintSquares, setHintSquares] = useState<Record<string, any>>({});
+
   const filteredLessons = LESSON_DATABASE.filter(lesson => {
     if (activeTab === 'all') return true;
     return lesson.category === activeTab;
@@ -141,6 +143,24 @@ export const Learn: React.FC = () => {
   const customBoardStyles = {
     customLightSquareStyle: { backgroundColor: 'var(--board-light)' },
     customDarkSquareStyle: { backgroundColor: 'var(--board-dark)' }
+  };
+
+  const showHint = () => {
+    if (!activeLesson || feedbackStatus !== 'solving' || pendingOpponentMove) return;
+    const currentStep = activeLesson.steps[activeStepIdx];
+    if (!currentStep) return;
+
+    const fromSq = currentStep.expectedMove.slice(0, 2);
+    const toSq = currentStep.expectedMove.slice(2, 4);
+
+    setHintSquares({
+      [fromSq]: { backgroundColor: 'rgba(34, 211, 238, 0.4)' },
+      [toSq]: { background: 'radial-gradient(circle, rgba(34, 211, 238, 0.5) 25%, transparent 25%)', borderRadius: '50%' }
+    });
+
+    setTimeout(() => {
+      setHintSquares({});
+    }, 2000);
   };
 
   return (
@@ -246,7 +266,7 @@ export const Learn: React.FC = () => {
                   boardWidth={432}
                   boardOrientation={activeLesson.playerColor || 'white'}
                   arePiecesDraggable={feedbackStatus === 'solving' && !pendingOpponentMove}
-                  customSquareStyles={optionSquares}
+                  customSquareStyles={{ ...optionSquares, ...hintSquares }}
                   customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                   customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
                 />
@@ -296,7 +316,15 @@ export const Learn: React.FC = () => {
 
                 {/* Progress Dot Indicators */}
                 <div className="flex flex-col gap-2 mt-4 select-none">
-                  <span className="text-[9px] font-mono-clock text-text-muted uppercase">Lesson Progress</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono-clock text-text-muted uppercase">Lesson Progress</span>
+                    <button 
+                      onClick={showHint}
+                      className="text-[9px] font-mono-clock text-accent-cyan uppercase hover:text-cyan-300 flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Lightbulb size={10} /> Show Hint
+                    </button>
+                  </div>
                   <div className="flex gap-2">
                     {activeLesson.steps.map((step, idx) => (
                       <span

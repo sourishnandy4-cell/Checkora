@@ -123,7 +123,7 @@ export const LESSON_DATABASE: ChessLesson[] = [
       { num: 2, expectedMove: 'd7d5', opponentMove: 'e4e5', instruction: 'White claims the full center with d4. Strike the center with d5! You are forcing White to make a decision.' },
       { num: 3, expectedMove: 'c7c5', opponentMove: 'c2c3', instruction: 'White pushes e5 (The Advance Variation), locking the pawn structure. Immediately attack the base of White\'s pawn chain with c5!' },
       { num: 4, expectedMove: 'b8c6', opponentMove: 'g1f3', instruction: 'White defends the center with c3. Pile more pressure onto d4 by developing your Knight to c6.' },
-      { num: 5, expectedMove: 'd1b6', opponentMove: 'a2a3', instruction: 'White defends with Nf3. Bring your Queen to b6! You are now hitting d4 with three pieces, and White is sweating to hold their center together.' },
+      { num: 5, expectedMove: 'd8b6', opponentMove: 'a2a3', instruction: 'White defends with Nf3. Bring your Queen to b6! You are now hitting d4 with three pieces, and White is sweating to hold their center together.' },
       { num: 6, expectedMove: 'g8h6', instruction: 'White prepares to expand on the Queenside. Play Nh6! Normally Knights on the rim are dim, but here it plans to jump to f5 to add a FOURTH attacker to the d4 square!' }
     ]
   },

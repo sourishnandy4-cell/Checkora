@@ -88,7 +88,8 @@ interface GameState {
   isGameActive: boolean;
   chatMessages: { sender: string; text: string; time: string }[];
   campaignNodeId?: string; // Optional ID for campaign mode tracking
-  playMode: 'bot' | 'multiplayer';
+  playMode: 'bot' | 'multiplayer' | 'local';
+  drawOfferReceived: boolean;
 
   // Statistics & History
   gameHistory: GameHistoryEntry[];
@@ -114,11 +115,13 @@ interface GameState {
 
   // Actions
   initGameStore: () => Promise<void>;
-  startNewGame: (bot: BotDefinition | null, timeControl: TimeControl, color: 'white' | 'black' | 'random', customMinutes?: number, customIncrement?: number, campaignNodeId?: string, playMode?: 'bot' | 'multiplayer') => void;
+  startNewGame: (bot: BotDefinition | null, timeControl: TimeControl, color: 'white' | 'black' | 'random', customMinutes?: number, customIncrement?: number, campaignNodeId?: string, playMode?: 'bot' | 'multiplayer' | 'local') => void;
   makeMove: (from: string, to: string, promotion?: string, isPeerMove?: boolean) => boolean;
   tickClocks: () => void;
   resignGame: () => void;
   offerDraw: () => void;
+  acceptDraw: () => void;
+  setDrawOfferReceived: (received: boolean) => void;
   sendChatMessage: (sender: string, text: string) => void;
   flipBoard: () => void;
   resetAll: () => void;
@@ -178,6 +181,7 @@ export const useGameStore = create<GameState>()(
     chatMessages: [],
     campaignNodeId: undefined,
     playMode: 'bot',
+    drawOfferReceived: false,
 
     gameHistory: MOCK_GAMES,
     userEloBlitz: 100,
@@ -242,7 +246,8 @@ export const useGameStore = create<GameState>()(
         isGameActive: true,
         chatMessages: initialChat,
         campaignNodeId,
-        playMode
+        playMode,
+        drawOfferReceived: false
       });
     },
 
@@ -441,8 +446,14 @@ export const useGameStore = create<GameState>()(
     },
 
     offerDraw: () => {
-      const { activeBot, isGameActive, playerColor, playMode } = get();
+      const { activeBot, isGameActive, playMode } = get();
       if (!isGameActive) return;
+
+      if (playMode === 'multiplayer' || playMode === 'local') {
+        // For human opponents, offering a draw does not calculate acceptance.
+        // It's handled purely by sending a message and waiting for their response.
+        return;
+      }
 
       // Draw acceptance depends on Bot ELO & material balance
       let botAccepts = false;
@@ -454,49 +465,10 @@ export const useGameStore = create<GameState>()(
         } else {
           botAccepts = Math.random() < 0.35; // 35% chance for higher bots
         }
-      } else {
-        botAccepts = true;
       }
 
       if (botAccepts) {
-        const activeOpponent = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
-        const oppElo = activeBot ? activeBot.elo : 1500;
-        
-        const tcCat = getTcCategory(get().timeControl);
-        let currentElo = 100;
-        if (tcCat === 'rapid') currentElo = get().userEloRapid;
-        else if (tcCat === 'blitz') currentElo = get().userEloBlitz;
-        else if (tcCat === 'bullet') currentElo = get().userEloBullet;
-
-        const change = calculateEloChange(currentElo, oppElo, 'D', get().gameHistory.length);
-
-        const newHistoryEntry: GameHistoryEntry = {
-          id: Date.now().toString(),
-          date: new Date().toISOString().split('T')[0],
-          opponent: activeOpponent,
-          opponentElo: oppElo,
-          timeControl: get().timeControl,
-          playerColor,
-          result: 'D',
-          ratingChange: change
-        };
-
-        const updatedHistory = [newHistoryEntry, ...get().gameHistory];
-        const newRapid = tcCat === 'rapid' ? Math.max(100, get().userEloRapid + change) : get().userEloRapid;
-        const newBlitz = tcCat === 'blitz' ? Math.max(100, get().userEloBlitz + change) : get().userEloBlitz;
-        const newBullet = tcCat === 'bullet' ? Math.max(100, get().userEloBullet + change) : get().userEloBullet;
-
-        set({
-          isGameActive: false,
-          gameResult: 'd',
-          gameOverReason: 'draw-agreement',
-          gameHistory: updatedHistory,
-          userEloRapid: newRapid,
-          userEloBlitz: newBlitz,
-          userEloBullet: newBullet,
-        });
-
-        get().sendChatMessage('System', 'Draw accepted by agreement.');
+        get().acceptDraw();
         if (activeBot) {
           get().sendChatMessage(activeBot.name, 'Very well, let us call it a draw.');
         }
@@ -506,6 +478,55 @@ export const useGameStore = create<GameState>()(
           get().sendChatMessage(activeBot.name, 'No, there is still plenty of chess to play!');
         }
       }
+    },
+
+    setDrawOfferReceived: (received: boolean) => {
+      set({ drawOfferReceived: received });
+    },
+
+    acceptDraw: () => {
+      const { activeBot, isGameActive, playerColor, playMode } = get();
+      if (!isGameActive) return;
+
+      const activeOpponent = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
+      const oppElo = activeBot ? activeBot.elo : 1500;
+      
+      const tcCat = getTcCategory(get().timeControl);
+      let currentElo = 100;
+      if (tcCat === 'rapid') currentElo = get().userEloRapid;
+      else if (tcCat === 'blitz') currentElo = get().userEloBlitz;
+      else if (tcCat === 'bullet') currentElo = get().userEloBullet;
+
+      const change = calculateEloChange(currentElo, oppElo, 'D', get().gameHistory.length);
+
+      const newHistoryEntry: GameHistoryEntry = {
+        id: Date.now().toString(),
+        date: new Date().toISOString().split('T')[0],
+        opponent: activeOpponent,
+        opponentElo: oppElo,
+        timeControl: get().timeControl,
+        playerColor,
+        result: 'D',
+        ratingChange: change
+      };
+
+      const updatedHistory = [newHistoryEntry, ...get().gameHistory];
+      const newRapid = tcCat === 'rapid' ? Math.max(100, get().userEloRapid + change) : get().userEloRapid;
+      const newBlitz = tcCat === 'blitz' ? Math.max(100, get().userEloBlitz + change) : get().userEloBlitz;
+      const newBullet = tcCat === 'bullet' ? Math.max(100, get().userEloBullet + change) : get().userEloBullet;
+
+      set({
+        isGameActive: false,
+        gameResult: 'd',
+        gameOverReason: 'draw-agreement',
+        gameHistory: updatedHistory,
+        userEloRapid: newRapid,
+        userEloBlitz: newBlitz,
+        userEloBullet: newBullet,
+        drawOfferReceived: false
+      });
+
+      get().sendChatMessage('System', 'Draw accepted by agreement.');
     },
 
     sendChatMessage: (sender, text) => {

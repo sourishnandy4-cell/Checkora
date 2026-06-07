@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface CampaignState {
   completedNodes: string[]; // List of defeated boss IDs
   completeNode: (nodeId: string) => void;
-  isNodeUnlocked: (nodeId: string, prerequisiteId?: string) => boolean;
+  isNodeUnlocked: (nodeId: string, prerequisiteId?: string | null) => boolean;
 }
 
 export const useCampaignStore = create<CampaignState>()(
@@ -21,7 +21,7 @@ export const useCampaignStore = create<CampaignState>()(
         });
       },
 
-      isNodeUnlocked: (nodeId: string, prerequisiteId?: string) => {
+      isNodeUnlocked: (nodeId: string, prerequisiteId?: string | null) => {
         const { completedNodes } = get();
         // First node or no prerequisite means it's unlocked by default
         if (!prerequisiteId) return true;

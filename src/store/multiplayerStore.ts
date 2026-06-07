@@ -38,7 +38,14 @@ function handleIncomingMessage(data: MultiplayerMessage) {
       break;
     case 'draw_offer':
       gameStore.sendChatMessage('System', 'Opponent offered a draw.');
-      // Currently auto-accepted or handled manually. Let's just log it.
+      gameStore.setDrawOfferReceived(true);
+      break;
+    case 'draw_accept':
+      gameStore.sendChatMessage('System', 'Opponent accepted the draw offer.');
+      gameStore.acceptDraw();
+      break;
+    case 'draw_decline':
+      gameStore.sendChatMessage('System', 'Opponent declined the draw offer.');
       break;
     case 'ping':
       // keeping connection alive

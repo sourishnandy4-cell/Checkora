@@ -162,8 +162,9 @@ export const Learn: React.FC = () => {
   }, [activeLesson]);
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (pendingOpponentMove && activeLesson) {
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         const oppFrom = pendingOpponentMove.slice(0, 2);
         const oppTo = pendingOpponentMove.slice(2, 4);
         const promo = pendingOpponentMove.length > 4 ? pendingOpponentMove[4] : undefined;
@@ -195,9 +196,11 @@ export const Learn: React.FC = () => {
 
         setPendingOpponentMove(null);
       }, 500);
-      return () => clearTimeout(timer);
     }
-  }, [pendingOpponentMove, lessonFen, activeStepIdx, activeLesson, markLessonCompleted]);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [pendingOpponentMove, activeLesson, lessonFen]);
 
   const handleCloseLesson = () => {
     setActiveLessonId(null);

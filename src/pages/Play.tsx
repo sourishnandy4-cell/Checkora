@@ -50,6 +50,9 @@ export const Play: React.FC = () => {
     tickClocks,
     resignGame,
     offerDraw,
+    acceptDraw,
+    setDrawOfferReceived,
+    drawOfferReceived,
     sendChatMessage,
     timeControl,
     userEloBlitz,
@@ -787,7 +790,6 @@ export const Play: React.FC = () => {
             <button
               onClick={() => {
                 const currentPgn = chess.pgn();
-                useGameStore.getState().loadPGN(currentPgn);
                 navigate('/analysis', { state: { pgn: currentPgn } });
               }}
               className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock mt-2 bg-bg-surface hover:text-accent-cyan transition-colors"
@@ -821,26 +823,56 @@ export const Play: React.FC = () => {
               </div>
             ) : !zenMode ? (
               <div className="flex gap-2 w-full mt-1">
-                <button
-                  onClick={() => {
-                    offerDraw();
-                    if (playMode === 'multiplayer') sendMessage({ type: 'draw_offer' });
-                  }}
-                  disabled={!!gameResult}
-                  className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
-                >
-                  <Handshake size={14} /> Offer Draw
-                </button>
-                <button
-                  onClick={() => {
-                    resignGame();
-                    if (playMode === 'multiplayer') sendMessage({ type: 'resign' });
-                  }}
-                  disabled={!!gameResult}
-                  className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-accent-red disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
-                >
-                  <Flag size={14} /> Resign
-                </button>
+                {drawOfferReceived ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        acceptDraw();
+                        if (playMode === 'multiplayer') sendMessage({ type: 'draw_accept' });
+                      }}
+                      disabled={!!gameResult}
+                      className="flex-1 py-2 bg-accent-green/20 border border-accent-green text-xs uppercase font-mono-clock text-accent-green hover:bg-accent-green/30 disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn rounded-sm"
+                    >
+                      <Check size={14} /> Accept Draw
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDrawOfferReceived(false);
+                        if (playMode === 'multiplayer') sendMessage({ type: 'draw_decline' });
+                      }}
+                      disabled={!!gameResult}
+                      className="flex-1 py-2 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red/30 disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn rounded-sm"
+                    >
+                      <X size={14} /> Decline
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        offerDraw();
+                        if (playMode === 'multiplayer') {
+                          sendMessage({ type: 'draw_offer' });
+                          sendChatMessage('System', 'Draw offer sent to opponent.');
+                        }
+                      }}
+                      disabled={!!gameResult}
+                      className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
+                    >
+                      <Handshake size={14} /> Offer Draw
+                    </button>
+                    <button
+                      onClick={() => {
+                        resignGame();
+                        if (playMode === 'multiplayer') sendMessage({ type: 'resign' });
+                      }}
+                      disabled={!!gameResult}
+                      className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-accent-red disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
+                    >
+                      <Flag size={14} /> Resign
+                    </button>
+                  </>
+                )}
                 <button
                   onClick={() => {
                     const success = undoMove();

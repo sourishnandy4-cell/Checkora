@@ -40,9 +40,9 @@ const LESSON_DATABASE: ChessLesson[] = [
     stepsCount: 3,
     percentCompleted: 0,
     steps: [
-      { num: 1, expectedMove: 'e2e4', instruction: 'Start by playing your pawn to e4. This claims the center e4/d5 squares.' },
-      { num: 2, expectedMove: 'g1f3', opponentMove: 'e7e5', instruction: 'Black matched your pawn with e5. Develop your king knight to f3 to attack that pawn.' },
-      { num: 3, expectedMove: 'f1c4', opponentMove: 'b8c6', instruction: 'Black defended with knight to c6. Bring your light-squared bishop to c4, targeting f7!' }
+      { num: 1, expectedMove: 'e2e4', opponentMove: 'e7e5', instruction: 'Start by playing your pawn to e4. This claims the center e4/d5 squares.' },
+      { num: 2, expectedMove: 'g1f3', opponentMove: 'b8c6', instruction: 'Black matched your pawn with e5. Develop your king knight to f3 to attack that pawn.' },
+      { num: 3, expectedMove: 'f1c4', instruction: 'Black defended with knight to c6. Bring your light-squared bishop to c4, targeting f7!' }
     ]
   },
   {
@@ -56,9 +56,9 @@ const LESSON_DATABASE: ChessLesson[] = [
     stepsCount: 3,
     percentCompleted: 0,
     steps: [
-      { num: 1, expectedMove: 'e2e4', instruction: 'Open the game with pawn to e4 to secure central space.' },
-      { num: 2, expectedMove: 'g1f3', opponentMove: 'e7e5', instruction: 'Develop your knight to f3 to exert pressure on black\'s e5 pawn.' },
-      { num: 3, expectedMove: 'f1b5', opponentMove: 'b8c6', instruction: 'Instead of the Italian, play bishop to b5. This is the Ruy Lopez, pinning the knight!' }
+      { num: 1, expectedMove: 'e2e4', opponentMove: 'e7e5', instruction: 'Open the game with pawn to e4 to secure central space.' },
+      { num: 2, expectedMove: 'g1f3', opponentMove: 'b8c6', instruction: 'Develop your knight to f3 to exert pressure on black\'s e5 pawn.' },
+      { num: 3, expectedMove: 'f1b5', instruction: 'Instead of the Italian, play bishop to b5. This is the Ruy Lopez, pinning the knight!' }
     ]
   },
   {
@@ -72,8 +72,8 @@ const LESSON_DATABASE: ChessLesson[] = [
     stepsCount: 2,
     percentCompleted: 0,
     steps: [
-      { num: 1, expectedMove: 'd2d4', instruction: 'Play d4 to claim central control of d4/e5 squares.' },
-      { num: 2, expectedMove: 'c2c4', opponentMove: 'd7d5', instruction: 'Black matches with d5. Offer your c4 pawn in sacrifice to draw away black\'s center control!' }
+      { num: 1, expectedMove: 'd2d4', opponentMove: 'd7d5', instruction: 'Play d4 to claim central control of d4/e5 squares.' },
+      { num: 2, expectedMove: 'c2c4', instruction: 'Black matches with d5. Offer your c4 pawn in sacrifice to draw away black\'s center control!' }
     ]
   },
   {
@@ -150,10 +150,10 @@ const LESSON_DATABASE: ChessLesson[] = [
     stepsCount: 4,
     percentCompleted: 0,
     steps: [
-      { num: 1, expectedMove: 'e2e4', instruction: 'Open the board with pawn to e4 to free your kingside pieces.' },
-      { num: 2, expectedMove: 'g1f3', opponentMove: 'e7e5', instruction: 'Develop your knight to f3, preparing kingside castling.' },
-      { num: 3, expectedMove: 'f1c4', opponentMove: 'b8c6', instruction: 'Bring your bishop to c4. Now all squares between your King and Rook are clear!' },
-      { num: 4, expectedMove: 'e1g1', opponentMove: 'g8f6', instruction: 'Perform a kingside Castle! Move your King two squares to g1—the Rook will jump over automatically!' }
+      { num: 1, expectedMove: 'e2e4', opponentMove: 'e7e5', instruction: 'Open the board with pawn to e4 to free your kingside pieces.' },
+      { num: 2, expectedMove: 'g1f3', opponentMove: 'b8c6', instruction: 'Develop your knight to f3, preparing kingside castling.' },
+      { num: 3, expectedMove: 'f1c4', opponentMove: 'g8f6', instruction: 'Bring your bishop to c4. Now all squares between your King and Rook are clear!' },
+      { num: 4, expectedMove: 'e1g1', instruction: 'Perform a kingside Castle! Move your King two squares to g1—the Rook will jump over automatically!' }
     ]
   },
   {
@@ -191,9 +191,9 @@ const LESSON_DATABASE: ChessLesson[] = [
     stepsCount: 4,
     percentCompleted: 0,
     steps: [
-      { num: 1, expectedMove: 'e2e4', instruction: 'Push your center e4 pawn forward.' },
-      { num: 2, expectedMove: 'f1c4', opponentMove: 'e7e5', instruction: 'Bring your bishop to c4, aiming at black\'s weak f7 pawn.' },
-      { num: 3, expectedMove: 'd1h5', opponentMove: 'b8c6', instruction: 'Develop your Queen aggressively to h5, multiplying the threat on f7!' },
+      { num: 1, expectedMove: 'e2e4', opponentMove: 'e7e5', instruction: 'Push your center e4 pawn forward.' },
+      { num: 2, expectedMove: 'f1c4', opponentMove: 'b8c6', instruction: 'Bring your bishop to c4, aiming at black\'s weak f7 pawn.' },
+      { num: 3, expectedMove: 'd1h5', opponentMove: 'g8f6', instruction: 'Develop your Queen aggressively to h5, multiplying the threat on f7!' },
       { num: 4, expectedMove: 'h5f7', instruction: 'Deliver the final blow! Capture the weak f7 pawn with your Queen. The black King has no escape!' }
     ]
   }
@@ -204,7 +204,9 @@ export const Learn: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<string>('all');
   
-  const [activeLesson, setActiveLesson] = useState<ChessLesson | null>(null);
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
+  const activeLesson = LESSON_DATABASE.find(l => l.id === activeLessonId) || null;
+
   const [activeStepIdx, setActiveStepIdx] = useState<number>(0);
   const [lessonChess, setLessonChess] = useState<Chess>(new Chess());
   const [lessonFen, setLessonFen] = useState<string>('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
@@ -277,10 +279,11 @@ export const Learn: React.FC = () => {
       const timer = setTimeout(() => {
         const oppFrom = pendingOpponentMove.slice(0, 2);
         const oppTo = pendingOpponentMove.slice(2, 4);
+        const promo = pendingOpponentMove.length > 4 ? pendingOpponentMove[4] : undefined;
         
         try {
           const tempChess = new Chess(lessonFen);
-          tempChess.move({ from: oppFrom, to: oppTo });
+          tempChess.move({ from: oppFrom, to: oppTo, promotion: promo });
           
           setLessonChess(new Chess(tempChess.fen()));
           setLessonFen(tempChess.fen());
@@ -304,7 +307,7 @@ export const Learn: React.FC = () => {
   }, [pendingOpponentMove, lessonFen, activeStepIdx, activeLesson, markLessonCompleted]);
 
   const handleCloseLesson = () => {
-    setActiveLesson(null);
+    setActiveLessonId(null);
   };
 
   const handleRestartLesson = () => {
@@ -315,6 +318,10 @@ export const Learn: React.FC = () => {
       setActiveStepIdx(0);
       setFeedbackStatus('solving');
     }
+  };
+
+  const handleStartLesson = (lesson: ChessLesson) => {
+    setActiveLessonId(lesson.id);
   };
 
   const filteredLessons = LESSON_DATABASE.filter(lesson => {

@@ -17,6 +17,9 @@ const THEMES = [
   { id: 'aurora',  name: 'Aurora',  preview: ['#0D0A1C', '#DDD6F3', '#2B1D5E', '#A78BFA'] },
   { id: 'wooden',  name: 'Wooden',  preview: ['#1C1511', '#E1C699', '#965D37', '#D4A373'] },
   { id: 'walnut',  name: 'Walnut',  preview: ['#110E0C', '#D2B48C', '#5C4033', '#A67B5B'] },
+  { id: 'mauryan', name: 'Mauryan', preview: ['#120B08', '#E8C6A8', '#B85D19', '#E07A5F'] },
+  { id: 'roman',   name: 'Roman',   preview: ['#0F0F14', '#EAEAEA', '#5E2129', '#C9A66B'] },
+  { id: 'spartan', name: 'Spartan', preview: ['#110808', '#C79F70', '#4A1212', '#8E2323'] },
 ] as const;
 
 export const Settings: React.FC = () => {

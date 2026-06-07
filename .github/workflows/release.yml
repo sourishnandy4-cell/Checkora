@@ -1,0 +1,140 @@
+name: Build and Release Checkora
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-desktop:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web App and Electron Main
+        run: npm run build
+
+      - name: Build Desktop Installer
+        run: npx electron-builder --publish never
+
+      - name: Upload Desktop Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-artifacts-${{ matrix.os }}
+          path: release/
+          if-no-files-found: error
+
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Web App
+        run: npm run build:renderer
+
+      - name: Copy web assets to Android
+        run: |
+          mkdir -p android/app/src/main/assets/public
+          cp -r dist/* android/app/src/main/assets/public/
+          cp capacitor.config.json android/app/src/main/assets/capacitor.config.json
+          echo "[]" > android/app/src/main/assets/capacitor.plugins.json
+
+      - name: Build APK
+        working-directory: ./android
+        run: |
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: |
+          mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Checkora-${{ github.ref_name }}.apk
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifact
+          path: android/app/build/outputs/apk/debug/Checkora-${{ github.ref_name }}.apk
+          if-no-files-found: error
+
+  publish-release:
+    runs-on: ubuntu-latest
+    needs: [build-desktop, build-android]
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create release directory
+        run: mkdir -p release-artifacts
+
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-artifacts-windows-latest
+          path: release-artifacts/windows
+
+      - name: Download macOS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-artifacts-macos-latest
+          path: release-artifacts/macos
+
+      - name: Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-artifact
+          path: release-artifacts/android
+
+      - name: List Artifacts
+        run: |
+          echo "=== List of all files to release ==="
+          find release-artifacts -type f
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.apk
+            release-artifacts/**/latest.yml
+            release-artifacts/**/latest-mac.yml
+            release-artifacts/**/*.blockmap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

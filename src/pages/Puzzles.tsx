@@ -25,20 +25,6 @@ export const Puzzles: React.FC = () => {
 
   // Local modes: 'daily' | 'rush' | 'themes'
   const [activeTab, setActiveTab] = useState<'daily' | 'rush' | 'themes'>('daily');
-  const [activePuzzles, setActivePuzzles] = useState<TacticalPuzzle[]>(LOCAL_PUZZLES);
-
-  // Load the full puzzles dataset asynchronously
-  useEffect(() => {
-    import('../data/puzzles.json')
-      .then((module) => {
-        if (module.default && module.default.length > 0) {
-          setActivePuzzles(module.default as TacticalPuzzle[]);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to load dynamic puzzles JSON:', err);
-      });
-  }, []);
 
   // Interactive Chess Engine states for puzzles
   const [puzzleChess, setPuzzleChess] = useState<Chess>(new Chess(LOCAL_PUZZLES[0].fen));
@@ -92,7 +78,7 @@ export const Puzzles: React.FC = () => {
   }, [activeTab, puzzleRushActive]);
 
   // Initialize active puzzle
-  const currentPuzzle = activePuzzles[puzzleIndex] || LOCAL_PUZZLES[0];
+  const currentPuzzle = LOCAL_PUZZLES[puzzleIndex];
 
   useEffect(() => {
     setPuzzleChess(new Chess(currentPuzzle.fen));
@@ -156,7 +142,7 @@ export const Puzzles: React.FC = () => {
             submitPuzzleAnswer(true);
             // Load next puzzle quickly in rush mode
             setTimeout(() => {
-              const nextIdx = (puzzleIndex + 1) % activePuzzles.length;
+              const nextIdx = (puzzleIndex + 1) % LOCAL_PUZZLES.length;
               setPuzzleIndex(nextIdx);
             }, 1000);
           }
@@ -168,7 +154,7 @@ export const Puzzles: React.FC = () => {
             submitPuzzleAnswer(false);
             // Even if wrong, slide to next in rush to keep speed high
             setTimeout(() => {
-              const nextIdx = (puzzleIndex + 1) % activePuzzles.length;
+              const nextIdx = (puzzleIndex + 1) % LOCAL_PUZZLES.length;
               setPuzzleIndex(nextIdx);
             }, 1200);
           }
@@ -190,17 +176,17 @@ export const Puzzles: React.FC = () => {
 
   const handleNextPuzzle = () => {
     // Adaptive difficulty: find next unsolved puzzle with >= difficulty
-    const unsolved = activePuzzles.filter(p => !solvedPuzzles.includes(p.id) && p.id !== currentPuzzle.id);
+    const unsolved = LOCAL_PUZZLES.filter(p => !solvedPuzzles.includes(p.id) && p.id !== currentPuzzle.id);
     let nextPuzzle = unsolved.find(p => p.difficulty >= currentPuzzle.difficulty);
     
     if (!nextPuzzle) {
       nextPuzzle = unsolved[0]; // fallback to any unsolved
     }
     if (!nextPuzzle) {
-      nextPuzzle = activePuzzles[(puzzleIndex + 1) % activePuzzles.length]; // fallback loop if all solved
+      nextPuzzle = LOCAL_PUZZLES[(puzzleIndex + 1) % LOCAL_PUZZLES.length]; // fallback loop if all solved
     }
     
-    setPuzzleIndex(activePuzzles.findIndex(p => p.id === nextPuzzle.id));
+    setPuzzleIndex(LOCAL_PUZZLES.findIndex(p => p.id === nextPuzzle.id));
   };
 
   const handleRetryPuzzle = () => {
@@ -469,7 +455,7 @@ export const Puzzles: React.FC = () => {
             <div
               key={theme.tag}
               onClick={() => {
-                const idx = activePuzzles.findIndex(p => p.theme === theme.tag);
+                const idx = LOCAL_PUZZLES.findIndex(p => p.theme === theme.tag);
                 if (idx !== -1) setPuzzleIndex(idx);
                 setActiveTab('daily');
               }}

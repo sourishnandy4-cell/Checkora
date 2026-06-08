@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Play, Map, Puzzle, Menu } from 'lucide-react';
+import { LayoutDashboard, Play, Map, Puzzle, Menu, GraduationCap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const BottomNavigation: React.FC = () => {
@@ -11,6 +11,7 @@ export const BottomNavigation: React.FC = () => {
     { icon: <Play size={20} />, label: 'Play', path: '/play' },
     { icon: <Map size={20} />, label: 'Story', path: '/campaign' },
     { icon: <Puzzle size={20} />, label: 'Puzzles', path: '/puzzles' },
+    { icon: <GraduationCap size={20} />, label: 'Learn', path: '/learn' },
     { icon: <Menu size={20} />, label: 'Menu', path: '/settings' },
   ];
 

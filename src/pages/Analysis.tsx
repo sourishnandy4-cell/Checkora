@@ -53,6 +53,41 @@ export const Analysis: React.FC = () => {
   // Responsive board size
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState(492);
+  // Handle piece drop in free setup
+  const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
+    try {
+      const tempChess = new Chess(fen);
+      
+      const move = tempChess.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: 'q'
+      });
+
+      if (move) {
+        playSound.play('move');
+
+        // Capture moves array and cut off future history if user drop branches
+        const fullHistory = analysisChess.history();
+        const activeHistory = fullHistory.slice(0, currentMoveIdx + 1);
+        
+        const nextChess = new Chess();
+        // Re-make all previous moves plus active move
+        activeHistory.forEach(m => nextChess.move(m));
+        nextChess.move({ from: sourceSquare, to: targetSquare, promotion: 'q' });
+
+        setAnalysisChess(nextChess);
+        setFen(nextChess.fen());
+        setHistory(nextChess.history());
+        setCurrentMoveIdx(activeHistory.length);
+
+        return true;
+      }
+    } catch {
+      // Invalid moves
+    }
+    return false;
+  };
 
   const { optionSquares, onSquareClick: defaultSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
     analysisChess,
@@ -136,41 +171,7 @@ export const Analysis: React.FC = () => {
     setRightClickedSquares({});
   }, [fen]);
 
-  // Handle piece drop in free setup
-  const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
-    try {
-      const tempChess = new Chess(fen);
-      
-      const move = tempChess.move({
-        from: sourceSquare,
-        to: targetSquare,
-        promotion: 'q'
-      });
 
-      if (move) {
-        playSound.play('move');
-
-        // Capture moves array and cut off future history if user drop branches
-        const fullHistory = analysisChess.history();
-        const activeHistory = fullHistory.slice(0, currentMoveIdx + 1);
-        
-        const nextChess = new Chess();
-        // Re-make all previous moves plus active move
-        activeHistory.forEach(m => nextChess.move(m));
-        nextChess.move({ from: sourceSquare, to: targetSquare, promotion: 'q' });
-
-        setAnalysisChess(nextChess);
-        setFen(nextChess.fen());
-        setHistory(nextChess.history());
-        setCurrentMoveIdx(activeHistory.length);
-
-        return true;
-      }
-    } catch {
-      // Invalid moves
-    }
-    return false;
-  };
 
   // Navigations [◀◀] [◀] [▶] [▶▶]
   const handleJumpStart = () => {

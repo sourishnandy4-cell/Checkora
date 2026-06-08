@@ -370,7 +370,7 @@ export const Learn: React.FC = () => {
             <div className="lg:col-span-7 flex flex-col items-center justify-center">
               <div ref={learnBoardContainerRef} className="w-full max-w-[440px] shrink-0 aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
                 <Chessboard
-                  key={lessonFen}
+                  key="CoachBoardComponent"
                   id="CoachBoard"
                   position={lessonFen}
                   onPieceDrop={onPieceDrop}
@@ -417,7 +417,7 @@ export const Learn: React.FC = () => {
             {/* Right side: Instructions card */}
             <div className="lg:col-span-5 bg-bg-surface border border-bg-border p-6 rounded-sm self-stretch flex flex-col justify-between">
               <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-1.5">
                     <Compass size={16} className="text-accent-cyan" />
                     <span className="text-[10px] font-mono-clock uppercase text-text-muted tracking-wider">Coach Instructions</span>

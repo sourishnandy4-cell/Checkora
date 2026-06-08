@@ -13,6 +13,10 @@ interface SettingsState {
   confirmMoves: boolean;
   autoPromoteToQueen: boolean;
   boardFlipped: boolean;
+  isVoiceEnabled: boolean;
+  voiceGender: 'male' | 'female';
+  enableAmbientSound: boolean;
+  ambientVolume: number;
 
   // Auth State
   isLoggedIn: boolean;
@@ -31,6 +35,10 @@ interface SettingsState {
   toggleConfirmMoves: () => void;
   toggleAutoPromote: () => void;
   toggleBoardFlipped: () => void;
+  toggleVoiceEnabled: () => void;
+  setVoiceGender: (gender: 'male' | 'female') => void;
+  toggleAmbientSound: () => void;
+  setAmbientVolume: (volume: number) => void;
   login: (name: string, isGuest: boolean, email?: string) => void;
   logout: () => void;
   setPlayerAvatar: (avatar: string) => void;
@@ -79,6 +87,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   confirmMoves: false,
   autoPromoteToQueen: true,
   boardFlipped: false,
+  isVoiceEnabled: true,
+  voiceGender: 'female',
+  enableAmbientSound: false,
+  ambientVolume: 50,
 
   isLoggedIn: false,
   isGuest: false,
@@ -138,6 +150,28 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await setStoredVal('boardFlipped', nextVal);
   },
 
+  toggleVoiceEnabled: async () => {
+    const nextVal = !get().isVoiceEnabled;
+    set({ isVoiceEnabled: nextVal });
+    await setStoredVal('isVoiceEnabled', nextVal);
+  },
+
+  setVoiceGender: async (voiceGender) => {
+    set({ voiceGender });
+    await setStoredVal('voiceGender', voiceGender);
+  },
+
+  toggleAmbientSound: async () => {
+    const nextVal = !get().enableAmbientSound;
+    set({ enableAmbientSound: nextVal });
+    await setStoredVal('enableAmbientSound', nextVal);
+  },
+
+  setAmbientVolume: async (ambientVolume) => {
+    set({ ambientVolume });
+    await setStoredVal('ambientVolume', ambientVolume);
+  },
+
   login: async (name, isGuest, email = '') => {
     set({ isLoggedIn: true, isGuest, playerName: name, playerEmail: email });
     await setStoredVal('isLoggedIn', true);
@@ -175,6 +209,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const confirmMoves = await getStoredVal('confirmMoves', false);
     const autoPromoteToQueen = await getStoredVal('autoPromoteToQueen', true);
     const boardFlipped = await getStoredVal('boardFlipped', false);
+    const isVoiceEnabled = await getStoredVal('isVoiceEnabled', true);
+    const voiceGender = await getStoredVal('voiceGender', 'female');
+    const enableAmbientSound = await getStoredVal('enableAmbientSound', false);
+    const ambientVolume = await getStoredVal('ambientVolume', 50);
 
     const isLoggedIn = await getStoredVal('isLoggedIn', false);
     const isGuest = await getStoredVal('isGuest', false);
@@ -194,6 +232,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       confirmMoves,
       autoPromoteToQueen,
       boardFlipped,
+      isVoiceEnabled,
+      voiceGender,
+      enableAmbientSound,
+      ambientVolume,
       isLoggedIn,
       isGuest,
       playerName,

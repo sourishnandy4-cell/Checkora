@@ -5,7 +5,6 @@ import { useGameStore } from './store/gameStore';
 import { TitleBar } from './components/TitleBar';
 import { NavigationRail } from './components/NavigationRail';
 import { BottomNavigation } from './components/BottomNavigation';
-import { StatusBar } from './components/StatusBar';
 import { MultiplayerModal } from './components/MultiplayerModal';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -175,7 +174,6 @@ export const App: React.FC = () => {
               </div>
             </div>
           </div>
-          <StatusBar />
           <MultiplayerModal />
         </div>
       </HashRouter>

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Chess } from 'chess.js';
 import { BotDefinition } from '../data/bots';
 import { useSettingsStore } from './settingsStore';
+import { useCampaignStore } from './campaignStore';
 
 export const getTcCategory = (tc: string): 'bullet' | 'blitz' | 'rapid' => {
   try {
@@ -354,6 +355,13 @@ export const useGameStore = create<GameState>()(
               userEloBlitz: newBlitz,
               userEloBullet: newBullet,
             });
+
+            // Save campaign progress if player won
+            const playerWon = historyResult === 'W';
+            const nodeId = get().campaignNodeId;
+            if (playerWon && nodeId) {
+              useCampaignStore.getState().completeNode(nodeId);
+            }
           }
 
           return true;
@@ -380,6 +388,11 @@ export const useGameStore = create<GameState>()(
             gameOverReason: 'timeout'
           });
           get().sendChatMessage('System', 'Game Over: Black wins on time.');
+          // Save campaign progress if player (black) won on time
+          const nodeIdBlack = get().campaignNodeId;
+          if (get().playerColor === 'black' && nodeIdBlack) {
+            useCampaignStore.getState().completeNode(nodeIdBlack);
+          }
         }
       } else {
         const nextTime = Math.max(0, blackTime - 1);
@@ -393,6 +406,11 @@ export const useGameStore = create<GameState>()(
             gameOverReason: 'timeout'
           });
           get().sendChatMessage('System', 'Game Over: White wins on time.');
+          // Save campaign progress if player (white) won on time
+          const nodeIdWhite = get().campaignNodeId;
+          if (get().playerColor === 'white' && nodeIdWhite) {
+            useCampaignStore.getState().completeNode(nodeIdWhite);
+          }
         }
       }
     },

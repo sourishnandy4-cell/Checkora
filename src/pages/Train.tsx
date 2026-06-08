@@ -133,7 +133,7 @@ export const Train: React.FC = () => {
           </div>
 
           {/* Interactive clicking board */}
-          <div ref={trainBoardContainerRef} className="w-full max-w-[420px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative select-none">
+          <div ref={trainBoardContainerRef} className="w-full max-w-[420px] shrink-0 aspect-square border-4 border-bg-border rounded-sm shadow-xl relative select-none">
             <Chessboard
               id="TrainerBoard"
               position="8/8/8/8/8/8/8/8"

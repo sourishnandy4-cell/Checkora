@@ -368,7 +368,7 @@ export const Learn: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left side: interactive board */}
             <div className="lg:col-span-7 flex flex-col items-center justify-center">
-              <div ref={learnBoardContainerRef} className="w-full max-w-[440px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
+              <div ref={learnBoardContainerRef} className="w-full max-w-[440px] shrink-0 aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
                 <Chessboard
                   id="CoachBoard"
                   position={lessonFen}

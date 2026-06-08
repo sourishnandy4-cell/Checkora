@@ -263,6 +263,7 @@ export const Puzzles: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col items-center">
             <div ref={dailyBoardContainerRef} className="w-full max-w-[460px] shrink-0 aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
               <Chessboard
+                key={puzzleFen}
                 id="DailyPuzzleBoard"
                 position={puzzleFen}
                 onPieceDrop={onPieceDrop}
@@ -418,6 +419,7 @@ export const Puzzles: React.FC = () => {
               {/* Active Puzzle Board */}
               <div ref={rushBoardContainerRef} className="w-full max-w-[420px] shrink-0 aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
                 <Chessboard
+                  key={puzzleFen}
                   id="RushBoard"
                   position={puzzleFen}
                   onPieceDrop={onPieceDrop}

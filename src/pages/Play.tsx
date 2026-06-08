@@ -595,6 +595,7 @@ export const Play: React.FC = () => {
             {/* INTERACTIVE CHESS BOARD */}
             <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square min-h-0 border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
+                key={pendingMove ? pendingMove.fen : fen}
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}
                 onPieceDrop={onPieceDrop}

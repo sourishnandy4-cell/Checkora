@@ -375,6 +375,7 @@ export const Analysis: React.FC = () => {
             {/* Chessboard frame */}
             <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
+                key={fen}
                 id="AnalysisBoard"
                 position={fen}
                 onPieceDrop={onPieceDrop}

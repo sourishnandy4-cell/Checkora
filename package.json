@@ -1,6 +1,6 @@
 {
   "name": "checkora",
-  "version": "1.1.14",
+  "version": "1.1.15",
   "description": "A premium offline-first desktop chess application with Stockfish AI, multiple themes, interactive puzzles, and a full ELO rating system. Built with React, TypeScript, and Electron.",
   "main": "dist-electron/main.js",
   "homepage": "https://github.com/sourishnandy4-cell/Checkora",

@@ -155,22 +155,24 @@ export const App: React.FC = () => {
       <HashRouter>
         <div className="w-screen h-screen flex flex-col bg-void text-text-primary overflow-hidden">
           <TitleBar />
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          <div className="flex-1 flex md:flex-row overflow-hidden relative">
             <NavigationRail />
-            <main 
-              className="flex-1 h-full overflow-hidden flex flex-col relative"
-              style={{
-                backgroundColor: 'var(--bg-base)',
-                backgroundImage: 'var(--bg-watermark, none)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundBlendMode: 'overlay'
-              }}
-            >
-              <AnimatedRoutes />
-            </main>
-            <div className="block md:hidden shrink-0 pb-safe pb-4">
-              <BottomNavigation />
+            <div className="flex-1 flex flex-col overflow-hidden relative">
+              <main 
+                className="flex-1 overflow-hidden flex flex-col relative"
+                style={{
+                  backgroundColor: 'var(--bg-base)',
+                  backgroundImage: 'var(--bg-watermark, none)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundBlendMode: 'overlay'
+                }}
+              >
+                <AnimatedRoutes />
+              </main>
+              <div className="block md:hidden shrink-0">
+                <BottomNavigation />
+              </div>
             </div>
           </div>
           <StatusBar />

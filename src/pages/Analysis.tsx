@@ -351,7 +351,7 @@ export const Analysis: React.FC = () => {
       </div>
 
       {/* Main Core Layout View */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden relative">
         
         {/* SECTION 1: Evaluation Vertical Bar (24px width) */}
         <div className="w-full lg:w-6 h-12 lg:h-full bg-bg-surface border-b lg:border-b-0 lg:border-r border-bg-border relative flex lg:flex-col items-center justify-center select-none shrink-0 z-20">
@@ -369,11 +369,11 @@ export const Analysis: React.FC = () => {
         </div>
 
         {/* SECTION 2: Board Workspace */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-6 overflow-y-auto select-none">
+        <div className="w-full flex-none lg:flex-1 flex flex-col items-center p-4 lg:p-6 lg:overflow-y-auto select-none">
           <div className="w-full max-w-[500px] flex flex-col gap-4">
             
             {/* Chessboard frame */}
-            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
                 id="AnalysisBoard"
                 position={fen}
@@ -425,7 +425,7 @@ export const Analysis: React.FC = () => {
         </div>
 
         {/* SECTION 3: Engine Control HUD & Move List */}
-        <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface shrink-0 z-20">
+        <div className="w-full lg:w-80 lg:flex-none border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface shrink-0 z-20">
           
           {/* Stockfish Engine Status panel */}
           <div className="p-4 border-b border-bg-border flex flex-col gap-3">
@@ -458,7 +458,7 @@ export const Analysis: React.FC = () => {
           </div>
 
           {/* Move Log Log */}
-          <div className="flex-1 min-h-[140px] flex flex-col overflow-hidden">
+          <div className="min-h-[140px] lg:flex-1 flex flex-col lg:overflow-hidden">
             <div className="p-3 border-b border-bg-border bg-bg-void text-[10px] font-mono-clock text-text-muted tracking-wider uppercase flex justify-between items-center select-none">
               <span>Loaded Game Notation</span>
               <span>MOVES: {history.length}</span>

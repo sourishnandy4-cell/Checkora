@@ -500,9 +500,9 @@ export const Play: React.FC = () => {
     const isBlackActive = turn === 'b';
 
     return (
-      <div className="w-full h-full flex flex-col lg:flex-row bg-base overflow-hidden">
+      <div className="w-full h-full flex flex-col lg:flex-row bg-base overflow-y-auto lg:overflow-hidden">
         {/* LEFT COLUMN: Board and info cards */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-6 overflow-y-auto">
+        <div className="w-full flex-none lg:flex-1 flex flex-col items-center p-4 lg:p-6 lg:overflow-y-auto">
           {/* Back button */}
           <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
             <button 
@@ -513,7 +513,7 @@ export const Play: React.FC = () => {
             </button>
           </div>
 
-          <div className="w-full max-w-[540px] flex flex-col gap-3">
+          <div className="w-full max-w-[540px] lg:max-w-[600px] flex flex-col gap-3">
             {/* BLACK PLAYER BAR */}
             <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
               isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
@@ -563,7 +563,7 @@ export const Play: React.FC = () => {
               </div>
 
             {/* INTERACTIVE CHESS BOARD */}
-            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square min-h-0 border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}
@@ -762,7 +762,7 @@ export const Play: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN: Sidebar (Move log, Chat) (320px width) */}
-        <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface">
+        <div className="w-full lg:w-80 lg:flex-none border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface lg:overflow-y-auto">
           {/* Active Opponent Info */}
           {activeBot && (
             <div className="p-4 border-b border-bg-border flex items-center gap-3">
@@ -782,9 +782,9 @@ export const Play: React.FC = () => {
           )}
 
           {/* Move Log pane */}
-          <div className="flex-1 min-h-[120px] p-4 flex flex-col border-b border-bg-border overflow-hidden">
+          <div className="min-h-[120px] lg:flex-1 p-4 flex flex-col border-b border-bg-border lg:overflow-hidden">
             <h4 className="text-[10px] font-mono-clock uppercase text-text-muted mb-2 tracking-wider">Move Log</h4>
-            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1.5 text-xs text-text-secondary font-mono-clock">
+            <div className="max-h-40 lg:flex-1 lg:max-h-none overflow-y-auto custom-scrollbar flex flex-col gap-1.5 text-xs text-text-secondary font-mono-clock">
               {history.length > 0 ? (
                 history.map((record) => (
                   <div key={record.num} className="flex py-1 px-2 hover:bg-bg-elevated rounded-sm">
@@ -802,7 +802,7 @@ export const Play: React.FC = () => {
           </div>
 
           {/* Simulated Chat Pane */}
-          <div className="h-60 flex flex-col bg-bg-surface">
+          <div className="h-64 lg:h-60 flex flex-col bg-bg-surface">
             <div className="p-3 border-b border-bg-border bg-bg-void flex items-center justify-between text-[10px] font-mono-clock text-text-muted tracking-wider uppercase">
               <span>Chat Log</span>
               <span className="w-1.5 h-1.5 rounded-full bg-accent-green inline-block" />

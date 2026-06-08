@@ -80,7 +80,7 @@ export const Train: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col p-6 overflow-y-auto custom-scrollbar items-center justify-center">
+    <div className="w-full h-full flex flex-col p-4 sm:p-6 overflow-y-auto custom-scrollbar items-center justify-start pt-6">
       {!coordsActive ? (
         /* START LOBBY */
         <div className="bg-bg-surface border border-bg-border p-8 rounded-sm text-center max-w-md w-full shadow-lg">

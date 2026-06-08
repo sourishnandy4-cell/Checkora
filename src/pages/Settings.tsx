@@ -255,11 +255,19 @@ export const Settings: React.FC = () => {
                 <div className="flex flex-col gap-0.5">
                   <span className="font-medium text-text-primary">Enable Coach Voice Instructions</span>
                   <span className="text-[10px] text-text-muted">Speak lesson instruction steps aloud using Web Speech API synthesis.</span>
-                </div>
-                <input 
+                </div>                 <input 
                   type="checkbox" 
                   checked={isVoiceEnabled}
-                  onChange={toggleVoiceEnabled}
+                  onChange={() => {
+                    const nextEnabled = !isVoiceEnabled;
+                    toggleVoiceEnabled();
+                    if (nextEnabled && 'speechSynthesis' in window) {
+                      try {
+                        window.speechSynthesis.cancel();
+                        window.speechSynthesis.speak(new SpeechSynthesisUtterance('Voice enabled'));
+                      } catch (e) {}
+                    }
+                  }}
                   className="w-4 h-4 rounded border-bg-border bg-bg-void focus:ring-0 text-text-primary accent-accent-primary"
                 />
               </div>
@@ -276,14 +284,30 @@ export const Settings: React.FC = () => {
                 <div className="flex bg-bg-void p-1 rounded border border-bg-border">
                   <button
                     disabled={!isVoiceEnabled}
-                    onClick={() => setVoiceGender('female')}
+                    onClick={() => {
+                      setVoiceGender('female');
+                      if (isVoiceEnabled && 'speechSynthesis' in window) {
+                        try {
+                          window.speechSynthesis.cancel();
+                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Female voice selected'));
+                        } catch (e) {}
+                      }
+                    }}
                     className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'female' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
                   >
                     Female
                   </button>
                   <button
                     disabled={!isVoiceEnabled}
-                    onClick={() => setVoiceGender('male')}
+                    onClick={() => {
+                      setVoiceGender('male');
+                      if (isVoiceEnabled && 'speechSynthesis' in window) {
+                        try {
+                          window.speechSynthesis.cancel();
+                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Male voice selected'));
+                        } catch (e) {}
+                      }
+                    }}
                     className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'male' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
                   >
                     Male

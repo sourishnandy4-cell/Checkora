@@ -8,6 +8,11 @@ class FastSpeechEngine {
     // Warm up the voices
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.getVoices();
+        };
+      }
     }
   }
 
@@ -21,7 +26,9 @@ class FastSpeechEngine {
     // Stop any ongoing speech instantly
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Use a small timeout to let the browser engine clear the queue before speaking
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
@@ -67,11 +74,12 @@ class FastSpeechEngine {
 
     // A weird bug in Chrome sometimes drops speech synthesis unless we attach a small delay
     // or resume the synthesis engine if it got stuck.
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
-    }
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
 
-    window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   }
   
   public stop() {

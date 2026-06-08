@@ -224,10 +224,19 @@ export const Learn: React.FC = () => {
   }, [pendingOpponentMove, activeLesson, lessonFen]);
 
   const handleCloseLesson = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     setActiveLessonId(null);
   };
 
   const handleRestartLesson = () => {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+      } catch (e) {}
+    }
     if (activeLesson) {
       const chess = activeLesson.startFen ? new Chess(activeLesson.startFen) : new Chess();
       setLessonChess(chess);
@@ -243,6 +252,12 @@ export const Learn: React.FC = () => {
   };
 
   const handleStartLesson = (lesson: ChessLesson) => {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+      } catch (e) {}
+    }
     setActiveLessonId(lesson.id);
   };
 
@@ -426,19 +441,44 @@ export const Learn: React.FC = () => {
                     <span className="text-[10px] text-text-secondary uppercase tracking-wider font-mono-clock">Voice:</span>
                     <div className="flex bg-void p-1 rounded border border-bg-border">
                       <button
-                        onClick={() => setVoiceGender('female')}
+                        onClick={() => {
+                          setVoiceGender('female');
+                          if (isVoiceEnabled && 'speechSynthesis' in window) {
+                            try {
+                              window.speechSynthesis.cancel();
+                              window.speechSynthesis.speak(new SpeechSynthesisUtterance('Female voice selected'));
+                            } catch (e) {}
+                          }
+                        }}
                         className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded ${voiceGender === 'female' ? 'bg-accent-primary text-void' : 'text-text-muted hover:text-text-primary'}`}
                       >
                         Female
                       </button>
                       <button
-                        onClick={() => setVoiceGender('male')}
+                        onClick={() => {
+                          setVoiceGender('male');
+                          if (isVoiceEnabled && 'speechSynthesis' in window) {
+                            try {
+                              window.speechSynthesis.cancel();
+                              window.speechSynthesis.speak(new SpeechSynthesisUtterance('Male voice selected'));
+                            } catch (e) {}
+                          }
+                        }}
                         className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded ${voiceGender === 'male' ? 'bg-accent-primary text-void' : 'text-text-muted hover:text-text-primary'}`}
                       >
                         Male
                       </button>
                       <button
-                        onClick={toggleVoiceEnabled}
+                        onClick={() => {
+                          const nextEnabled = !isVoiceEnabled;
+                          toggleVoiceEnabled();
+                          if (nextEnabled && 'speechSynthesis' in window) {
+                            try {
+                              window.speechSynthesis.cancel();
+                              window.speechSynthesis.speak(new SpeechSynthesisUtterance('Voice enabled'));
+                            } catch (e) {}
+                          }
+                        }}
                         className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded border-l border-bg-border ml-1 pl-2 ${!isVoiceEnabled ? 'text-accent-secondary font-bold' : 'text-text-muted hover:text-text-primary'}`}
                       >
                         {isVoiceEnabled ? 'ON' : 'OFF'}

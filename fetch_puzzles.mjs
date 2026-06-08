@@ -2,7 +2,7 @@ import fs from 'fs';
 import { Chess } from 'chess.js';
 
 async function fetchPuzzles() {
-  const TOTAL = 500;
+  const TOTAL = 3000;
   const BATCH = 100;
   let puzzles = [];
 
@@ -59,22 +59,8 @@ async function fetchPuzzles() {
     }
   }
 
-  const tsContent = `export interface TacticalPuzzle {
-  id: string;
-  fen: string;
-  solution: string;
-  theme: string;
-  difficulty: number;
-  playerColor: 'white' | 'black';
-  instruction: string;
-  successMessage: string;
-}
-
-export const LOCAL_PUZZLES: TacticalPuzzle[] = ${JSON.stringify(puzzles, null, 2)};
-`;
-
-  fs.writeFileSync('src/data/puzzles.ts', tsContent);
-  console.log('Saved 3000 puzzles to src/data/puzzles.ts');
+  fs.writeFileSync('src/data/puzzles.json', JSON.stringify(puzzles, null, 2));
+  console.log(`Saved ${puzzles.length} puzzles to src/data/puzzles.json`);
 }
 
 fetchPuzzles().catch(console.error);

@@ -8,8 +8,9 @@ on:
 jobs:
   build-desktop:
     strategy:
+      fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -60,7 +61,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build Web App
         run: npm run build:renderer
@@ -109,12 +110,6 @@ jobs:
           name: desktop-artifacts-windows-latest
           path: release-artifacts/windows
 
-      - name: Download macOS Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: desktop-artifacts-macos-latest
-          path: release-artifacts/macos
-
       - name: Download Android Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -131,10 +126,8 @@ jobs:
         with:
           files: |
             release-artifacts/**/*.exe
-            release-artifacts/**/*.dmg
             release-artifacts/**/*.apk
             release-artifacts/**/latest.yml
-            release-artifacts/**/latest-mac.yml
             release-artifacts/**/*.blockmap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

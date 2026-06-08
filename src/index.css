@@ -62,7 +62,6 @@
 /* Fallback for un-themed root to Mono theme */
 html:not([data-theme]),
 html[data-theme="mono"] {
-  --bg-watermark: none;
   --bg-void:       #000000;
   --bg-base:       #0A0A0A;
   --bg-surface:    #111111;
@@ -286,105 +285,6 @@ html[data-theme="walnut"] {
   --glow-md: 0 0 20px rgba(166,123,91,0.08);
 }
 
-html[data-theme="mauryan"] {
-  --bg-watermark:  url('./mauryan_watermark.png');
-  --bg-void:       #0A0604;
-  --bg-base:       #120B08;
-  --bg-surface:    #1A100B;
-  --bg-elevated:   #251610;
-  --bg-border:     #3B221A;
-  --text-primary:  #F2E5DF;
-  --text-secondary:#B69D92;
-  --text-muted:    #736058;
-  
-  --board-light:   #E8C6A8;
-  --board-dark:    #B85D19;
-  
-  --accent-primary:#E07A5F;
-  --accent-green:  #4ADE80;
-  --accent-cyan:   #22D3EE;
-  --accent-amber:  #FBBF24;
-  --accent-red:    #F87171;
-  --nav-bg:        #0A0604;
-  --sidebar-bg:    #0D0806;
-
-  --move-brilliant:  #22D3EE;
-  --move-best:       #4ADE80;
-  --move-good:       #86EFAC;
-  --move-inaccuracy: #FBBF24;
-  --move-mistake:    #FB923C;
-  --move-blunder:    #F87171;
-
-  --glow-sm: 0 0 8px rgba(224,122,95,0.12);
-  --glow-md: 0 0 20px rgba(224,122,95,0.08);
-}
-
-html[data-theme="roman"] {
-  --bg-watermark:  url('./roman_watermark.png');
-  --bg-void:       #0A0A0C;
-  --bg-base:       #0F0F14;
-  --bg-surface:    #16161D;
-  --bg-elevated:   #1E1E28;
-  --bg-border:     #2D2D3B;
-  --text-primary:  #F0F0F5;
-  --text-secondary:#9A9AB0;
-  --text-muted:    #5E5E72;
-  
-  --board-light:   #EAEAEA;
-  --board-dark:    #5E2129;
-  
-  --accent-primary:#C9A66B;
-  --accent-green:  #4ADE80;
-  --accent-cyan:   #22D3EE;
-  --accent-amber:  #FBBF24;
-  --accent-red:    #F87171;
-  --nav-bg:        #0A0A0C;
-  --sidebar-bg:    #0D0D12;
-
-  --move-brilliant:  #22D3EE;
-  --move-best:       #4ADE80;
-  --move-good:       #86EFAC;
-  --move-inaccuracy: #FBBF24;
-  --move-mistake:    #FB923C;
-  --move-blunder:    #F87171;
-
-  --glow-sm: 0 0 8px rgba(201,166,107,0.12);
-  --glow-md: 0 0 20px rgba(201,166,107,0.08);
-}
-
-html[data-theme="spartan"] {
-  --bg-watermark:  url('./spartan_watermark.png');
-  --bg-void:       #080404;
-  --bg-base:       #110808;
-  --bg-surface:    #1A0C0C;
-  --bg-elevated:   #261111;
-  --bg-border:     #3D1D1D;
-  --text-primary:  #F5EBEB;
-  --text-secondary:#B59D9D;
-  --text-muted:    #755F5F;
-  
-  --board-light:   #C79F70;
-  --board-dark:    #4A1212;
-  
-  --accent-primary:#8E2323;
-  --accent-green:  #4ADE80;
-  --accent-cyan:   #22D3EE;
-  --accent-amber:  #FBBF24;
-  --accent-red:    #F87171;
-  --nav-bg:        #080404;
-  --sidebar-bg:    #0D0606;
-
-  --move-brilliant:  #22D3EE;
-  --move-best:       #4ADE80;
-  --move-good:       #86EFAC;
-  --move-inaccuracy: #FBBF24;
-  --move-mistake:    #FB923C;
-  --move-blunder:    #F87171;
-
-  --glow-sm: 0 0 8px rgba(142,35,35,0.12);
-  --glow-md: 0 0 20px rgba(142,35,35,0.08);
-}
-
 /* ══════════════════════════════════════════════════════════════
    GLOBAL STYLES & INTERACTION STYLES
    ══════════════════════════════════════════════════════════════ */
@@ -407,12 +307,6 @@ html[data-theme="spartan"] {
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-void);
-  background-image: var(--bg-watermark, none);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-blend-mode: overlay;
-  background-attachment: fixed;
   color: var(--text-primary);
   margin: 0;
   padding: 0;

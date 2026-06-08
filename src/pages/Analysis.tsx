@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { useLocation } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { 
   Play, 
@@ -20,7 +19,6 @@ import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
-import { useChessOptions } from '../utils/useChessOptions';
 
 interface ChartPoint {
   move: number;
@@ -29,7 +27,6 @@ interface ChartPoint {
 
 export const Analysis: React.FC = () => {
   const { showCoordinates, pieceSet } = useSettingsStore();
-  const location = useLocation();
 
   // Chess Board state
   const [analysisChess, setAnalysisChess] = useState<Chess>(new Chess());
@@ -62,30 +59,6 @@ export const Analysis: React.FC = () => {
       if (engineRef.current) engineRef.current.terminate();
     };
   }, []);
-
-  // Load passed PGN from state if available
-  useEffect(() => {
-    if (location.state?.pgn) {
-      try {
-        const testChess = new Chess();
-        testChess.loadPgn(location.state.pgn);
-        setAnalysisChess(testChess);
-        setFen(testChess.fen());
-        
-        const fullHistory = testChess.history();
-        setHistory(fullHistory);
-        setCurrentMoveIdx(fullHistory.length - 1);
-        
-        const initChart = Array.from({ length: fullHistory.length + 1 }).map((_, idx) => ({
-          move: idx,
-          eval: 0
-        }));
-        setEvalHistory(initChart);
-      } catch (e) {
-        console.error('Failed to load PGN from state:', e);
-      }
-    }
-  }, [location.state]);
 
   // Responsive board size via ResizeObserver
   useEffect(() => {
@@ -166,18 +139,6 @@ export const Analysis: React.FC = () => {
     }
     return false;
   };
-
-  const { optionSquares, onSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
-    analysisChess,
-    onPieceDrop,
-    true, // always allow in analysis
-    true
-  );
-
-  // Clear highlights if board state manually jumps
-  useEffect(() => {
-    clearOptions();
-  }, [fen]);
 
   // Navigations [◀◀] [◀] [▶] [▶▶]
   const handleJumpStart = () => {
@@ -412,19 +373,15 @@ export const Analysis: React.FC = () => {
           <div className="w-full max-w-[500px] flex flex-col gap-4">
             
             {/* Chessboard frame */}
-            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
                 id="AnalysisBoard"
                 position={fen}
                 onPieceDrop={onPieceDrop}
-                onSquareClick={onSquareClick}
-                onPieceDragBegin={onPieceDragBegin}
-                onPieceDragEnd={onPieceDragEnd}
                 boardWidth={boardSize}
                 boardOrientation={boardFlipped ? 'black' : 'white'}
                 arePiecesDraggable={true}
                 showBoardNotation={showCoordinates}
-                customSquareStyles={optionSquares}
                 customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                 customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
               />

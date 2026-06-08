@@ -12,9 +12,6 @@ import {
   ArrowLeft,
   X,
   Play as PlayIcon,
-  Trophy,
-  Maximize,
-  Minimize,
   Check,
   Undo2
 } from 'lucide-react';
@@ -23,11 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSettingsStore } from '../store/settingsStore';
 import { BOTS, BotDefinition } from '../data/bots';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
-import { ambientAudio } from '../utils/ambientAudio';
 import { playSound } from '../utils/audio';
-import { useCampaignStore } from '../store/campaignStore';
-import { useMultiplayerStore } from '../store/multiplayerStore';
-import { useChessOptions } from '../utils/useChessOptions';
 
 export const Play: React.FC = () => {
   const navigate = useNavigate();
@@ -50,17 +43,12 @@ export const Play: React.FC = () => {
     tickClocks,
     resignGame,
     offerDraw,
-    acceptDraw,
-    setDrawOfferReceived,
-    drawOfferReceived,
     sendChatMessage,
     timeControl,
     userEloBlitz,
     userEloRapid,
     userEloBullet,
-    undoMove,
-    campaignNodeId,
-    playMode
+    undoMove
   } = useGameStore();
 
   const { 
@@ -72,12 +60,7 @@ export const Play: React.FC = () => {
     confirmMoves,
     autoPromoteToQueen,
     playerAvatar,
-    pieceSet,
-    zenMode,
-    toggleZenMode,
-    theme,
-    enableAmbientSound,
-    ambientVolume
+    pieceSet
   } = useSettingsStore();
 
   // Local Pre-game Picker states
@@ -100,17 +83,10 @@ export const Play: React.FC = () => {
   const [showPromotionDialog, setShowPromotionDialog] = useState(false);
   const [promoMove, setPromoMove] = useState<{ from: string; to: string } | null>(null);
 
-  // Square highlighting states
-  const [rightClickedSquares, setRightClickedSquares] = useState<{ [square: string]: React.CSSProperties | undefined }>({});
-  const [clickedSquare, setClickedSquare] = useState<string | null>(null);
-
   // Engine references
   const engineRef = useRef<StockfishEngine | null>(null);
   const clockIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const botThinkingRef = useRef(false);
-
-  // Multiplayer Hook
-  const { sendMessage } = useMultiplayerStore();
 
   // Engine evaluation states for the real-time Eval Bar
   const evalEngineRef = useRef<StockfishEngine | null>(null);
@@ -151,26 +127,6 @@ export const Play: React.FC = () => {
   // Responsive board size
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState(504);
-
-  // Manage ambient sound lifecycle
-  useEffect(() => {
-    if (isGameActive && zenMode && enableAmbientSound) {
-      ambientAudio.start(theme);
-    } else {
-      ambientAudio.stop();
-    }
-    return () => ambientAudio.stop();
-  }, [isGameActive, zenMode, theme, enableAmbientSound, ambientVolume]);
-
-  // Campaign Completion Logic
-  useEffect(() => {
-    if (gameResult && campaignNodeId) {
-      const isWin = (gameResult === 'w' && playerColor === 'white') || (gameResult === 'b' && playerColor === 'black');
-      if (isWin) {
-        useCampaignStore.getState().completeNode(campaignNodeId);
-      }
-    }
-  }, [gameResult, campaignNodeId, playerColor]);
 
   // Chat scroll reference
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -378,13 +334,11 @@ export const Play: React.FC = () => {
 
   // Handlers for piece drops
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
-    clearOptions();
-
     if (!isGameActive || gameResult) return false;
     
     // Check if it's the player's turn
     const isPlayerTurn = (turn === 'w' && playerColor === 'white') || (turn === 'b' && playerColor === 'black');
-    if (!isPlayerTurn || (playMode === 'bot' && botThinkingRef.current)) return false;
+    if (!isPlayerTurn || botThinkingRef.current) return false;
 
     // Check if we already have a pending move that needs confirmation
     if (pendingMove) return false;
@@ -422,9 +376,6 @@ export const Play: React.FC = () => {
 
         const success = makeMove(sourceSquare, targetSquare);
         if (success) {
-          if (playMode === 'multiplayer') {
-            sendMessage({ type: 'move', payload: { from: sourceSquare, to: targetSquare } });
-          }
           handlePostMoveSoundAndGameEnding(isCapture);
           return true;
         }
@@ -445,37 +396,10 @@ export const Play: React.FC = () => {
 
     const success = makeMove(pendingMove.from, pendingMove.to, pendingMove.promotion);
     if (success) {
-      if (playMode === 'multiplayer') {
-        sendMessage({ type: 'move', payload: { from: pendingMove.from, to: pendingMove.to, promotion: pendingMove.promotion } });
-      }
       handlePostMoveSoundAndGameEnding(isCapture);
     }
     setPendingMove(null);
   };
-
-  const { optionSquares, onSquareClick: defaultSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
-    chess,
-    onPieceDrop,
-    !botThinkingRef.current && !gameResult && !pendingMove,
-    showLegalMoves
-  );
-
-  const onSquareClick = (square: string) => {
-    setRightClickedSquares({});
-    defaultSquareClick(square);
-  };
-
-  function onSquareRightClick(square: string) {
-    const colour = "rgba(239, 68, 68, 0.8)";
-    setRightClickedSquares({
-      ...rightClickedSquares,
-      [square]:
-        rightClickedSquares[square] &&
-        rightClickedSquares[square].backgroundColor === colour
-          ? undefined
-          : { backgroundColor: colour }
-    });
-  }
 
   const handleCancelMove = () => {
     setPendingMove(null);
@@ -495,11 +419,6 @@ export const Play: React.FC = () => {
     if (!chatInput.trim()) return;
 
     sendChatMessage('You', chatInput);
-    
-    if (playMode === 'multiplayer') {
-      sendMessage({ type: 'chat', payload: { text: chatInput } });
-    }
-
     const userText = chatInput;
     setChatInput('');
 
@@ -572,92 +491,62 @@ export const Play: React.FC = () => {
     };
     const activeUserElo = getActiveUserElo();
 
-    const blackPlayerName = playerColor === 'black' ? playerName : (playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Stockfish Bot'));
+    const blackPlayerName = playerColor === 'black' ? playerName : (activeBot ? activeBot.name : 'Stockfish Bot');
     const blackPlayerElo = playerColor === 'black' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
-    const whitePlayerName = playerColor === 'white' ? playerName : (playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Stockfish Bot'));
+    const whitePlayerName = playerColor === 'white' ? playerName : (activeBot ? activeBot.name : 'Stockfish Bot');
     const whitePlayerElo = playerColor === 'white' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
 
     const isWhiteActive = turn === 'w';
     const isBlackActive = turn === 'b';
 
-    const orientationColor = boardFlipped ? (playerColor === 'white' ? 'black' : 'white') : playerColor;
-    const topPlayerColor = orientationColor === 'white' ? 'black' : 'white';
-    const bottomPlayerColor = orientationColor;
-
-    const renderPlayerBar = (color: 'white' | 'black') => {
-      const pName = color === 'black' ? blackPlayerName : whitePlayerName;
-      const pElo = color === 'black' ? blackPlayerElo : whitePlayerElo;
-      const pTime = color === 'black' ? blackTime : whiteTime;
-      const pActive = color === 'black' ? isBlackActive : isWhiteActive;
-      const isBot = color !== playerColor;
-      
-      const avatarElem = isBot
-        ? (activeBot && activeBot.isImageAvatar
-            ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
-            : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>)
-        : (playerAvatar
-            ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
-            : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>);
-
-      return (
-        <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-          pActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-        }`}>
-          <div className="flex items-center gap-3">
-            {avatarElem}
-            <div>
-              <div className="text-xs font-semibold flex items-center gap-1.5">
-                {pName} 
-                <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
-                  {pElo}
-                </span>
-              </div>
-              {isBotTurn && isBot && botThinkingRef.current && (
-                <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
-              )}
-            </div>
-          </div>
-
-          {/* CLOCK */}
-          <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-            pTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-          } ${pActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
-            {formatTime(pTime)}
-          </div>
-        </div>
-      );
-    };
-
     return (
-      <div className="w-full h-full flex flex-col lg:flex-row bg-base overflow-hidden relative">
-        {zenMode && (
-          <button 
-            onClick={toggleZenMode}
-            className="absolute top-4 right-4 z-50 p-3 bg-bg-surface/80 glassmorphism border border-bg-border rounded-full text-text-secondary hover:text-text-primary hover:scale-110 transition-all shadow-2xl"
-            title="Exit Zen Mode"
-          >
-            <Minimize size={18} />
-          </button>
-        )}
-        
+      <div className="w-full h-full flex flex-col lg:flex-row bg-base overflow-hidden">
         {/* LEFT COLUMN: Board and info cards */}
-        <div className={`flex-1 flex flex-col items-center p-4 lg:p-6 overflow-y-auto ${zenMode ? 'max-w-none' : ''}`}>
-          <div className="w-full flex flex-col items-center my-auto shrink-0">
+        <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-6 overflow-y-auto">
           {/* Back button */}
-          {!zenMode && (
-            <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
-              <button 
-                onClick={() => useGameStore.getState().resetAll()}
-                className="text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary flex items-center gap-1 cursor-pointer"
-              >
-                <ArrowLeft size={14} /> Back to Bot Selection
-              </button>
-            </div>
-          )}
+          <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
+            <button 
+              onClick={() => useGameStore.getState().resetAll()}
+              className="text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary flex items-center gap-1 cursor-pointer"
+            >
+              <ArrowLeft size={14} /> Back to Bot Selection
+            </button>
+          </div>
 
-          <div className={`w-full flex flex-col gap-3 ${zenMode ? 'max-w-[70vh]' : 'max-w-[540px]'}`}>
-            {/* TOP PLAYER BAR */}
-            {!zenMode && renderPlayerBar(topPlayerColor)}
+          <div className="w-full max-w-[540px] flex flex-col gap-3">
+            {/* BLACK PLAYER BAR */}
+            <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+              isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+            }`}>
+              <div className="flex items-center gap-3">
+                {playerColor === 'black' 
+                  ? playerAvatar
+                    ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
+                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                  : activeBot && activeBot.isImageAvatar
+                    ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
+                }
+                <div>
+                  <div className="text-xs font-semibold flex items-center gap-1.5">
+                    {blackPlayerName} 
+                    <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                      {blackPlayerElo}
+                    </span>
+                  </div>
+                  {isBotTurn && playerColor === 'white' && botThinkingRef.current && (
+                    <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
+                  )}
+                </div>
+              </div>
+
+              {/* CLOCK */}
+              <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+              } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                {formatTime(blackTime)}
+              </div>
+            </div>
 
             {/* EVAL BAR + BOARD WRAPPER */}
             <div className="flex w-full gap-2 lg:gap-4 relative">
@@ -679,15 +568,8 @@ export const Play: React.FC = () => {
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}
                 onPieceDrop={onPieceDrop}
-                onPieceDragBegin={(piece, sourceSquare) => {
-                  setRightClickedSquares({});
-                  onPieceDragBegin(piece, sourceSquare);
-                }}
-                onPieceDragEnd={onPieceDragEnd}
-                onSquareClick={onSquareClick}
-                onSquareRightClick={onSquareRightClick}
                 boardWidth={boardSize}
-                boardOrientation={orientationColor}
+                boardOrientation={playerColor}
                 arePiecesDraggable={!botThinkingRef.current && !gameResult && !pendingMove}
                 showBoardNotation={showCoordinates}
                 customLightSquareStyle={customBoardStyles.customLightSquareStyle}
@@ -716,8 +598,8 @@ export const Play: React.FC = () => {
                   setPromoMove(null);
                   return true;
                 }}
-                customSquareStyles={{
-                  ...(chess.inCheck() 
+                customSquareStyles={
+                  chess.inCheck() 
                     ? {
                         // Soft red overlay on checked king
                         [chess.history({ verbose: true }).pop()?.color === 'w' 
@@ -725,10 +607,8 @@ export const Play: React.FC = () => {
                           : (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
                         ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
                       }
-                    : {}),
-                  ...optionSquares,
-                  ...rightClickedSquares
-                }}
+                    : {}
+                }
               />
 
               {/* Game Over Overlay */}
@@ -745,53 +625,40 @@ export const Play: React.FC = () => {
                     {gameOverReason === 'checkmate' ? 'Checkmate' : gameOverReason}
                   </span>
                   <div className="flex gap-4">
-                    {campaignNodeId ? (
+                    {canUndo && (
                       <button
                         onClick={() => {
-                          useGameStore.getState().resetAll();
-                          navigate('/campaign');
+                          const success = undoMove();
+                          if (success) {
+                            playSound.play('move');
+                          }
                         }}
-                        className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock mt-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors"
+                        className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase bg-accent-amber/20 border border-accent-amber text-accent-amber hover:bg-accent-amber/30"
                       >
-                        Back to Map
+                        Takeback
                       </button>
-                    ) : (
-                      <>
-                        {canUndo && (
-                          <button
-                            onClick={() => {
-                              const success = undoMove();
-                              if (success) {
-                                playSound.play('move');
-                              }
-                            }}
-                            className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase bg-accent-amber/20 border border-accent-amber text-accent-amber hover:bg-accent-amber/30"
-                          >
-                            Takeback
-                          </button>
-                        )}
-                        <button
-                          onClick={() => {
-                            if (activeBot) startNewGame(activeBot, timeControl as any, playerColor);
-                          }}
-                          className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
-                        >
-                          Rematch
-                        </button>
-                        <button
-                          onClick={() => {
-                            useGameStore.getState().resetAll();
-                          }}
-                          className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock"
-                        >
-                          Play Again
-                        </button>
-                      </>
                     )}
+                    <button
+                      onClick={() => {
+                        if (activeBot) startNewGame(activeBot, timeControl as any, playerColor);
+                      }}
+                      className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
+                    >
+                      Rematch
+                    </button>
+                    <button
+              onClick={() => {
+                useGameStore.getState().resetAll();
+              }}
+              className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock"
+            >
+              Play Again
+            </button>
             <button
               onClick={() => {
                 const currentPgn = chess.pgn();
-                navigate('/analysis', { state: { pgn: currentPgn } });
+                useGameStore.getState().loadPGN(currentPgn);
+                navigate('/analysis');
               }}
               className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock mt-2 bg-bg-surface hover:text-accent-cyan transition-colors"
             >
@@ -803,8 +670,39 @@ export const Play: React.FC = () => {
             </div>
             </div>
 
-            {/* BOTTOM PLAYER BAR */}
-            {!zenMode && renderPlayerBar(bottomPlayerColor)}
+            {/* OPPONENT BAR (BOTTOM) */}
+            <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+              isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+            }`}>
+              <div className="flex items-center gap-3">
+                {playerColor === 'white' 
+                  ? playerAvatar
+                    ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
+                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                  : activeBot && activeBot.isImageAvatar
+                    ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
+                }
+                <div>
+                  <div className="text-xs font-semibold flex items-center gap-1.5">
+                    {whitePlayerName}
+                    <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                      {whitePlayerElo}
+                    </span>
+                  </div>
+                  {isBotTurn && playerColor === 'black' && botThinkingRef.current && (
+                    <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
+                  )}
+                </div>
+              </div>
+
+              {/* CLOCK */}
+              <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+              } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                {formatTime(whiteTime)}
+              </div>
+            </div>
 
             {/* CONTROLS OR CONFIRMATION STRIP */}
             {pendingMove ? (
@@ -822,58 +720,22 @@ export const Play: React.FC = () => {
                   <X size={14} /> Cancel Move
                 </button>
               </div>
-            ) : !zenMode ? (
+            ) : (
               <div className="flex gap-2 w-full mt-1">
-                {drawOfferReceived ? (
-                  <>
-                    <button
-                      onClick={() => {
-                        acceptDraw();
-                        if (playMode === 'multiplayer') sendMessage({ type: 'draw_accept' });
-                      }}
-                      disabled={!!gameResult}
-                      className="flex-1 py-2 bg-accent-green/20 border border-accent-green text-xs uppercase font-mono-clock text-accent-green hover:bg-accent-green/30 disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn rounded-sm"
-                    >
-                      <Check size={14} /> Accept Draw
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDrawOfferReceived(false);
-                        if (playMode === 'multiplayer') sendMessage({ type: 'draw_decline' });
-                      }}
-                      disabled={!!gameResult}
-                      className="flex-1 py-2 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red/30 disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn rounded-sm"
-                    >
-                      <X size={14} /> Decline
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => {
-                        offerDraw();
-                        if (playMode === 'multiplayer') {
-                          sendMessage({ type: 'draw_offer' });
-                          sendChatMessage('System', 'Draw offer sent to opponent.');
-                        }
-                      }}
-                      disabled={!!gameResult}
-                      className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
-                    >
-                      <Handshake size={14} /> Offer Draw
-                    </button>
-                    <button
-                      onClick={() => {
-                        resignGame();
-                        if (playMode === 'multiplayer') sendMessage({ type: 'resign' });
-                      }}
-                      disabled={!!gameResult}
-                      className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-accent-red disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
-                    >
-                      <Flag size={14} /> Resign
-                    </button>
-                  </>
-                )}
+                <button
+                  onClick={offerDraw}
+                  disabled={!!gameResult}
+                  className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
+                >
+                  <Handshake size={14} /> Offer Draw
+                </button>
+                <button
+                  onClick={resignGame}
+                  disabled={!!gameResult}
+                  className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-accent-red disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
+                >
+                  <Flag size={14} /> Resign
+                </button>
                 <button
                   onClick={() => {
                     const success = undoMove();
@@ -894,21 +756,12 @@ export const Play: React.FC = () => {
                 >
                   <FlipHorizontal size={14} />
                 </button>
-                <button
-                  onClick={toggleZenMode}
-                  className="p-2 bg-bg-surface border border-bg-border text-text-secondary hover:text-accent-cyan premium-btn"
-                  title="Enter Zen Mode"
-                >
-                  <Maximize size={14} />
-                </button>
               </div>
-            ) : null}
-          </div>
+            )}
           </div>
         </div>
 
         {/* RIGHT COLUMN: Sidebar (Move log, Chat) (320px width) */}
-        {!zenMode && (
         <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface">
           {/* Active Opponent Info */}
           {activeBot && (
@@ -991,7 +844,6 @@ export const Play: React.FC = () => {
             </form>
           </div>
         </div>
-        )}
       </div>
     );
   }

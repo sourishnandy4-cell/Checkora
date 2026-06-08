@@ -17,9 +17,6 @@ const THEMES = [
   { id: 'aurora',  name: 'Aurora',  preview: ['#0D0A1C', '#DDD6F3', '#2B1D5E', '#A78BFA'] },
   { id: 'wooden',  name: 'Wooden',  preview: ['#1C1511', '#E1C699', '#965D37', '#D4A373'] },
   { id: 'walnut',  name: 'Walnut',  preview: ['#110E0C', '#D2B48C', '#5C4033', '#A67B5B'] },
-  { id: 'mauryan', name: 'Mauryan', preview: ['#120B08', '#E8C6A8', '#B85D19', '#E07A5F'] },
-  { id: 'roman',   name: 'Roman',   preview: ['#0F0F14', '#EAEAEA', '#5E2129', '#C9A66B'] },
-  { id: 'spartan', name: 'Spartan', preview: ['#110808', '#C79F70', '#4A1212', '#8E2323'] },
 ] as const;
 
 export const Settings: React.FC = () => {
@@ -40,19 +37,11 @@ export const Settings: React.FC = () => {
     setSoundVolume,
     toggleSound,
     toggleConfirmMoves,
-    toggleAutoPromote,
-    enableAmbientSound,
-    ambientVolume,
-    toggleAmbientSound,
-    setAmbientVolume
+    toggleAutoPromote
   } = useSettingsStore();
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSoundVolume(parseInt(e.target.value, 10));
-  };
-
-  const handleAmbientVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmbientVolume(parseInt(e.target.value, 10));
   };
 
   return (
@@ -246,43 +235,6 @@ export const Settings: React.FC = () => {
                     className="w-28 h-1 bg-bg-border rounded-lg appearance-none cursor-pointer accent-accent-primary disabled:opacity-30"
                   />
                   <span className="font-mono-clock text-xs w-8 text-right font-bold">{soundVolume}%</span>
-                </div>
-              </div>
-
-              <div className="w-full border-t border-bg-border/40" />
-
-              {/* Ambient Sounds Enable */}
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex flex-col gap-0.5">
-                  <span className="font-medium text-text-primary">Enable Ambient Soundscapes</span>
-                  <span className="text-[10px] text-text-muted">Procedurally generated soothing background audio (Ocean, Wind, etc).</span>
-                </div>
-                <input 
-                  type="checkbox" 
-                  checked={enableAmbientSound}
-                  onChange={toggleAmbientSound}
-                  className="w-4 h-4 rounded border-bg-border bg-bg-void focus:ring-0 text-text-primary accent-accent-primary"
-                />
-              </div>
-
-              {/* Ambient Volume Slider */}
-              <div className="flex items-center justify-between text-xs gap-6">
-                <div className="flex flex-col gap-0.5 flex-1">
-                  <span className="font-medium text-text-primary">Ambient Volume</span>
-                  <span className="text-[10px] text-text-muted">Adjust volume of soothing ambient soundscapes.</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <input 
-                    type="range" 
-                    min={0} 
-                    max={100}
-                    value={ambientVolume}
-                    disabled={!enableAmbientSound}
-                    onChange={handleAmbientVolumeChange}
-                    className="w-28 h-1 bg-bg-border rounded-lg appearance-none cursor-pointer accent-accent-primary disabled:opacity-30"
-                  />
-                  <span className="font-mono-clock text-xs w-8 text-right font-bold">{ambientVolume}%</span>
                 </div>
               </div>
             </div>

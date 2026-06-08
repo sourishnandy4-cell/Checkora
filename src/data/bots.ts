@@ -488,7 +488,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'samay-raina',
     name: 'Samay Raina',
-    avatar: './avatars/samay_raina.png',
+    avatar: '/avatars/samay_raina.png',
     isImageAvatar: true,
     emoji: '🎭',
     country: '🇮🇳',
@@ -514,7 +514,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'gotham-chess',
     name: 'GothamChess',
-    avatar: './avatars/gotham_chess.png',
+    avatar: '/avatars/gotham_chess.png',
     isImageAvatar: true,
     emoji: '🗽',
     country: '🇺🇸',
@@ -540,7 +540,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'sagar-shah',
     name: 'Sagar Shah',
-    avatar: './avatars/sagar_shah.png',
+    avatar: '/avatars/sagar_shah.png',
     isImageAvatar: true,
     emoji: '🎤',
     country: '🇮🇳',
@@ -566,7 +566,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'vidit-gujrathi',
     name: 'Vidit Gujrathi',
-    avatar: './avatars/vidit_gujrathi.png',
+    avatar: '/avatars/vidit_gujrathi.png',
     isImageAvatar: true,
     emoji: '🎯',
     country: '🇮🇳',
@@ -592,7 +592,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'hikaru',
     name: 'Hikaru Nakamura',
-    avatar: './avatars/hikaru.png',
+    avatar: '/avatars/hikaru.png',
     isImageAvatar: true,
     emoji: '⚡',
     country: '🇺🇸',
@@ -618,7 +618,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'magnus',
     name: 'Magnus Carlsen',
-    avatar: './avatars/magnus.png',
+    avatar: '/avatars/magnus.png',
     isImageAvatar: true,
     emoji: '👑',
     country: '🇳🇴',
@@ -644,7 +644,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'pragg',
     name: 'Praggnanandhaa',
-    avatar: './avatars/pragg.png',
+    avatar: '/avatars/pragg.png',
     isImageAvatar: true,
     emoji: '🎓',
     country: '🇮🇳',
@@ -670,7 +670,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'narendra-modi',
     name: 'Narendra Modi',
-    avatar: './avatars/narendra_modi.png',
+    avatar: '/avatars/narendra_modi.png',
     isImageAvatar: true,
     emoji: '🦁',
     country: '🇮🇳',
@@ -696,7 +696,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'rahul-gandhi',
     name: 'Rahul Gandhi',
-    avatar: './avatars/rahul_gandhi.png',
+    avatar: '/avatars/rahul_gandhi.png',
     isImageAvatar: true,
     emoji: '🏃',
     country: '🇮🇳',
@@ -722,7 +722,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'mamta-banarjee',
     name: 'Mamta Banerjee',
-    avatar: './avatars/mamta_banarjee.png',
+    avatar: '/avatars/mamta_banarjee.png',
     isImageAvatar: true,
     emoji: '🩴',
     country: '🇮🇳',
@@ -748,7 +748,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'amit-shah',
     name: 'Amit Shah',
-    avatar: './avatars/amit_shah.png',
+    avatar: '/avatars/amit_shah.png',
     isImageAvatar: true,
     emoji: '♟️',
     country: '🇮🇳',
@@ -774,7 +774,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'donald-trump',
     name: 'Donald Trump',
-    avatar: './avatars/donald_trump.png',
+    avatar: '/avatars/donald_trump.png',
     isImageAvatar: true,
     emoji: '👱',
     country: '🇺🇸',
@@ -800,7 +800,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'meloni',
     name: 'Giorgia Meloni',
-    avatar: './avatars/meloni.png',
+    avatar: '/avatars/meloni.png',
     isImageAvatar: true,
     emoji: '🍕',
     country: '🇮🇹',
@@ -826,7 +826,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'xi-jinping',
     name: 'Xi Jinping',
-    avatar: './avatars/xi_jinping.png',
+    avatar: '/avatars/xi_jinping.png',
     isImageAvatar: true,
     emoji: '🐼',
     country: '🇨🇳',
@@ -852,7 +852,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'vladimir-putin',
     name: 'Vladimir Putin',
-    avatar: './avatars/vladimir_putin.png',
+    avatar: '/avatars/vladimir_putin.png',
     isImageAvatar: true,
     emoji: '🐻',
     country: '🇷🇺',
@@ -878,7 +878,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'mohammed-bin-salman',
     name: 'Mohammed bin Salman',
-    avatar: './avatars/mohammed_bin_salman.png',
+    avatar: '/avatars/mohammed_bin_salman.png',
     isImageAvatar: true,
     emoji: '🌴',
     country: '🇸🇦',
@@ -904,7 +904,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'elon-musk',
     name: 'Elon Musk',
-    avatar: './avatars/elon_musk.png',
+    avatar: '/avatars/elon_musk.png',
     isImageAvatar: true,
     emoji: '🚀',
     country: '🇺🇸',
@@ -930,7 +930,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'benjamin-netanyahu',
     name: 'Benjamin Netanyahu',
-    avatar: './avatars/benjamin_netanyahu.png',
+    avatar: '/avatars/benjamin_netanyahu.png',
     isImageAvatar: true,
     emoji: '🏛️',
     country: '🇮🇱',
@@ -956,7 +956,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'pope-francis',
     name: 'Pope Francis',
-    avatar: './avatars/pope_francis.png',
+    avatar: '/avatars/pope_francis.png',
     isImageAvatar: true,
     emoji: '🕊️',
     country: '🇻🇦',
@@ -982,7 +982,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'claudia-sheinbaum',
     name: 'Claudia Sheinbaum',
-    avatar: './avatars/claudia_sheinbaum.png',
+    avatar: '/avatars/claudia_sheinbaum.png',
     isImageAvatar: true,
     emoji: '🔬',
     country: '🇲🇽',
@@ -1008,7 +1008,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'larry-page',
     name: 'Larry Page',
-    avatar: './avatars/larry_page.png',
+    avatar: '/avatars/larry_page.png',
     isImageAvatar: true,
     emoji: '🔍',
     country: '🇺🇸',
@@ -1034,7 +1034,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'abraham-lincoln',
     name: 'Abraham Lincoln',
-    avatar: './avatars/abraham_lincoln.png',
+    avatar: '/avatars/abraham_lincoln.png',
     isImageAvatar: true,
     emoji: '🎩',
     country: '🇺🇸',
@@ -1060,7 +1060,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'nelson-mandela',
     name: 'Nelson Mandela',
-    avatar: './avatars/nelson_mandela.png',
+    avatar: '/avatars/nelson_mandela.png',
     isImageAvatar: true,
     emoji: '☮️',
     country: '🇿🇦',
@@ -1086,7 +1086,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'alexander-the-great',
     name: 'Alexander the Great',
-    avatar: './avatars/alexander_the_great.png',
+    avatar: '/avatars/alexander_the_great.png',
     isImageAvatar: true,
     emoji: '⚔️',
     country: '🇬🇷',
@@ -1112,7 +1112,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'winston-churchill',
     name: 'Winston Churchill',
-    avatar: './avatars/winston_churchill.png',
+    avatar: '/avatars/winston_churchill.png',
     isImageAvatar: true,
     emoji: '🎩',
     country: '🇬🇧',
@@ -1138,7 +1138,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'julius-caesar',
     name: 'Julius Caesar',
-    avatar: './avatars/julius_caesar.png',
+    avatar: '/avatars/julius_caesar.png',
     isImageAvatar: true,
     emoji: '👑',
     country: '🇮🇹',
@@ -1164,7 +1164,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'queen-elizabeth-ii',
     name: 'Queen Elizabeth II',
-    avatar: './avatars/queen_elizabeth_ii.png',
+    avatar: '/avatars/queen_elizabeth_ii.png',
     isImageAvatar: true,
     emoji: '👑',
     country: '🇬🇧',
@@ -1190,7 +1190,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'emperor-ashoka',
     name: 'Emperor Ashoka',
-    avatar: './avatars/emperor_ashoka.png',
+    avatar: '/avatars/emperor_ashoka.png',
     isImageAvatar: true,
     emoji: '☸️',
     country: '🇮🇳',
@@ -1216,7 +1216,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'genghis-khan',
     name: 'Genghis Khan',
-    avatar: './avatars/genghis_khan.png',
+    avatar: '/avatars/genghis_khan.png',
     isImageAvatar: true,
     emoji: '🏹',
     country: '🇲🇳',
@@ -1242,7 +1242,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'chanakya',
     name: 'Chanakya',
-    avatar: './avatars/chanakya.png',
+    avatar: '/avatars/chanakya.png',
     isImageAvatar: true,
     emoji: '📜',
     country: '🇮🇳',
@@ -1268,7 +1268,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'cyrus-the-great',
     name: 'Cyrus the Great',
-    avatar: './avatars/cyrus_the_great.png',
+    avatar: '/avatars/cyrus_the_great.png',
     isImageAvatar: true,
     emoji: '🦁',
     country: '🇮🇷',
@@ -1294,7 +1294,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'napoleon-bonaparte',
     name: 'Napoleon Bonaparte',
-    avatar: './avatars/napoleon_bonaparte.png',
+    avatar: '/avatars/napoleon_bonaparte.png',
     isImageAvatar: true,
     emoji: '🏇',
     country: '🇫🇷',
@@ -1320,7 +1320,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'charlemagne',
     name: 'Charlemagne',
-    avatar: './avatars/charlemagne.png',
+    avatar: '/avatars/charlemagne.png',
     isImageAvatar: true,
     emoji: '🛡️',
     country: '🇫🇷',
@@ -1346,7 +1346,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'queen-elizabeth-i',
     name: 'Queen Elizabeth I',
-    avatar: './avatars/queen_elizabeth_i.png',
+    avatar: '/avatars/queen_elizabeth_i.png',
     isImageAvatar: true,
     emoji: '👑',
     country: '🇬🇧',
@@ -1372,7 +1372,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'adolf-hitler',
     name: 'Adolf Hitler',
-    avatar: './avatars/adolf_hitler.png',
+    avatar: '/avatars/adolf_hitler.png',
     isImageAvatar: true,
     emoji: '🛑',
     country: '🇩🇪',
@@ -1398,7 +1398,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'chhatrapati-shivaji',
     name: 'Chhatrapati Shivaji Maharaj',
-    avatar: './avatars/chhatrapati_shivaji.png',
+    avatar: '/avatars/chhatrapati_shivaji.png',
     isImageAvatar: true,
     emoji: '🐅',
     country: '🇮🇳',
@@ -1424,7 +1424,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'akbar-the-great',
     name: 'Akbar the Great',
-    avatar: './avatars/akbar_the_great.png',
+    avatar: '/avatars/akbar_the_great.png',
     isImageAvatar: true,
     emoji: '🐘',
     country: '🇮🇳',
@@ -1450,7 +1450,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'chandragupta-maurya',
     name: 'Chandragupta Maurya',
-    avatar: './avatars/chandragupta_maurya.png',
+    avatar: '/avatars/chandragupta_maurya.png',
     isImageAvatar: true,
     emoji: '🏹',
     country: '🇮🇳',
@@ -1476,7 +1476,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'raja-raja-chola-i',
     name: 'Raja Raja Chola I',
-    avatar: './avatars/raja_raja_chola_i.png',
+    avatar: '/avatars/raja_raja_chola_i.png',
     isImageAvatar: true,
     emoji: '🚢',
     country: '🇮🇳',
@@ -1502,7 +1502,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'netaji-subhas-chandra-bose',
     name: 'Netaji Subhas Chandra Bose',
-    avatar: './avatars/netaji_subhas_chandra_bose.png',
+    avatar: '/avatars/netaji_subhas_chandra_bose.png',
     isImageAvatar: true,
     emoji: '🎖️',
     country: '🇮🇳',
@@ -1528,7 +1528,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'rani-lakshmibai',
     name: 'Rani Lakshmibai',
-    avatar: './avatars/rani_lakshmibai.png',
+    avatar: '/avatars/rani_lakshmibai.png',
     isImageAvatar: true,
     emoji: '🏇',
     country: '🇮🇳',
@@ -1554,7 +1554,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'swami-vivekananda',
     name: 'Swami Vivekananda',
-    avatar: './avatars/swami_vivekananda.png',
+    avatar: '/avatars/swami_vivekananda.png',
     isImageAvatar: true,
     emoji: '🧘',
     country: '🇮🇳',
@@ -1580,7 +1580,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'prithviraj-chauhan',
     name: 'Prithviraj Chauhan',
-    avatar: './avatars/prithviraj_chauhan.png',
+    avatar: '/avatars/prithviraj_chauhan.png',
     isImageAvatar: true,
     emoji: '🏹',
     country: '🇮🇳',
@@ -1606,7 +1606,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'maharana-pratap',
     name: 'Maharana Pratap',
-    avatar: './avatars/maharana_pratap.png',
+    avatar: '/avatars/maharana_pratap.png',
     isImageAvatar: true,
     emoji: '🐎',
     country: '🇮🇳',
@@ -1632,7 +1632,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'chhatrapati-sambhaji',
     name: 'Chhatrapati Sambhaji Maharaj',
-    avatar: './avatars/chhatrapati_sambhaji.png',
+    avatar: '/avatars/chhatrapati_sambhaji.png',
     isImageAvatar: true,
     emoji: '🦁',
     country: '🇮🇳',
@@ -1658,7 +1658,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'qin-shi-huang',
     name: 'Qin Shi Huang',
-    avatar: './avatars/qin_shi_huang.png',
+    avatar: '/avatars/qin_shi_huang.png',
     isImageAvatar: true,
     emoji: '🧱',
     country: '🇨🇳',
@@ -1684,7 +1684,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'suleiman-magnificent',
     name: 'Suleiman the Magnificent',
-    avatar: './avatars/suleiman_magnificent.png',
+    avatar: '/avatars/suleiman_magnificent.png',
     isImageAvatar: true,
     emoji: '🕌',
     country: '🇹🇷',
@@ -1710,7 +1710,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'garry-kasparov',
     name: 'Garry Kasparov',
-    avatar: './avatars/garry_kasparov.png',
+    avatar: '/avatars/garry_kasparov.png',
     isImageAvatar: true,
     emoji: '👑',
     country: '🇭🇷',
@@ -1736,7 +1736,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'bobby-fischer',
     name: 'Bobby Fischer',
-    avatar: './avatars/bobby_fischer.png',
+    avatar: '/avatars/bobby_fischer.png',
     isImageAvatar: true,
     emoji: '🎩',
     country: '🇺🇸',
@@ -1762,7 +1762,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'mikhail-tal',
     name: 'Mikhail Tal',
-    avatar: './avatars/mikhail_tal.png',
+    avatar: '/avatars/mikhail_tal.png',
     isImageAvatar: true,
     emoji: '🔥',
     country: '🇱🇻',
@@ -1788,7 +1788,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'viswanathan-anand',
     name: 'Viswanathan Anand',
-    avatar: './avatars/viswanathan_anand.png',
+    avatar: '/avatars/viswanathan_anand.png',
     isImageAvatar: true,
     emoji: '🐅',
     country: '🇮🇳',
@@ -1814,7 +1814,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'botez-sisters',
     name: 'Botez Sisters',
-    avatar: './avatars/botez_sisters.png',
+    avatar: '/avatars/botez_sisters.png',
     isImageAvatar: true,
     emoji: '👩‍👧',
     country: '🇨🇦',
@@ -1840,7 +1840,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'anish-giri',
     name: 'Anish Giri',
-    avatar: './avatars/anish_giri.png',
+    avatar: '/avatars/anish_giri.png',
     isImageAvatar: true,
     emoji: '💬',
     country: '🇳🇱',
@@ -1866,7 +1866,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'judit-polgar',
     name: 'Judit Polgar',
-    avatar: './avatars/judit_polgar.png',
+    avatar: '/avatars/judit_polgar.png',
     isImageAvatar: true,
     emoji: '⚔️',
     country: '🇭🇺',
@@ -1892,7 +1892,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'divya-deshmukh',
     name: 'Divya Deshmukh',
-    avatar: './avatars/divya_deshmukh.png',
+    avatar: '/avatars/divya_deshmukh.png',
     isImageAvatar: true,
     emoji: '🇮🇳',
     country: '🇮🇳',
@@ -1918,7 +1918,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'anatoly-karpov',
     name: 'Anatoly Karpov',
-    avatar: './avatars/anatoly_karpov.png',
+    avatar: '/avatars/anatoly_karpov.png',
     isImageAvatar: true,
     emoji: '🐍',
     country: '🇷🇺',
@@ -1944,7 +1944,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'vaishali-r',
     name: 'Vaishali Rameshbabu',
-    avatar: './avatars/vaishali_r.png',
+    avatar: '/avatars/vaishali_r.png',
     isImageAvatar: true,
     emoji: '🐅',
     country: '🇮🇳',
@@ -1970,7 +1970,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'koneru-humpy',
     name: 'Koneru Humpy',
-    avatar: './avatars/koneru_humpy.png',
+    avatar: '/avatars/koneru_humpy.png',
     isImageAvatar: true,
     emoji: '🇮🇳',
     country: '🇮🇳',
@@ -1996,7 +1996,7 @@ export const BOTS: BotDefinition[] = [
   {
     id: 'ding-liren',
     name: 'Ding Liren',
-    avatar: './avatars/ding_liren.png',
+    avatar: '/avatars/ding_liren.png',
     isImageAvatar: true,
     emoji: '🐉',
     country: '🇨🇳',

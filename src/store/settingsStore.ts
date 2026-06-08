@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ThemeId = 'mono' | 'forest' | 'ocean' | 'crimson' | 'aurora' | 'wooden' | 'walnut' | 'mauryan' | 'roman' | 'spartan';
+export type ThemeId = 'mono' | 'forest' | 'ocean' | 'crimson' | 'aurora' | 'wooden' | 'walnut';
 export type PieceSetId = 'classic' | 'neo' | 'alpha' | 'maya' | 'bases' | 'wooden-pieces';
 
 interface SettingsState {
@@ -13,11 +13,6 @@ interface SettingsState {
   confirmMoves: boolean;
   autoPromoteToQueen: boolean;
   boardFlipped: boolean;
-  zenMode: boolean;
-  enableAmbientSound: boolean;
-  ambientVolume: number;
-  isVoiceEnabled: boolean;
-  voiceGender: 'male' | 'female';
 
   // Auth State
   isLoggedIn: boolean;
@@ -36,11 +31,6 @@ interface SettingsState {
   toggleConfirmMoves: () => void;
   toggleAutoPromote: () => void;
   toggleBoardFlipped: () => void;
-  toggleZenMode: () => void;
-  toggleAmbientSound: () => void;
-  setAmbientVolume: (volume: number) => void;
-  toggleVoiceEnabled: () => void;
-  setVoiceGender: (gender: 'male' | 'female') => void;
   login: (name: string, isGuest: boolean, email?: string) => void;
   logout: () => void;
   setPlayerAvatar: (avatar: string) => void;
@@ -89,17 +79,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   confirmMoves: false,
   autoPromoteToQueen: true,
   boardFlipped: false,
-  zenMode: false,
-  enableAmbientSound: true,
-  ambientVolume: 50,
-  isVoiceEnabled: true,
-  voiceGender: 'female',
 
   isLoggedIn: false,
   isGuest: false,
   playerName: 'Guest',
   playerEmail: '',
-  playerAvatar: './avatars/preset_pawn.png',
+  playerAvatar: '/avatars/preset_pawn.png',
 
   setTheme: async (theme) => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -153,34 +138,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await setStoredVal('boardFlipped', nextVal);
   },
 
-  toggleZenMode: async () => {
-    const nextVal = !get().zenMode;
-    set({ zenMode: nextVal });
-    await setStoredVal('zenMode', nextVal);
-  },
-
-  toggleAmbientSound: async () => {
-    const nextVal = !get().enableAmbientSound;
-    set({ enableAmbientSound: nextVal });
-    await setStoredVal('enableAmbientSound', nextVal);
-  },
-
-  setAmbientVolume: async (ambientVolume) => {
-    set({ ambientVolume });
-    await setStoredVal('ambientVolume', ambientVolume);
-  },
-
-  toggleVoiceEnabled: async () => {
-    const nextVal = !get().isVoiceEnabled;
-    set({ isVoiceEnabled: nextVal });
-    await setStoredVal('isVoiceEnabled', nextVal);
-  },
-
-  setVoiceGender: async (voiceGender) => {
-    set({ voiceGender });
-    await setStoredVal('voiceGender', voiceGender);
-  },
-
   login: async (name, isGuest, email = '') => {
     set({ isLoggedIn: true, isGuest, playerName: name, playerEmail: email });
     await setStoredVal('isLoggedIn', true);
@@ -190,12 +147,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   logout: async () => {
-    set({ isLoggedIn: false, isGuest: false, playerName: 'Guest', playerEmail: '', playerAvatar: './avatars/preset_pawn.png' });
+    set({ isLoggedIn: false, isGuest: false, playerName: 'Guest', playerEmail: '', playerAvatar: '/avatars/preset_pawn.png' });
     await setStoredVal('isLoggedIn', false);
     await setStoredVal('isGuest', false);
     await setStoredVal('playerName', 'Guest');
     await setStoredVal('playerEmail', '');
-    await setStoredVal('playerAvatar', './avatars/preset_pawn.png');
+    await setStoredVal('playerAvatar', '/avatars/preset_pawn.png');
   },
 
   setPlayerAvatar: async (avatar) => {
@@ -218,23 +175,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const confirmMoves = await getStoredVal('confirmMoves', false);
     const autoPromoteToQueen = await getStoredVal('autoPromoteToQueen', true);
     const boardFlipped = await getStoredVal('boardFlipped', false);
-    const zenMode = await getStoredVal('zenMode', false);
-    const enableAmbientSound = await getStoredVal('enableAmbientSound', true);
-    const ambientVolume = await getStoredVal('ambientVolume', 50);
-    const isVoiceEnabled = await getStoredVal('isVoiceEnabled', true);
-    const voiceGender = await getStoredVal('voiceGender', 'female');
 
     const isLoggedIn = await getStoredVal('isLoggedIn', false);
     const isGuest = await getStoredVal('isGuest', false);
     const playerName = await getStoredVal('playerName', 'Guest');
     const playerEmail = await getStoredVal('playerEmail', '');
-    let playerAvatar = await getStoredVal('playerAvatar', './avatars/preset_pawn.png');
-
-    // Migration for previously stored absolute paths
-    if (typeof playerAvatar === 'string' && playerAvatar.startsWith('/avatars/')) {
-      playerAvatar = '.' + playerAvatar;
-      await setStoredVal('playerAvatar', playerAvatar);
-    }
+    const playerAvatar = await getStoredVal('playerAvatar', '/avatars/preset_pawn.png');
 
     document.documentElement.setAttribute('data-theme', theme);
 
@@ -248,11 +194,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       confirmMoves,
       autoPromoteToQueen,
       boardFlipped,
-      zenMode,
-      enableAmbientSound,
-      ambientVolume,
-      isVoiceEnabled,
-      voiceGender,
       isLoggedIn,
       isGuest,
       playerName,

@@ -19,6 +19,7 @@ import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
+import { useChessOptions } from '../utils/useChessOptions';
 
 interface ChartPoint {
   move: number;
@@ -26,7 +27,7 @@ interface ChartPoint {
 }
 
 export const Analysis: React.FC = () => {
-  const { showCoordinates, pieceSet } = useSettingsStore();
+  const { showCoordinates, pieceSet, showLegalMoves } = useSettingsStore();
 
   // Chess Board state
   const [analysisChess, setAnalysisChess] = useState<Chess>(new Chess());
@@ -34,6 +35,7 @@ export const Analysis: React.FC = () => {
   const [history, setHistory] = useState<string[]>([]);
   const [currentMoveIdx, setCurrentMoveIdx] = useState<number>(-1);
   const [boardFlipped, setBoardFlipped] = useState(false);
+  const [rightClickedSquares, setRightClickedSquares] = useState<{ [square: string]: React.CSSProperties | undefined }>({});
 
   // Engine evaluation states
   const [engineActive, setEngineActive] = useState(true);
@@ -51,6 +53,31 @@ export const Analysis: React.FC = () => {
   // Responsive board size
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState(492);
+
+  const { optionSquares, onSquareClick: defaultSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
+    analysisChess,
+    onPieceDrop,
+    true,
+    showLegalMoves
+  );
+
+  const onSquareClick = (square: string) => {
+    setRightClickedSquares({});
+    defaultSquareClick(square);
+  };
+
+  function onSquareRightClick(square: string) {
+    const colour = "rgba(239, 68, 68, 0.8)";
+    setRightClickedSquares((prev) => {
+      const copy = { ...prev };
+      if (copy[square]) {
+        delete copy[square];
+      } else {
+        copy[square] = { backgroundColor: colour };
+      }
+      return copy;
+    });
+  }
 
   // Initialize analysis engine
   useEffect(() => {
@@ -103,6 +130,11 @@ export const Analysis: React.FC = () => {
       });
     });
   }, [fen, engineActive, depthLimit, currentMoveIdx]);
+
+  useEffect(() => {
+    clearOptions();
+    setRightClickedSquares({});
+  }, [fen]);
 
   // Handle piece drop in free setup
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
@@ -379,12 +411,31 @@ export const Analysis: React.FC = () => {
                 id="AnalysisBoard"
                 position={fen}
                 onPieceDrop={onPieceDrop}
+                onPieceDragBegin={(piece, sourceSquare) => {
+                  setRightClickedSquares({});
+                  onPieceDragBegin(piece, sourceSquare);
+                }}
+                onPieceDragEnd={onPieceDragEnd}
+                onSquareClick={onSquareClick}
+                onSquareRightClick={onSquareRightClick}
                 boardWidth={boardSize}
                 boardOrientation={boardFlipped ? 'black' : 'white'}
                 arePiecesDraggable={true}
                 showBoardNotation={showCoordinates}
                 customLightSquareStyle={customBoardStyles.customLightSquareStyle}
                 customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
+                customSquareStyles={{
+                  ...(analysisChess.inCheck() 
+                    ? {
+                        [analysisChess.history({ verbose: true }).pop()?.color === 'w' 
+                          ? (analysisChess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'b')?.square || '')
+                          : (analysisChess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
+                        ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
+                      }
+                    : {}),
+                  ...optionSquares,
+                  ...rightClickedSquares
+                }}
               />
             </div>
 

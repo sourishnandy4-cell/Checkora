@@ -21,6 +21,7 @@ import { useSettingsStore } from '../store/settingsStore';
 import { BOTS, BotDefinition } from '../data/bots';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
+import { useChessOptions } from '../utils/useChessOptions';
 
 export const Play: React.FC = () => {
   const navigate = useNavigate();
@@ -196,6 +197,8 @@ export const Play: React.FC = () => {
       setPendingMove(null);
       setShowPromotionDialog(false);
       setPromoMove(null);
+      clearOptions();
+      setRightClickedSquares({});
     }
   }, [isGameActive]);
 
@@ -339,6 +342,7 @@ export const Play: React.FC = () => {
 
   // Handlers for piece drops
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
+    clearOptions();
     if (!isGameActive || gameResult) return false;
     
     // Check if it's the player's turn
@@ -392,8 +396,36 @@ export const Play: React.FC = () => {
     return false;
   };
 
+  const [rightClickedSquares, setRightClickedSquares] = useState<{ [square: string]: React.CSSProperties | undefined }>({});
+
+  const { optionSquares, onSquareClick: defaultSquareClick, onPieceDragBegin, onPieceDragEnd, clearOptions } = useChessOptions(
+    chess,
+    onPieceDrop,
+    !botThinkingRef.current && !gameResult && !pendingMove,
+    showLegalMoves
+  );
+
+  const onSquareClick = (square: string) => {
+    setRightClickedSquares({});
+    defaultSquareClick(square);
+  };
+
+  function onSquareRightClick(square: string) {
+    const colour = "rgba(239, 68, 68, 0.8)";
+    setRightClickedSquares((prev) => {
+      const copy = { ...prev };
+      if (copy[square]) {
+        delete copy[square];
+      } else {
+        copy[square] = { backgroundColor: colour };
+      }
+      return copy;
+    });
+  }
+
   const handleConfirmMove = () => {
     if (!pendingMove) return;
+    clearOptions();
 
     const sourcePiece = chess.get(pendingMove.from as any);
     const targetPiece = chess.get(pendingMove.to as any);
@@ -408,6 +440,7 @@ export const Play: React.FC = () => {
 
   const handleCancelMove = () => {
     setPendingMove(null);
+    clearOptions();
     playSound.play('move'); // play tap click on undo slide back
   };
 
@@ -599,6 +632,13 @@ export const Play: React.FC = () => {
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}
                 onPieceDrop={onPieceDrop}
+                onPieceDragBegin={(piece, sourceSquare) => {
+                  setRightClickedSquares({});
+                  onPieceDragBegin(piece, sourceSquare);
+                }}
+                onPieceDragEnd={onPieceDragEnd}
+                onSquareClick={onSquareClick}
+                onSquareRightClick={onSquareRightClick}
                 boardWidth={boardSize}
                 boardOrientation={boardFlipped ? (playerColor === 'white' ? 'black' : 'white') : playerColor}
                 arePiecesDraggable={!botThinkingRef.current && !gameResult && !pendingMove}
@@ -629,8 +669,8 @@ export const Play: React.FC = () => {
                   setPromoMove(null);
                   return true;
                 }}
-                customSquareStyles={
-                  chess.inCheck() 
+                customSquareStyles={{
+                  ...(chess.inCheck() 
                     ? {
                         // Soft red overlay on checked king
                         [chess.history({ verbose: true }).pop()?.color === 'w' 
@@ -638,8 +678,10 @@ export const Play: React.FC = () => {
                           : (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
                         ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
                       }
-                    : {}
-                }
+                    : {}),
+                  ...optionSquares,
+                  ...rightClickedSquares
+                }}
               />
 
               {/* Game Over Overlay */}

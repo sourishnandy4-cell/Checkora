@@ -134,12 +134,17 @@ export const Play: React.FC = () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState(504);
 
-  // Chat scroll reference
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  // Chat container reference
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll chat log to bottom as bot (or player) speaks
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, [chatMessages]);
 
   // Initialize engine on start
@@ -628,7 +633,7 @@ export const Play: React.FC = () => {
             {/* INTERACTIVE CHESS BOARD */}
             <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square min-h-0 border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
-                key={pendingMove ? pendingMove.fen : fen}
+                key="PlayBoardComponent"
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}
                 onPieceDrop={onPieceDrop}
@@ -901,7 +906,7 @@ export const Play: React.FC = () => {
             </div>
 
             {/* Chat message scrolling list */}
-            <div className="flex-1 p-3 overflow-y-auto custom-scrollbar flex flex-col gap-2.5">
+            <div ref={chatContainerRef} className="flex-1 p-3 overflow-y-auto custom-scrollbar flex flex-col gap-2.5">
               {chatMessages.map((msg, idx) => (
                 <div key={idx} className="flex flex-col text-xs leading-relaxed">
                   <div className="flex items-baseline justify-between mb-0.5">
@@ -915,7 +920,6 @@ export const Play: React.FC = () => {
                   </p>
                 </div>
               ))}
-              <div ref={chatEndRef} />
             </div>
 
             {/* Chat Send Form */}

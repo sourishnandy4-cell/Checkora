@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { BookOpen, Compass, ArrowLeft, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react';

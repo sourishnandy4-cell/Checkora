@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Zap, Clock, Trophy, Play, RefreshCw, Compass } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';

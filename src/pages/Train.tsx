@@ -19,6 +19,27 @@ export const Train: React.FC = () => {
 
   const coordsIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const trainBoardContainerRef = useRef<HTMLDivElement>(null);
+  const [trainBoardSize, setTrainBoardSize] = useState(412);
+
+  useEffect(() => {
+    const el = trainBoardContainerRef.current;
+    if (!el) return;
+    
+    const initialWidth = el.getBoundingClientRect().width;
+    if (initialWidth > 0) setTrainBoardSize(Math.floor(initialWidth));
+
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          setTrainBoardSize(Math.floor(entry.contentRect.width));
+        }
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [coordsActive]);
+
   // Coordinates timer tick setup
   useEffect(() => {
     if (coordsActive) {
@@ -112,12 +133,12 @@ export const Train: React.FC = () => {
           </div>
 
           {/* Interactive clicking board */}
-          <div className="w-full max-w-[420px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative select-none">
+          <div ref={trainBoardContainerRef} className="w-full max-w-[420px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative select-none">
             <Chessboard
               id="TrainerBoard"
               position="8/8/8/8/8/8/8/8"
               onSquareClick={handleSquareClick}
-              boardWidth={412}
+              boardWidth={trainBoardSize}
               boardOrientation="white"
               arePiecesDraggable={false}
               showBoardNotation={true}

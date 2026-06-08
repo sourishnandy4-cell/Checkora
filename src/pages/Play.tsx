@@ -641,7 +641,8 @@ export const Play: React.FC = () => {
         )}
         
         {/* LEFT COLUMN: Board and info cards */}
-        <div className={`flex-1 flex flex-col items-center justify-center p-4 lg:p-6 overflow-y-auto ${zenMode ? 'max-w-none' : ''}`}>
+        <div className={`flex-1 flex flex-col items-center p-4 lg:p-6 overflow-y-auto ${zenMode ? 'max-w-none' : ''}`}>
+          <div className="w-full flex flex-col items-center my-auto shrink-0">
           {/* Back button */}
           {!zenMode && (
             <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
@@ -902,6 +903,7 @@ export const Play: React.FC = () => {
                 </button>
               </div>
             ) : null}
+          </div>
           </div>
         </div>
 

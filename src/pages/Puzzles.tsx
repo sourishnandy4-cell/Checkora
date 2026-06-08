@@ -107,6 +107,48 @@ export const Puzzles: React.FC = () => {
 
   const rushIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Responsive board sizes
+  const dailyBoardContainerRef = useRef<HTMLDivElement>(null);
+  const rushBoardContainerRef = useRef<HTMLDivElement>(null);
+  const [dailyBoardSize, setDailyBoardSize] = useState(452);
+  const [rushBoardSize, setRushBoardSize] = useState(412);
+
+  useEffect(() => {
+    const el = dailyBoardContainerRef.current;
+    if (!el) return;
+    
+    const initialWidth = el.getBoundingClientRect().width;
+    if (initialWidth > 0) setDailyBoardSize(Math.floor(initialWidth));
+
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          setDailyBoardSize(Math.floor(entry.contentRect.width));
+        }
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [activeTab]);
+
+  useEffect(() => {
+    const el = rushBoardContainerRef.current;
+    if (!el) return;
+    
+    const initialWidth = el.getBoundingClientRect().width;
+    if (initialWidth > 0) setRushBoardSize(Math.floor(initialWidth));
+
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          setRushBoardSize(Math.floor(entry.contentRect.width));
+        }
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [activeTab, puzzleRushActive]);
+
   // Initialize active puzzle
   const currentPuzzle = LOCAL_PUZZLES[puzzleIndex];
 
@@ -290,13 +332,13 @@ export const Puzzles: React.FC = () => {
       {activeTab === 'daily' && !puzzleRushActive && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto w-full">
           {/* Board representation */}
-          <div className="lg:col-span-7 flex flex-col items-center justify-center">
-            <div className="w-full max-w-[460px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
+          <div className="lg:col-span-7 flex flex-col items-center">
+            <div ref={dailyBoardContainerRef} className="w-full max-w-[460px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
               <Chessboard
                 id="DailyPuzzleBoard"
                 position={puzzleFen}
                 onPieceDrop={onPieceDrop}
-                boardWidth={452}
+                boardWidth={dailyBoardSize}
                 boardOrientation={currentPuzzle.playerColor}
                 arePiecesDraggable={puzzleStatus === 'solving'}
                 onSquareClick={onSquareClick}
@@ -446,12 +488,12 @@ export const Puzzles: React.FC = () => {
               </div>
 
               {/* Active Puzzle Board */}
-              <div className="w-full max-w-[420px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
+              <div ref={rushBoardContainerRef} className="w-full max-w-[420px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
                 <Chessboard
                   id="RushBoard"
                   position={puzzleFen}
                   onPieceDrop={onPieceDrop}
-                  boardWidth={412}
+                  boardWidth={rushBoardSize}
                   boardOrientation={currentPuzzle.playerColor}
                   arePiecesDraggable={puzzleStatus === 'solving'}
                   onSquareClick={onSquareClick}

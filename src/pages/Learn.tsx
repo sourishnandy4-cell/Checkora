@@ -28,6 +28,27 @@ export const Learn: React.FC = () => {
   const engineRef = React.useRef<StockfishEngine | null>(null);
   const [coachMessage, setCoachMessage] = useState<string | null>(null);
   
+  const learnBoardContainerRef = useRef<HTMLDivElement>(null);
+  const [learnBoardSize, setLearnBoardSize] = useState(432);
+
+  useEffect(() => {
+    const el = learnBoardContainerRef.current;
+    if (!el) return;
+    
+    const initialWidth = el.getBoundingClientRect().width;
+    if (initialWidth > 0) setLearnBoardSize(Math.floor(initialWidth));
+
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          setLearnBoardSize(Math.floor(entry.contentRect.width));
+        }
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [activeLesson]);
+  
   const { isVoiceEnabled, voiceGender, toggleVoiceEnabled, setVoiceGender } = useSettingsStore();
 
   useEffect(() => {
@@ -347,7 +368,7 @@ export const Learn: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left side: interactive board */}
             <div className="lg:col-span-7 flex flex-col items-center justify-center">
-              <div className="w-full max-w-[440px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
+              <div ref={learnBoardContainerRef} className="w-full max-w-[440px] aspect-square border-4 border-bg-border rounded-sm shadow-xl relative">
                 <Chessboard
                   id="CoachBoard"
                   position={lessonFen}
@@ -355,7 +376,7 @@ export const Learn: React.FC = () => {
                   onSquareClick={onSquareClick}
                   onPieceDragBegin={onPieceDragBegin}
                   onPieceDragEnd={onPieceDragEnd}
-                  boardWidth={432}
+                  boardWidth={learnBoardSize}
                   boardOrientation={activeLesson.playerColor || 'white'}
                   arePiecesDraggable={feedbackStatus === 'solving' && !pendingOpponentMove}
                   customSquareStyles={{ ...optionSquares, ...hintSquares }}

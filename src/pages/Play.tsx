@@ -674,7 +674,7 @@ export const Play: React.FC = () => {
               </div>
 
             {/* INTERACTIVE CHESS BOARD */}
-            <div ref={boardContainerRef} data-pieces={pieceSet} className="flex-1 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
               <Chessboard
                 id="PlayBoard"
                 position={pendingMove ? pendingMove.fen : fen}

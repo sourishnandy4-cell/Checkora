@@ -557,66 +557,8 @@ export const Play: React.FC = () => {
           </div>
 
           <div className="w-full max-w-[540px] lg:max-w-[600px] flex flex-col gap-3">
-            {/* TOP PLAYER BAR - opponent is always at top */}
-            {playerColor === 'black' ? (
-              /* When playing black, WHITE BAR (opponent) goes on top */
-              <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-              }`}>
-                <div className="flex items-center gap-3">
-                  {activeBot && activeBot.isImageAvatar
-                    ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
-                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
-                  }
-                  <div>
-                    <div className="text-xs font-semibold flex items-center gap-1.5">
-                      {whitePlayerName}
-                      <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
-                        {whitePlayerElo}
-                      </span>
-                    </div>
-                    {isBotTurn && playerColor === 'black' && botThinkingRef.current && (
-                      <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
-                    )}
-                  </div>
-                </div>
-                <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                  whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
-                  {formatTime(whiteTime)}
-                </div>
-              </div>
-            ) : (
-              /* When playing white, BLACK BAR (opponent) goes on top */
-              <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-              }`}>
-                <div className="flex items-center gap-3">
-                  {activeBot && activeBot.isImageAvatar
-                    ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
-                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
-                  }
-                  <div>
-                    <div className="text-xs font-semibold flex items-center gap-1.5">
-                      {blackPlayerName}
-                      <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
-                        {blackPlayerElo}
-                      </span>
-                    </div>
-                    {isBotTurn && playerColor === 'white' && botThinkingRef.current && (
-                      <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
-                    )}
-                  </div>
-                </div>
-                <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                  blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
-                  {formatTime(blackTime)}
-                </div>
-              </div>
-            )}
 
-            {/* EVAL BAR + BOARD WRAPPER */}
+            {/* EVAL BAR + BOARD + PLAYER BARS WRAPPER */}
             <div className="flex w-full gap-2 lg:gap-4 relative">
               {/* EVAL BAR */}
               <div className="w-4 lg:w-6 rounded-sm bg-bg-surface border border-bg-border relative flex flex-col items-center justify-center select-none shrink-0 overflow-hidden shadow-xl hidden md:flex">
@@ -630,176 +572,238 @@ export const Play: React.FC = () => {
                 </span>
               </div>
 
-            {/* INTERACTIVE CHESS BOARD */}
-            <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square min-h-0 border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
-              <Chessboard
-                key="PlayBoardComponent"
-                id="PlayBoard"
-                position={pendingMove ? pendingMove.fen : fen}
-                onPieceDrop={onPieceDrop}
-                onPieceDragBegin={(piece, sourceSquare) => {
-                  setRightClickedSquares({});
-                  onPieceDragBegin(piece, sourceSquare);
-                }}
-                onPieceDragEnd={onPieceDragEnd}
-                onSquareClick={onSquareClick}
-                onSquareRightClick={onSquareRightClick}
-                boardWidth={boardSize}
-                boardOrientation={boardFlipped ? (playerColor === 'white' ? 'black' : 'white') : playerColor}
-                arePiecesDraggable={!botThinkingRef.current && !gameResult && !pendingMove}
-                showBoardNotation={showCoordinates}
-                customLightSquareStyle={customBoardStyles.customLightSquareStyle}
-                customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
-                showPromotionDialog={showPromotionDialog}
-                onPromotionPieceSelect={(piece) => {
-                  if (!piece) return false;
-                  const selectedPromo = piece[1].toLowerCase();
-                  if (promoMove) {
-                    if (confirmMoves) {
-                      const tempChess = new Chess(fen);
-                      tempChess.move({ from: promoMove.from, to: promoMove.to, promotion: selectedPromo });
-                      setPendingMove({ from: promoMove.from, to: promoMove.to, promotion: selectedPromo, fen: tempChess.fen() });
-                    } else {
-                      const sourcePiece = chess.get(promoMove.from as any);
-                      const targetPiece = chess.get(promoMove.to as any);
-                      const isCapture = !!targetPiece || (sourcePiece?.type === 'p' && promoMove.from[0] !== promoMove.to[0] && !targetPiece);
-
-                      const success = makeMove(promoMove.from, promoMove.to, selectedPromo);
-                      if (success) {
-                        handlePostMoveSoundAndGameEnding(isCapture);
+              {/* BOARD COLUMN - contains player bars and board */}
+              <div className="flex-1 flex flex-col gap-3">
+                {/* TOP PLAYER BAR - opponent is always at top */}
+                {playerColor === 'black' ? (
+                  /* When playing black, WHITE BAR (opponent) goes on top */
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+                    isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      {activeBot && activeBot.isImageAvatar
+                        ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
                       }
-                    }
-                  }
-                  setShowPromotionDialog(false);
-                  setPromoMove(null);
-                  return true;
-                }}
-                customSquareStyles={{
-                  ...(chess.inCheck() 
-                    ? {
-                        // Soft red overlay on checked king
-                        [chess.history({ verbose: true }).pop()?.color === 'w' 
-                          ? (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'b')?.square || '')
-                          : (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
-                        ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
+                      <div>
+                        <div className="text-xs font-semibold flex items-center gap-1.5">
+                          {whitePlayerName}
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                            {whitePlayerElo}
+                          </span>
+                        </div>
+                        {isBotTurn && playerColor === 'black' && botThinkingRef.current && (
+                          <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                      whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                    } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                      {formatTime(whiteTime)}
+                    </div>
+                  </div>
+                ) : (
+                  /* When playing white, BLACK BAR (opponent) goes on top */
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+                    isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      {activeBot && activeBot.isImageAvatar
+                        ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
                       }
-                    : {}),
-                  ...optionSquares,
-                  ...rightClickedSquares
-                }}
-              />
+                      <div>
+                        <div className="text-xs font-semibold flex items-center gap-1.5">
+                          {blackPlayerName}
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                            {blackPlayerElo}
+                          </span>
+                        </div>
+                        {isBotTurn && playerColor === 'white' && botThinkingRef.current && (
+                          <span className="text-[9px] font-mono-clock text-accent-cyan tracking-wider animate-pulse">THINKING...</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                      blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                    } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                      {formatTime(blackTime)}
+                    </div>
+                  </div>
+                )}
 
-              {/* Game Over Overlay */}
-              {gameResult && (
-                <div className="absolute inset-0 bg-void/90 flex flex-col items-center justify-center p-6 text-center z-25">
-                  <span className="font-serif-header text-3xl font-bold mb-2">
-                    {gameResult === 'd' 
-                      ? 'Match Drawn' 
-                      : (gameResult === 'w' && playerColor === 'white') || (gameResult === 'b' && playerColor === 'black')
-                        ? 'Victory'
-                        : 'Defeat'}
-                  </span>
-                  <span className="text-xs uppercase font-mono-clock text-text-secondary tracking-widest mb-6">
-                    {gameOverReason === 'checkmate' ? 'Checkmate' : gameOverReason}
-                  </span>
-                  <div className="flex gap-4">
-                    {canUndo && (
-                      <button
-                        onClick={() => {
-                          const success = undoMove();
+                {/* INTERACTIVE CHESS BOARD */}
+                <div ref={boardContainerRef} data-pieces={pieceSet} className="w-full shrink-0 aspect-square min-h-0 border-4 border-bg-border bg-bg-void rounded-sm shadow-2xl relative">
+                  <Chessboard
+                    key="PlayBoardComponent"
+                    id="PlayBoard"
+                    position={pendingMove ? pendingMove.fen : fen}
+                    onPieceDrop={onPieceDrop}
+                    onPieceDragBegin={(piece, sourceSquare) => {
+                      setRightClickedSquares({});
+                      onPieceDragBegin(piece, sourceSquare);
+                    }}
+                    onPieceDragEnd={onPieceDragEnd}
+                    onSquareClick={onSquareClick}
+                    onSquareRightClick={onSquareRightClick}
+                    boardWidth={boardSize}
+                    boardOrientation={boardFlipped ? (playerColor === 'white' ? 'black' : 'white') : playerColor}
+                    arePiecesDraggable={!botThinkingRef.current && !gameResult && !pendingMove}
+                    showBoardNotation={showCoordinates}
+                    customLightSquareStyle={customBoardStyles.customLightSquareStyle}
+                    customDarkSquareStyle={customBoardStyles.customDarkSquareStyle}
+                    showPromotionDialog={showPromotionDialog}
+                    onPromotionPieceSelect={(piece) => {
+                      if (!piece) return false;
+                      const selectedPromo = piece[1].toLowerCase();
+                      if (promoMove) {
+                        if (confirmMoves) {
+                          const tempChess = new Chess(fen);
+                          tempChess.move({ from: promoMove.from, to: promoMove.to, promotion: selectedPromo });
+                          setPendingMove({ from: promoMove.from, to: promoMove.to, promotion: selectedPromo, fen: tempChess.fen() });
+                        } else {
+                          const sourcePiece = chess.get(promoMove.from as any);
+                          const targetPiece = chess.get(promoMove.to as any);
+                          const isCapture = !!targetPiece || (sourcePiece?.type === 'p' && promoMove.from[0] !== promoMove.to[0] && !targetPiece);
+
+                          const success = makeMove(promoMove.from, promoMove.to, selectedPromo);
                           if (success) {
-                            playSound.play('move');
+                            handlePostMoveSoundAndGameEnding(isCapture);
                           }
-                        }}
-                        className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase bg-accent-amber/20 border border-accent-amber text-accent-amber hover:bg-accent-amber/30"
-                      >
-                        Takeback
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        if (activeBot) startNewGame(activeBot, timeControl as any, playerColor);
-                      }}
-                      className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
-                    >
-                      Rematch
-                    </button>
-                    <button
-              onClick={() => {
-                useGameStore.getState().resetAll();
-              }}
-              className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock"
-            >
-              Play Again
-            </button>
-            <button
-              onClick={() => {
-                const currentPgn = chess.pgn();
-                useGameStore.getState().loadPGN(currentPgn);
-                navigate('/analysis');
-              }}
-              className="w-full premium-btn border-bg-border text-xs py-2 uppercase font-mono-clock mt-2 bg-bg-surface hover:text-accent-cyan transition-colors"
-            >
-              Review Game
-            </button>
-                  </div>
-                </div>
-              )}
-            </div>
-            </div>
+                        }
+                      }
+                      setShowPromotionDialog(false);
+                      setPromoMove(null);
+                      return true;
+                    }}
+                    customSquareStyles={{
+                      ...(chess.inCheck() 
+                        ? {
+                            // Soft red overlay on checked king
+                            [chess.history({ verbose: true }).pop()?.color === 'w' 
+                              ? (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'b')?.square || '')
+                              : (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
+                            ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
+                          }
+                        : {}),
+                      ...optionSquares,
+                      ...rightClickedSquares
+                    }}
+                  />
 
-            {/* BOTTOM PLAYER BAR - player is always at bottom */}
-            {playerColor === 'black' ? (
-              /* When playing black, BLACK BAR (player) goes on bottom */
-              <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-              }`}>
-                <div className="flex items-center gap-3">
-                  {playerAvatar
-                    ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
-                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
-                  }
-                  <div>
-                    <div className="text-xs font-semibold flex items-center gap-1.5">
-                      {blackPlayerName}
-                      <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
-                        {blackPlayerElo}
+                  {/* Game Over Overlay */}
+                  {gameResult && (
+                    <div className="absolute inset-0 bg-void/90 flex flex-col items-center justify-center p-6 text-center z-25">
+                      <span className="font-serif-header text-3xl font-bold mb-2">
+                        {gameResult === 'd' 
+                          ? 'Match Drawn' 
+                          : (gameResult === 'w' && playerColor === 'white') || (gameResult === 'b' && playerColor === 'black')
+                            ? 'Victory'
+                            : 'Defeat'}
                       </span>
+                      <span className="text-xs uppercase font-mono-clock text-text-secondary tracking-widest mb-6">
+                        {gameOverReason === 'checkmate' ? 'Checkmate' : gameOverReason}
+                      </span>
+                      <div className="flex gap-4">
+                        {canUndo && (
+                          <button
+                            onClick={() => {
+                              const success = undoMove();
+                              if (success) {
+                                playSound.play('move');
+                              }
+                            }}
+                            className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase bg-accent-amber/20 border border-accent-amber text-accent-amber hover:bg-accent-amber/30"
+                          >
+                            Takeback
+                          </button>
+                        )}
+                        <button
+                          onClick={() => {
+                            if (activeBot) startNewGame(activeBot, timeControl as any, playerColor);
+                          }}
+                          className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
+                        >
+                          Rematch
+                        </button>
+                        <button
+                          onClick={() => {
+                            useGameStore.getState().resetAll();
+                          }}
+                          className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
+                        >
+                          Play Again
+                        </button>
+                        <button
+                          onClick={() => {
+                            const currentPgn = chess.pgn();
+                            useGameStore.getState().loadPGN(currentPgn);
+                            navigate('/analysis');
+                          }}
+                          className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase bg-bg-surface hover:text-accent-cyan transition-colors"
+                        >
+                          Review Game
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* BOTTOM PLAYER BAR - player is always at bottom */}
+                {playerColor === 'black' ? (
+                  /* When playing black, BLACK BAR (player) goes on bottom */
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+                    isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      {playerAvatar
+                        ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
+                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                      }
+                      <div>
+                        <div className="text-xs font-semibold flex items-center gap-1.5">
+                          {blackPlayerName}
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                            {blackPlayerElo}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                      blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                    } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                      {formatTime(blackTime)}
                     </div>
                   </div>
-                </div>
-                <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                  blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
-                  {formatTime(blackTime)}
-                </div>
-              </div>
-            ) : (
-              /* When playing white, WHITE BAR (player) goes on bottom */
-              <div className={`p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-              }`}>
-                <div className="flex items-center gap-3">
-                  {playerAvatar
-                    ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
-                    : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
-                  }
-                  <div>
-                    <div className="text-xs font-semibold flex items-center gap-1.5">
-                      {whitePlayerName}
-                      <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
-                        {whitePlayerElo}
-                      </span>
+                ) : (
+                  /* When playing white, WHITE BAR (player) goes on bottom */
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
+                    isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      {playerAvatar
+                        ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
+                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                      }
+                      <div>
+                        <div className="text-xs font-semibold flex items-center gap-1.5">
+                          {whitePlayerName}
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                            {whitePlayerElo}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
+                      whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                    } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                      {formatTime(whiteTime)}
                     </div>
                   </div>
-                </div>
-                <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                  whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
-                  {formatTime(whiteTime)}
-                </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* CONTROLS OR CONFIRMATION STRIP */}
             {pendingMove ? (

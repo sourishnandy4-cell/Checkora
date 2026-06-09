@@ -1,5 +1,30 @@
 {
   "appId": "com.checkora.app",
   "appName": "Checkora",
-  "webDir": "dist"
+  "webDir": "dist",
+  "ios": {
+    "scheme": "Checkora",
+    "backgroundColor": "#000000",
+    "contentInset": "automatic",
+    "scrollEnabled": false,
+    "allowsLinkPreview": false,
+    "handleApplicationNotifications": false,
+    "preferredContentMode": "mobile"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "backgroundColor": "#000000",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "iosSpinnerStyle": "small",
+      "spinnerColor": "#ffffff"
+    },
+    "Keyboard": {
+      "resize": "body",
+      "style": "dark",
+      "resizeOnFullScreen": true
+    }
+  }
 }

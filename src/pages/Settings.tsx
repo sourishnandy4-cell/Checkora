@@ -56,7 +56,7 @@ export const Settings: React.FC = () => {
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        {/* LEFT COLUMN: Appearance & Themes (Zustand persistent) */}
+        {/* LEFT COLUMN: Appearance, Themes, Voice & Danger Zone (Zustand persistent) */}
         <div className="flex flex-col gap-6">
           {/* Theme Switcher card */}
           <div className="bg-bg-surface border border-bg-border p-5 rounded-sm">
@@ -128,9 +128,109 @@ export const Settings: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* Coach Voice Settings panel */}
+          <div className="bg-bg-surface border border-bg-border p-5 rounded-sm flex flex-col gap-4">
+            <h2 className="font-serif-header text-sm font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+              <Volume2 size={14} className="text-accent-cyan" /> Coach Voice Settings
+            </h2>
+            
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-medium text-text-primary">Enable Coach Voice Instructions</span>
+                  <span className="text-[10px] text-text-muted">Speak lesson instruction steps aloud using Web Speech API synthesis.</span>
+                </div>                 <input 
+                  type="checkbox" 
+                  checked={isVoiceEnabled}
+                  onChange={() => {
+                    const nextEnabled = !isVoiceEnabled;
+                    toggleVoiceEnabled();
+                    if (nextEnabled && 'speechSynthesis' in window) {
+                      try {
+                        window.speechSynthesis.cancel();
+                        window.speechSynthesis.speak(new SpeechSynthesisUtterance('Voice enabled'));
+                      } catch (e) {}
+                    }
+                  }}
+                  className="w-4 h-4 rounded border-bg-border bg-bg-void focus:ring-0 text-text-primary accent-accent-primary"
+                />
+              </div>
+
+              <div className="w-full border-t border-bg-border/40" />
+
+              {/* Voice Gender Toggle */}
+              <div className="flex items-center justify-between text-xs gap-6">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="font-medium text-text-primary">Voice Gender</span>
+                  <span className="text-[10px] text-text-muted">Select gender personality of the synthetic chess tutor.</span>
+                </div>
+                
+                <div className="flex bg-bg-void p-1 rounded border border-bg-border">
+                  <button
+                    disabled={!isVoiceEnabled}
+                    onClick={() => {
+                      setVoiceGender('female');
+                      if (isVoiceEnabled && 'speechSynthesis' in window) {
+                        try {
+                          window.speechSynthesis.cancel();
+                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Female voice selected'));
+                        } catch (e) {}
+                      }
+                    }}
+                    className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'female' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
+                  >
+                    Female
+                  </button>
+                  <button
+                    disabled={!isVoiceEnabled}
+                    onClick={() => {
+                      setVoiceGender('male');
+                      if (isVoiceEnabled && 'speechSynthesis' in window) {
+                        try {
+                          window.speechSynthesis.cancel();
+                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Male voice selected'));
+                        } catch (e) {}
+                      }
+                    }}
+                    className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'male' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
+                  >
+                    Male
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Danger Zone: Reset ELO panel */}
+          <div className="bg-bg-surface border border-accent-red/35 p-5 rounded-sm flex flex-col gap-4 shadow-lg shadow-accent-red/5">
+            <h2 className="font-serif-header text-sm font-bold uppercase tracking-wider text-accent-red flex items-center gap-2">
+              ⚠️ Danger Zone
+            </h2>
+            
+            <div className="flex flex-col gap-1 text-xs">
+              <span className="font-medium text-text-primary">Reset ELO Ratings</span>
+              <span className="text-[10px] text-text-muted leading-relaxed mb-3">
+                This will permanently reset all your ratings (Rapid, Blitz, and Bullet) back to the base rating floor of **100 ELO**. This action cannot be undone.
+              </span>
+              
+              <button
+                onClick={() => {
+                  const confirmReset = window.confirm("Are you absolutely sure you want to reset all your ELO ratings back to 100? This cannot be undone.");
+                  if (confirmReset) {
+                    resetElo();
+                    alert("Your ELO ratings have been successfully reset to 100.");
+                  }
+                }}
+                className="py-2.5 px-4 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red hover:text-bg-void hover:border-accent-red transition-all duration-200 cursor-pointer font-bold rounded-sm text-center"
+              >
+                Reset ELO Ratings
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* RIGHT COLUMN: Sound, Gameplay, and About (Zustand persistent) */}
+        {/* RIGHT COLUMN: Gameplay, Sound, and About (Zustand persistent) */}
         <div className="flex flex-col gap-6">
           {/* Gameplay switches */}
           <div className="bg-bg-surface border border-bg-border p-5 rounded-sm flex flex-col gap-4">
@@ -241,106 +341,6 @@ export const Settings: React.FC = () => {
                   <span className="font-mono-clock text-xs w-8 text-right font-bold">{soundVolume}%</span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Coach Voice Settings panel */}
-          <div className="bg-bg-surface border border-bg-border p-5 rounded-sm flex flex-col gap-4">
-            <h2 className="font-serif-header text-sm font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
-              <Volume2 size={14} className="text-accent-cyan" /> Coach Voice Settings
-            </h2>
-            
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex flex-col gap-0.5">
-                  <span className="font-medium text-text-primary">Enable Coach Voice Instructions</span>
-                  <span className="text-[10px] text-text-muted">Speak lesson instruction steps aloud using Web Speech API synthesis.</span>
-                </div>                 <input 
-                  type="checkbox" 
-                  checked={isVoiceEnabled}
-                  onChange={() => {
-                    const nextEnabled = !isVoiceEnabled;
-                    toggleVoiceEnabled();
-                    if (nextEnabled && 'speechSynthesis' in window) {
-                      try {
-                        window.speechSynthesis.cancel();
-                        window.speechSynthesis.speak(new SpeechSynthesisUtterance('Voice enabled'));
-                      } catch (e) {}
-                    }
-                  }}
-                  className="w-4 h-4 rounded border-bg-border bg-bg-void focus:ring-0 text-text-primary accent-accent-primary"
-                />
-              </div>
-
-              <div className="w-full border-t border-bg-border/40" />
-
-              {/* Voice Gender Toggle */}
-              <div className="flex items-center justify-between text-xs gap-6">
-                <div className="flex flex-col gap-0.5 flex-1">
-                  <span className="font-medium text-text-primary">Voice Gender</span>
-                  <span className="text-[10px] text-text-muted">Select gender personality of the synthetic chess tutor.</span>
-                </div>
-                
-                <div className="flex bg-bg-void p-1 rounded border border-bg-border">
-                  <button
-                    disabled={!isVoiceEnabled}
-                    onClick={() => {
-                      setVoiceGender('female');
-                      if (isVoiceEnabled && 'speechSynthesis' in window) {
-                        try {
-                          window.speechSynthesis.cancel();
-                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Female voice selected'));
-                        } catch (e) {}
-                      }
-                    }}
-                    className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'female' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
-                  >
-                    Female
-                  </button>
-                  <button
-                    disabled={!isVoiceEnabled}
-                    onClick={() => {
-                      setVoiceGender('male');
-                      if (isVoiceEnabled && 'speechSynthesis' in window) {
-                        try {
-                          window.speechSynthesis.cancel();
-                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Male voice selected'));
-                        } catch (e) {}
-                      }
-                    }}
-                    className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'male' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
-                  >
-                    Male
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Danger Zone: Reset ELO panel */}
-          <div className="bg-bg-surface border border-accent-red/35 p-5 rounded-sm flex flex-col gap-4 shadow-lg shadow-accent-red/5">
-            <h2 className="font-serif-header text-sm font-bold uppercase tracking-wider text-accent-red flex items-center gap-2">
-              ⚠️ Danger Zone
-            </h2>
-            
-            <div className="flex flex-col gap-1 text-xs">
-              <span className="font-medium text-text-primary">Reset ELO Ratings</span>
-              <span className="text-[10px] text-text-muted leading-relaxed mb-3">
-                This will permanently reset all your ratings (Rapid, Blitz, and Bullet) back to the base rating floor of **100 ELO**. This action cannot be undone.
-              </span>
-              
-              <button
-                onClick={() => {
-                  const confirmReset = window.confirm("Are you absolutely sure you want to reset all your ELO ratings back to 100? This cannot be undone.");
-                  if (confirmReset) {
-                    resetElo();
-                    alert("Your ELO ratings have been successfully reset to 100.");
-                  }
-                }}
-                className="py-2.5 px-4 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red hover:text-bg-void hover:border-accent-red transition-all duration-200 cursor-pointer font-bold rounded-sm text-center"
-              >
-                Reset ELO Ratings
-              </button>
             </div>
           </div>
 

@@ -11,6 +11,10 @@ export class StockfishEngine {
   private onBestMoveCallback: ((bestMove: string) => void) | null = null;
   private isReady = false;
 
+  // Throttle eval updates to avoid UI flooding
+  private lastEvalEmittedAtMs = 0;
+  private readonly evalEmitMinIntervalMs = 100; // max 10 updates/sec
+
   constructor() {
     this.initWorker();
   }
@@ -54,13 +58,21 @@ export class StockfishEngine {
   }
 
   evaluatePosition(fen: string, depth: number, onEval: (evaluation: EngineEvaluation) => void) {
+    // Stop any in-flight search before starting a new one
+    this.send('stop');
+    this.onBestMoveCallback = null; // clear so it doesn't fire spuriously
     this.onEvalCallback = onEval;
+    this.lastEvalEmittedAtMs = 0;
     this.send(`position fen ${fen}`);
     this.send(`go depth ${depth}`);
   }
 
   getBestMove(fen: string, depth: number, skillLevel: number, elo: number, onBestMove: (bestMove: string) => void) {
+    // Stop any in-flight search before starting a new one
+    this.send('stop');
+    this.onEvalCallback = null; // clear eval listener during bot thinking
     this.onBestMoveCallback = onBestMove;
+    this.lastEvalEmittedAtMs = 0;
     this.setDifficulty(skillLevel, elo);
     this.send(`position fen ${fen}`);
     this.send(`go depth ${depth}`);
@@ -84,6 +96,11 @@ export class StockfishEngine {
     }
 
     if (line.startsWith('info depth') && this.onEvalCallback) {
+      const now = Date.now();
+      if (now - this.lastEvalEmittedAtMs < this.evalEmitMinIntervalMs) {
+        return;
+      }
+
       const parts = line.split(' ');
       const depthIndex = parts.indexOf('depth');
       const scoreIndex = parts.indexOf('score');
@@ -94,25 +111,29 @@ export class StockfishEngine {
       let mateIn: number | undefined;
       let bestMove: string | undefined;
 
-      if (depthIndex !== -1) {
-        depth = parseInt(parts[depthIndex + 1], 10);
+      if (depthIndex !== -1 && parts.length > depthIndex + 1) {
+        const d = parseInt(parts[depthIndex + 1], 10);
+        if (Number.isFinite(d)) depth = d;
       }
 
-      if (scoreIndex !== -1) {
+      if (scoreIndex !== -1 && parts.length > scoreIndex + 2) {
         const scoreType = parts[scoreIndex + 1]; // 'cp' or 'mate'
         const scoreVal = parseInt(parts[scoreIndex + 2], 10);
 
-        if (scoreType === 'cp') {
-          score = scoreVal / 100; // convert centipawns to pawn advantage
-        } else if (scoreType === 'mate') {
-          mateIn = scoreVal;
+        if (Number.isFinite(scoreVal)) {
+          if (scoreType === 'cp') {
+            score = scoreVal / 100; // convert centipawns to pawn advantage
+          } else if (scoreType === 'mate') {
+            mateIn = scoreVal;
+          }
         }
       }
 
-      if (pvIndex !== -1) {
+      if (pvIndex !== -1 && parts.length > pvIndex + 1) {
         bestMove = parts[pvIndex + 1];
       }
 
+      this.lastEvalEmittedAtMs = now;
       this.onEvalCallback({
         depth,
         score,
@@ -124,7 +145,8 @@ export class StockfishEngine {
     if (line.startsWith('bestmove') && this.onBestMoveCallback) {
       const parts = line.split(' ');
       const bestMove = parts[1]; // e.g. "e2e4"
-      
+      if (!bestMove) return;
+
       // Prevent callbacks triggering repeatedly if engine is stopped
       const cb = this.onBestMoveCallback;
       this.onBestMoveCallback = null;

@@ -11,9 +11,44 @@ Built with React • TypeScript • Electron • Stockfish AI
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
+
 ---
 
-</div>
+## 📥 Downloads & Installation
+
+Get the latest stable release of Checkora for your platform:
+
+* **💻 Windows**: [Download Installer (.exe)](https://github.com/sourishnandy4-cell/Checkora/releases/latest)
+* **🍏 macOS**: [Download Disk Image (.dmg)](https://github.com/sourishnandy4-cell/Checkora/releases/latest) or [Compressed Archive (.zip)](https://github.com/sourishnandy4-cell/Checkora/releases/latest)
+* **🤖 Android**: [Download Package (.apk)](https://github.com/sourishnandy4-cell/Checkora/releases/latest)
+* **📱 iPhone / iOS**: See below to build and run on your iPhone locally.
+
+---
+
+## 🛠️ iOS Local Build Instructions
+
+Due to Apple's security policy, distributing pre-compiled iOS packages (`.ipa`) requires an active Apple Developer Program membership and code-signing certificates. However, you can build and run Checkora on your iPhone locally for free:
+
+1. Ensure you have a Mac with **Xcode** installed.
+2. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
+3. Build the React web frontend:
+   ```bash
+   npm run build:renderer
+   ```
+4. Sync the web assets with the Capacitor iOS project:
+   ```bash
+   npx cap sync ios
+   ```
+5. Open the project in Xcode:
+   ```bash
+   npx cap open ios
+   ```
+6. Connect your iPhone via USB, select your device as the target in Xcode, and click the **Run** button (or press `Cmd + R`).
+
+---
 
 ## ✨ Features
 

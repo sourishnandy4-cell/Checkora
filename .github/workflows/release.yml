@@ -10,7 +10,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        include:
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: mac
 
     runs-on: ${{ matrix.os }}
 
@@ -26,18 +30,35 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Install Pillow (macOS icon background removal)
+        if: matrix.os == 'macos-latest'
+        run: pip3 install Pillow --break-system-packages || pip3 install Pillow
+
+      - name: Generate macOS Icons
+        if: matrix.os == 'macos-latest'
+        run: |
+          chmod +x build/generate-icons.sh
+          cd build && ./generate-icons.sh
+        continue-on-error: true
+
       - name: Build Web App and Electron Main
         run: npm run build
 
-      - name: Build Desktop Installer
-        run: npx electron-builder --publish never
+      - name: Build Desktop Installer (Windows)
+        if: matrix.os == 'windows-latest'
+        run: npx electron-builder --win --publish never
+
+      - name: Build Desktop Installer (macOS)
+        if: matrix.os == 'macos-latest'
+        run: npx electron-builder --mac --publish never
 
       - name: Upload Desktop Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-artifacts-${{ matrix.os }}
+          name: desktop-artifacts-${{ matrix.platform }}
           path: release/
           if-no-files-found: error
+
 
   build-android:
     runs-on: ubuntu-latest
@@ -82,7 +103,8 @@ jobs:
 
       - name: Rename APK
         run: |
-          mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Checkora-${{ github.ref_name }}.apk
+          mv android/app/build/outputs/apk/debug/app-debug.apk \
+             android/app/build/outputs/apk/debug/Checkora-${{ github.ref_name }}.apk
 
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v4
@@ -107,8 +129,14 @@ jobs:
       - name: Download Windows Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: desktop-artifacts-windows-latest
+          name: desktop-artifacts-windows
           path: release-artifacts/windows
+
+      - name: Download macOS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-artifacts-mac
+          path: release-artifacts/mac
 
       - name: Download Android Artifacts
         uses: actions/download-artifact@v4
@@ -118,7 +146,7 @@ jobs:
 
       - name: List Artifacts
         run: |
-          echo "=== List of all files to release ==="
+          echo "=== Files to release ==="
           find release-artifacts -type f
 
       - name: Create Release and Upload Assets
@@ -126,8 +154,10 @@ jobs:
         with:
           files: |
             release-artifacts/**/*.exe
+            release-artifacts/**/*.dmg
             release-artifacts/**/*.apk
             release-artifacts/**/latest.yml
+            release-artifacts/**/latest-mac.yml
             release-artifacts/**/*.blockmap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

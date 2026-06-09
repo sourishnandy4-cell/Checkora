@@ -130,11 +130,24 @@ export const App: React.FC = () => {
   const initSettings = useSettingsStore(state => state.initSettings);
   const initGameStore = useGameStore(state => state.initGameStore);
   const isLoggedIn = useSettingsStore(state => state.isLoggedIn);
+  const [settingsReady, setSettingsReady] = React.useState(false);
 
   useEffect(() => {
-    initSettings();
-    initGameStore();
+    // Both inits are async — wait for settings before rendering
+    // to avoid a flash of wrong theme / unauthenticated state.
+    Promise.all([initSettings(), initGameStore()]).finally(() => {
+      setSettingsReady(true);
+    });
   }, [initSettings, initGameStore]);
+
+  // Render nothing until settings are loaded to prevent theme/auth flash
+  if (!settingsReady) {
+    return (
+      <div className="w-screen h-screen bg-black flex items-center justify-center">
+        <span className="text-white/20 text-2xl animate-pulse">♟</span>
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return (

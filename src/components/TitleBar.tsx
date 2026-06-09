@@ -38,21 +38,28 @@ export const TitleBar: React.FC = () => {
               className="w-11 h-full flex items-center justify-center hover:bg-white/10 text-text-secondary hover:text-text-primary transition-colors duration-150"
               title="Minimize"
             >
-              <span className="text-sm pb-1">─</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <line x1="2" y1="6" x2="10" y2="6" />
+              </svg>
             </button>
             <button
               onClick={handleMaximize}
               className="w-11 h-full flex items-center justify-center hover:bg-white/10 text-text-secondary hover:text-text-primary transition-colors duration-150"
               title="Maximize"
             >
-              <span className="text-[10px] border border-current w-2.5 h-2.5" />
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="2" y="2" width="8" height="8" rx="0.5" />
+              </svg>
             </button>
             <button
               onClick={handleClose}
               className="w-11 h-full flex items-center justify-center hover:bg-[#E81123] hover:text-white text-text-secondary transition-colors duration-150"
               title="Close"
             >
-              <span className="text-[10px] font-sans">✕</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <line x1="2.5" y1="2.5" x2="9.5" y2="9.5" />
+                <line x1="9.5" y1="2.5" x2="2.5" y2="9.5" />
+              </svg>
             </button>
           </>
         ) : (

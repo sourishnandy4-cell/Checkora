@@ -24,7 +24,7 @@ interface SettingsState {
   playerName: string;
   playerEmail: string;
   playerAvatar: string;
-  
+
   // Actions
   setTheme: (theme: ThemeId) => void;
   setPieceSet: (pieceSet: PieceSetId) => void;
@@ -43,38 +43,44 @@ interface SettingsState {
   logout: () => void;
   setPlayerAvatar: (avatar: string) => void;
   setPlayerName: (name: string) => void;
-  
+
   // Initialize
   initSettings: () => Promise<void>;
 }
 
-// Helper to interact with Electron Store or fallback to localStorage
-const getStoredVal = async (key: string, defaultVal: any) => {
+const getStoredVal = async (key: keyof SettingsState, defaultVal: any) => {
+  // Electron store (allowlisted keys via preload/main)
   if (window.electronAPI?.store) {
     try {
-      const val = await window.electronAPI.store.get(key);
+      const val = await window.electronAPI.store.get(key as any);
       if (val !== undefined && val !== null) return val;
     } catch (e) {
-      console.warn(`Failed to fetch key ${key} from Electron Store:`, e);
+      console.warn(`Failed to fetch key ${String(key)} from Electron Store:`, e);
     }
   }
-  const localVal = localStorage.getItem(`checkora-${key}`);
+
+  // Fallback (dev/non-electron)
+  const localVal = localStorage.getItem(`checkora-${String(key)}`);
   if (localVal !== null) {
-    try { return JSON.parse(localVal); } catch { return localVal; }
+    try {
+      return JSON.parse(localVal);
+    } catch {
+      return localVal;
+    }
   }
   return defaultVal;
 };
 
-const setStoredVal = async (key: string, val: any) => {
+const setStoredVal = async (key: keyof SettingsState, val: any) => {
   if (window.electronAPI?.store) {
     try {
-      await window.electronAPI.store.set(key, val);
+      await window.electronAPI.store.set(key as any, val);
       return;
     } catch (e) {
-      console.warn(`Failed to save key ${key} to Electron Store:`, e);
+      console.warn(`Failed to save key ${String(key)} to Electron Store:`, e);
     }
   }
-  localStorage.setItem(`checkora-${key}`, JSON.stringify(val));
+  localStorage.setItem(`checkora-${String(key)}`, JSON.stringify(val));
 };
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({

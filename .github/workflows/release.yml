@@ -28,7 +28,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Install Pillow (macOS icon background removal)
         if: matrix.os == 'macos-latest'
@@ -82,7 +82,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install Node Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Web App
         run: npm run build:renderer

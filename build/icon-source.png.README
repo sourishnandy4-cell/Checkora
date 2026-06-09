@@ -1,0 +1,9 @@
+# Place your 1024x1024 source icon here as "icon-source.png"
+# 
+# Then run: ./generate-icons.sh
+#
+# The script will generate:
+# - macOS .icns file
+# - Windows .ico file  
+# - Android icons
+# - Web favicons

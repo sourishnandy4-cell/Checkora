@@ -10,7 +10,6 @@ out/
 
 # Electron packaged binaries
 release/
-build/
 
 # Environment variables
 .env

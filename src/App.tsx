@@ -19,6 +19,7 @@ import { Analysis } from './pages/Analysis';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
 import { Campaign } from './pages/Campaign';
+import { Menu } from './pages/Menu';
 
 const pageVariants = {
   initial: { opacity: 0, y: 10, scale: 0.99 },
@@ -118,6 +119,11 @@ const AnimatedRoutes: React.FC = () => {
         <Route path="/settings" element={
           <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} className="absolute inset-0">
             <Settings />
+          </motion.div>
+        } />
+        <Route path="/menu" element={
+          <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} className="absolute inset-0">
+            <Menu />
           </motion.div>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -12,7 +12,7 @@ export const BottomNavigation: React.FC = () => {
     { icon: <Map size={20} />, label: 'Story', path: '/campaign' },
     { icon: <Puzzle size={20} />, label: 'Puzzles', path: '/puzzles' },
     { icon: <GraduationCap size={20} />, label: 'Learn', path: '/learn' },
-    { icon: <Menu size={20} />, label: 'Menu', path: '/settings' },
+    { icon: <Menu size={20} />, label: 'Menu', path: '/menu' },
   ];
 
   return (

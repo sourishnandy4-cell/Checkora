@@ -112,13 +112,11 @@ Due to Apple's security policy, distributing pre-compiled iOS packages (`.ipa`) 
 
 ## Screenshots
 
-<img width="1465" height="852" alt="Screenshot 2026-05-31 at 11 41 31 PM" src="https://github.com/user-attachments/assets/4475ca10-cc8a-4dde-9c86-1bea8289c75d" />
-<img width="1464" height="854" alt="Screenshot 2026-05-31 at 11 43 16 PM" src="https://github.com/user-attachments/assets/45286183-0fe1-4dad-9498-2398105c279e" />
-<img width="1466" height="857" alt="Screenshot 2026-05-31 at 11 42 53 PM" src="https://github.com/user-attachments/assets/31a0224b-9ee4-407e-b8ac-e9fd8c152e10" />
-
-
-
-
+<img width="2920" height="1684" alt="image" src="https://github.com/user-attachments/assets/f3bdc743-15e2-4440-9eeb-a75291b96606" />
+<img width="2920" height="1684" alt="image" src="https://github.com/user-attachments/assets/f9434175-d296-4a1a-8241-0991f277d47b" />
+<img width="2914" height="1688" alt="image" src="https://github.com/user-attachments/assets/603e7eb8-0775-444d-9830-4578efdf41ff" />
+<img width="2916" height="1692" alt="image" src="https://github.com/user-attachments/assets/ab15175d-1f82-43e6-bfc8-a2baf971be76" />
+<img width="2908" height="1696" alt="image" src="https://github.com/user-attachments/assets/8cae5276-f15c-49df-aa58-ef7d818dfc05" />
 
 
 ---

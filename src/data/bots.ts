@@ -25,7 +25,7 @@ export interface BotDefinition {
   };
 }
 
-type BotTier  = 'Beginner' | 'Casual' | 'Intermediate' | 'Advanced' | 'Expert' | 'Master' | 'Legend' | 'Leaders' | 'Luminaries' | 'Celebrity';
+type BotTier  = 'Beginner' | 'Casual' | 'Intermediate' | 'Advanced' | 'Expert' | 'Master' | 'Legend' | 'Leaders' | 'Luminaries' | 'Celebrity' | 'CEOs' | 'Creators';
 type BotStyle = 'Aggressive' | 'Defensive' | 'Positional' | 'Tactical' | 'Chaotic' | 'Solid' | 'Tricky' | 'Classical';
 
 export const BOTS: BotDefinition[] = [
@@ -496,7 +496,7 @@ export const BOTS: BotDefinition[] = [
     elo: 1500,
     skillLevel: 11,
     uciElo: 1500,
-    tier: 'Advanced',
+    tier: 'Creators',
     style: ['Aggressive', 'Chaotic', 'Tactical'],
     bio: 'India\'s most famous chess comedian and streamer. He might blunder his queen while cracking a joke — but don\'t underestimate him. Chess Mafia is always watching.',
     quote: 'Bhai, ek baar blunder karunga toh bhi tujhe checkmate kar dunga!',
@@ -522,7 +522,7 @@ export const BOTS: BotDefinition[] = [
     elo: 2350,
     skillLevel: 17,
     uciElo: 2350,
-    tier: 'Master',
+    tier: 'Creators',
     style: ['Aggressive', 'Tactical', 'Classical'],
     bio: 'International Master Levy Rozman — the world\'s most-watched chess content creator. He will analyze your mistakes in real time and make you question every move.',
     quote: 'You are cooked. This is completely winning for me.',
@@ -912,7 +912,7 @@ export const BOTS: BotDefinition[] = [
     elo: 1600,
     skillLevel: 12,
     uciElo: 1600,
-    tier: 'Leaders',
+    tier: 'CEOs',
     style: ['Chaotic', 'Aggressive', 'Tactical'],
     bio: 'Tech entrepreneur and visionary. Elon plays hyper-modern, chaotic openings, sacrificing pieces for high-risk, high-reward attack vectors.',
     quote: 'If something is important enough, you do it even if the odds are not in your favor.',
@@ -1016,7 +1016,7 @@ export const BOTS: BotDefinition[] = [
     elo: 1750,
     skillLevel: 13,
     uciElo: 1750,
-    tier: 'Leaders',
+    tier: 'CEOs',
     style: ['Positional', 'Tactical'],
     bio: 'Co-founder of Google. Larry plays with high-computational logic, seeking patterns and optimizing square efficiency.',
     quote: 'Optimize for the best search path to victory.',
@@ -1822,7 +1822,7 @@ export const BOTS: BotDefinition[] = [
     elo: 2024,
     skillLevel: 15,
     uciElo: 2024,
-    tier: 'Celebrity',
+    tier: 'Creators',
     style: ['Tactical', 'Chaotic'],
     bio: 'Alexandra and Andrea Botez, the famous chess streaming duo. Watch out for the infamous "Botez Gambit" (accidental queen blunder)!',
     quote: 'Did we just Botez Gambit our queen?',
@@ -1835,6 +1835,48 @@ export const BOTS: BotDefinition[] = [
       lose: ['Nooo! We Botez Gambitted the game away!', 'You played so well, congratulations!'],
       capture: ['Yes! Piece taken!', 'Boom! Gotcha!'],
       blunder: ['OH NO! We blundered the queen again! Botez Gambit!', 'Wait, did I just hang that?']
+    }
+  },
+  {
+    id: 'mr-beast',
+    name: 'MrBeast',
+    avatar: './avatars/mr_beast.png',
+    isImageAvatar: true,
+    emoji: '🎥',
+    country: '🇺🇸',
+    title: 'Creator',
+    elo: 1600,
+    skillLevel: 12,
+    uciElo: 1600,
+    tier: 'Creators',
+    style: ['Aggressive', 'Chaotic'],
+    bio: 'Jimmy Donaldson, aka MrBeast — the biggest YouTuber in the world. He plays with grand, high-investment moves, throwing resources around to challenge his opponents.',
+    quote: "I gave away a private island, but I'm not giving away this game!",
+    favoriteOpening: "King's Gambit",
+    weaknesses: 'Can be overly focused on flashy tactical sacrifices.',
+    recommendedTime: '10+0',
+    accentColor: '#3B82F6',
+    chatPools: {
+      win: [
+        'I just won a chess match against you! Let\'s go!',
+        'We successfully completed the challenge!',
+        'This victory is going in the next video!'
+      ],
+      lose: [
+        'You beat me! You win $10,000! Just kidding, good game.',
+        'Unbelievable! You defended like a pro.',
+        'I guess I\'m the one giving away a point this time.'
+      ],
+      capture: [
+        'Taking your piece for my next video!',
+        'A massive capture!',
+        'I spent $100,000 to buy this piece!'
+      ],
+      blunder: [
+        'Oops! That blunder was NOT part of the script!',
+        'I gave away that piece for free.',
+        'Wait, did I just blunder? Roll the cameras!'
+      ]
     }
   },
   {

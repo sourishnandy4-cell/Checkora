@@ -958,7 +958,7 @@ export const Play: React.FC = () => {
   }
 
   // PRE-GAME BOT PICKER SCREEN
-  const botTiers = ['All', 'Celebrity', 'Leaders', 'Luminaries', 'Beginner', 'Casual', 'Intermediate', 'Advanced', 'Expert', 'Master', 'Legend'];
+  const botTiers = ['All', 'Celebrity', 'Creators', 'CEOs', 'Leaders', 'Luminaries', 'Beginner', 'Casual', 'Intermediate', 'Advanced', 'Expert', 'Master', 'Legend'];
 
   return (
     <div className="w-full h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
@@ -993,12 +993,20 @@ export const Play: React.FC = () => {
                 ? activeTier === tier
                   ? 'bg-amber-400 text-bg-void border-amber-400 font-bold shadow-lg shadow-amber-400/20'
                   : 'bg-amber-400/10 border-amber-400/40 text-amber-400 hover:bg-amber-400/20'
+                : tier === 'Creators'
+                ? activeTier === tier
+                  ? 'bg-pink-500 text-bg-void border-pink-500 font-bold shadow-lg shadow-pink-500/20'
+                  : 'bg-pink-500/10 border-pink-500/40 text-pink-400 hover:bg-pink-500/20'
+                : tier === 'CEOs'
+                ? activeTier === tier
+                  ? 'bg-sky-400 text-bg-void border-sky-400 font-bold shadow-lg shadow-sky-400/20'
+                  : 'bg-sky-400/10 border-sky-400/40 text-sky-400 hover:bg-sky-400/20'
                 : activeTier === tier 
                   ? 'bg-text-primary text-bg-void border-text-primary font-semibold' 
                   : 'bg-bg-surface border-bg-border text-text-secondary hover:text-text-primary hover:bg-bg-elevated'
             }`}
           >
-            {tier === 'Celebrity' ? '⭐ Celebrity' : tier}
+            {tier === 'Celebrity' ? '⭐ Celebrity' : tier === 'Creators' ? '🎥 Creators' : tier === 'CEOs' ? '💼 CEOs' : tier}
           </button>
         ))}
       </div>

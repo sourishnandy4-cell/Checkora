@@ -103,7 +103,7 @@ export const Train: React.FC = () => {
 
           <button
             onClick={startCoordsTrainer}
-            className="premium-btn-primary w-full max-w-xs py-3 text-xs uppercase font-mono-clock flex items-center justify-center gap-1.5 cursor-pointer"
+            className="premium-btn-primary w-full max-w-xs py-3 text-xs uppercase font-mono-clock flex items-center justify-center gap-1.5 cursor-pointer mx-auto"
           >
             Start Challenge <Play size={12} fill="currentColor" />
           </button>

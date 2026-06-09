@@ -93,11 +93,11 @@ const updateBotsTs = (id, filename) => {
     const idRegex = new RegExp(`(id:\\s*'${id}',\\s*name:\\s*'[^']+',\\s*)avatar:\\s*'[^']+'(,\\s*isImageAvatar:\\s*true)?`, 'g');
     
     if (content.match(idRegex)) {
-        content = content.replace(idRegex, `$1avatar: '/avatars/${filename}',\n    isImageAvatar: true`);
+        content = content.replace(idRegex, `$1avatar: './avatars/${filename}',\n    isImageAvatar: true`);
     } else {
         // Fallback for emojis, no isImageAvatar yet
         const fallbackRegex = new RegExp(`(id:\\s*'${id}',\\s*name:\\s*'[^']+',\\s*)avatar:\\s*'[^']+'`, 'g');
-        content = content.replace(fallbackRegex, `$1avatar: '/avatars/${filename}',\n    isImageAvatar: true`);
+        content = content.replace(fallbackRegex, `$1avatar: './avatars/${filename}',\n    isImageAvatar: true`);
     }
     
     fs.writeFileSync(filePath, content);

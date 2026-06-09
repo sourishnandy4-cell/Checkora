@@ -102,7 +102,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   isGuest: false,
   playerName: 'Guest',
   playerEmail: '',
-  playerAvatar: '/avatars/preset_pawn.png',
+  playerAvatar: './avatars/preset_pawn.png',
 
   setTheme: async (theme) => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -187,12 +187,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   logout: async () => {
-    set({ isLoggedIn: false, isGuest: false, playerName: 'Guest', playerEmail: '', playerAvatar: '/avatars/preset_pawn.png' });
+    set({ isLoggedIn: false, isGuest: false, playerName: 'Guest', playerEmail: '', playerAvatar: './avatars/preset_pawn.png' });
     await setStoredVal('isLoggedIn', false);
     await setStoredVal('isGuest', false);
     await setStoredVal('playerName', 'Guest');
     await setStoredVal('playerEmail', '');
-    await setStoredVal('playerAvatar', '/avatars/preset_pawn.png');
+    await setStoredVal('playerAvatar', './avatars/preset_pawn.png');
   },
 
   setPlayerAvatar: async (avatar) => {
@@ -224,7 +224,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const isGuest = await getStoredVal('isGuest', false);
     const playerName = await getStoredVal('playerName', 'Guest');
     const playerEmail = await getStoredVal('playerEmail', '');
-    const playerAvatar = await getStoredVal('playerAvatar', '/avatars/preset_pawn.png');
+    const playerAvatar = await getStoredVal('playerAvatar', './avatars/preset_pawn.png');
 
     document.documentElement.setAttribute('data-theme', theme);
 

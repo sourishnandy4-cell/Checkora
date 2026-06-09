@@ -21,6 +21,11 @@ Get the latest stable release of Checkora for your platform:
 
 * **💻 Windows**: [Download Installer (.exe)](https://github.com/sourishnandy4-cell/Checkora/releases/latest)
 * **🍏 macOS**: [Download Disk Image (.dmg)](https://github.com/sourishnandy4-cell/Checkora/releases/latest) or [Compressed Archive (.zip)](https://github.com/sourishnandy4-cell/Checkora/releases/latest)
+  > [!IMPORTANT]
+  > **Note for macOS users**: If you see the message `"Checkora is damaged and can't be opened. You should move it to the Bin."`, this is due to Gatekeeper blocking unsigned applications. You can easily fix this by opening your Terminal and running:
+  > ```bash
+  > xattr -cr /Applications/Checkora.app
+  > ```
 * **🤖 Android**: [Download Package (.apk)](https://github.com/sourishnandy4-cell/Checkora/releases/latest)
 * **📱 iPhone / iOS**: See below to build and run on your iPhone locally.
 

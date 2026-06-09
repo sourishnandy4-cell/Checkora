@@ -581,10 +581,13 @@ export const Play: React.FC = () => {
                     isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
                   }`}>
                     <div className="flex items-center gap-3">
-                      {activeBot && activeBot.isImageAvatar
-                        ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
-                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
-                      }
+                      {activeBot && activeBot.isImageAvatar ? (
+                        <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
+                          {activeBot ? activeBot.avatar : '🤖'}
+                        </div>
+                      )}
                       <div>
                         <div className="text-xs font-semibold flex items-center gap-1.5">
                           {whitePlayerName}
@@ -609,10 +612,13 @@ export const Play: React.FC = () => {
                     isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
                   }`}>
                     <div className="flex items-center gap-3">
-                      {activeBot && activeBot.isImageAvatar
-                        ? <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
-                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">{activeBot ? activeBot.avatar : '🤖'}</div>
-                      }
+                      {activeBot && activeBot.isImageAvatar ? (
+                        <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
+                          {activeBot ? activeBot.avatar : '🤖'}
+                        </div>
+                      )}
                       <div>
                         <div className="text-xs font-semibold flex items-center gap-1.5">
                           {blackPlayerName}
@@ -867,10 +873,13 @@ export const Play: React.FC = () => {
           {/* Active Opponent Info */}
           {activeBot && (
             <div className="p-4 border-b border-bg-border flex items-center gap-3">
-              {activeBot.isImageAvatar
-                ? <img src={activeBot.avatar} alt={activeBot.name} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }} />
-                : <span className="text-2xl flex-shrink-0">{activeBot.avatar}</span>
-              }
+              {activeBot.isImageAvatar ? (
+                <img src={activeBot.avatar} alt={activeBot.name} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }} />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-bg-elevated border-2 flex items-center justify-center text-lg flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }}>
+                  <span className="filter drop-shadow">{activeBot.avatar}</span>
+                </div>
+              )}
               <div>
                 <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5">
                   {activeBot.name}
@@ -1006,10 +1015,13 @@ export const Play: React.FC = () => {
             {/* Header info */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                {bot.isImageAvatar
-                  ? <img src={bot.avatar} alt={bot.name} className="w-16 h-16 rounded-full object-cover border-2 shadow-lg" style={{ borderColor: bot.accentColor + '80' }} />
-                  : <span className="text-4xl filter drop-shadow">{bot.avatar}</span>
-                }
+                {bot.isImageAvatar ? (
+                  <img src={bot.avatar} alt={bot.name} className="w-16 h-16 rounded-full object-cover border-2 shadow-lg" style={{ borderColor: bot.accentColor + '80' }} />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-bg-elevated border-2 flex items-center justify-center text-3xl shadow-lg" style={{ borderColor: bot.accentColor + '80' }}>
+                    <span className="filter drop-shadow">{bot.avatar}</span>
+                  </div>
+                )}
                 <div className="flex flex-col items-end gap-1">
                   {bot.title && (
                     <span className="text-[9px] font-mono-clock uppercase px-1.5 py-0.5 border rounded-sm font-bold" style={{ color: bot.accentColor, backgroundColor: bot.accentColor + '15', borderColor: bot.accentColor + '40' }}>
@@ -1082,10 +1094,13 @@ export const Play: React.FC = () => {
 
             {/* Header */}
             <div className="flex items-center gap-4 mb-5 pb-4 border-b border-bg-border">
-              {selectedBot.isImageAvatar
-                ? <img src={selectedBot.avatar} alt={selectedBot.name} className="w-14 h-14 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: selectedBot.accentColor + '80' }} />
-                : <span className="text-4xl">{selectedBot.avatar}</span>
-              }
+              {selectedBot.isImageAvatar ? (
+                <img src={selectedBot.avatar} alt={selectedBot.name} className="w-14 h-14 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: selectedBot.accentColor + '80' }} />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-bg-elevated border-2 flex items-center justify-center text-2xl flex-shrink-0" style={{ borderColor: selectedBot.accentColor + '80' }}>
+                  <span className="filter drop-shadow">{selectedBot.avatar}</span>
+                </div>
+              )}
               <div>
                 <h3 className="font-serif-header text-md font-bold flex items-center gap-2">
                   Challenge {selectedBot.name}

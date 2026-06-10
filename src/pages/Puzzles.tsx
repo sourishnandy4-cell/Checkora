@@ -83,7 +83,6 @@ export const Puzzles: React.FC = () => {
   useEffect(() => {
     setPuzzleChess(new Chess(currentPuzzle.fen));
     setPuzzleFen(currentPuzzle.fen);
-    setPuzzleFen(currentPuzzle.fen);
     setPuzzleStatus('solving');
     setHintActive(false);
   }, [puzzleIndex, activeTab, currentPuzzle.fen]);
@@ -117,19 +116,24 @@ export const Puzzles: React.FC = () => {
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
     if (puzzleStatus !== 'solving') return false;
 
-    const moveUci = `${sourceSquare}${targetSquare}`;
-    const isCorrect = moveUci.toLowerCase() === currentPuzzle.solution.toLowerCase();
-
     try {
       // Create temporary chess logic to verify move validity
       const tempChess = new Chess(puzzleFen);
+      const isPawn = tempChess.get(sourceSquare as any)?.type === 'p';
+      const isPromoRank = (targetSquare.endsWith('8') && tempChess.turn() === 'w') ||
+                          (targetSquare.endsWith('1') && tempChess.turn() === 'b');
+      const promoGuess = isPawn && isPromoRank ? 'q' : undefined;
+
       const moveResult = tempChess.move({
         from: sourceSquare,
         to: targetSquare,
-        promotion: 'q' // force promotion
+        promotion: promoGuess
       });
 
       if (moveResult) {
+        // Build the UCI move string including promotion piece if present
+        const moveUci = `${sourceSquare}${targetSquare}${moveResult.promotion ?? ''}`;
+        const isCorrect = moveUci.toLowerCase() === currentPuzzle.solution.toLowerCase();
         if (isCorrect) {
           setPuzzleChess(tempChess);
           setPuzzleFen(tempChess.fen());

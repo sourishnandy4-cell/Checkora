@@ -79,22 +79,45 @@ export const Profile: React.FC = () => {
       });
     }
 
-    let runBlitz = userEloBlitz;
-    let runRapid = userEloRapid;
-    let runBullet = userEloBullet;
-
-    // Walk backwards to find ratings at each day start
+    // Walk backwards through game history to reconstruct ratings per day
     const gamesDesc = [...gameHistory].sort((a, b) => b.date.localeCompare(a.date));
 
-    // Compute running totals backward
-    const dayData = days.map((day, idx) => {
-      if (idx === 4) {
-        return { name: day.name, Blitz: runBlitz, Rapid: runRapid, Bullet: runBullet };
-      }
-      return { name: day.name, Blitz: runBlitz, Rapid: runRapid, Bullet: runBullet };
-    });
+    // Start from today's current ELO and subtract changes going back in time
+    let runBlitz  = userEloBlitz;
+    let runRapid  = userEloRapid;
+    let runBullet = userEloBullet;
 
-    return dayData;
+    // dayRatings[i] = rating at START of days[i] (before that day's games)
+    const dayRatings: { Blitz: number; Rapid: number; Bullet: number }[] = days.map(() => ({
+      Blitz: runBlitz, Rapid: runRapid, Bullet: runBullet
+    }));
+
+    // Walk backwards, unwinding rating changes day by day
+    for (let d = days.length - 1; d >= 0; d--) {
+      const dayStr = days[d].date;
+      const gamesOnDay = gamesDesc.filter(g => g.date === dayStr);
+
+      // Save the rating AFTER this day (today = current elo, previous days = unwind)
+      dayRatings[d] = { Blitz: runBlitz, Rapid: runRapid, Bullet: runBullet };
+
+      // Unwind this day's ELO changes to get the rating before this day
+      for (const g of gamesOnDay) {
+        const tc = g.timeControl;
+        const isBlitz  = tc.startsWith('3') || tc.startsWith('5');
+        const isRapid  = tc.startsWith('10') || tc.startsWith('15') || tc.startsWith('30');
+        const isBullet = tc.startsWith('1+');
+        if (isBlitz)  runBlitz  = Math.max(100, runBlitz  - g.ratingChange);
+        else if (isRapid)  runRapid  = Math.max(100, runRapid  - g.ratingChange);
+        else if (isBullet) runBullet = Math.max(100, runBullet - g.ratingChange);
+      }
+    }
+
+    return days.map((day, idx) => ({
+      name: day.name,
+      Blitz:  dayRatings[idx].Blitz,
+      Rapid:  dayRatings[idx].Rapid,
+      Bullet: dayRatings[idx].Bullet,
+    }));
   };
 
   const ratingTrendData = buildTrendData();

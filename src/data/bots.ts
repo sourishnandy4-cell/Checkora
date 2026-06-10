@@ -25,7 +25,7 @@ export interface BotDefinition {
   };
 }
 
-type BotTier  = 'Beginner' | 'Casual' | 'Intermediate' | 'Advanced' | 'Expert' | 'Master' | 'Legend' | 'Leaders' | 'Luminaries' | 'Celebrity' | 'CEOs' | 'Creators';
+type BotTier  = 'Beginner' | 'Casual' | 'Intermediate' | 'Advanced' | 'Expert' | 'Master' | 'Legend' | 'Leaders' | 'Luminaries' | 'Celebrity' | 'CEOs' | 'Creators' | 'Killers';
 type BotStyle = 'Aggressive' | 'Defensive' | 'Positional' | 'Tactical' | 'Chaotic' | 'Solid' | 'Tricky' | 'Classical';
 
 export const BOTS: BotDefinition[] = [
@@ -2099,6 +2099,258 @@ export const BOTS: BotDefinition[] = [
       lose: ['You played an incredibly sharp game. Congratulations!', 'A deserved victory for you. Well played.'],
       capture: ['Precisely executing the exchange.', 'Reclaiming spatial balance.'],
       blunder: ['A calculation slip. Recalibrating.', 'A time-pressure mistake.']
+    }
+  },
+
+  // ── DEAD BY DAYLIGHT KILLERS TIER (ELO below 1500) ──────────────────────
+  {
+    id: 'dbd-trapper',
+    name: 'The Trapper',
+    avatar: './avatars/dbd_trapper.png',
+    isImageAvatar: true,
+    emoji: '🪤',
+    title: 'Killer',
+    elo: 900,
+    skillLevel: 5,
+    uciElo: 900,
+    tier: 'Killers',
+    style: ['Aggressive', 'Tricky'],
+    bio: 'The Trapper lays bear traps across the board, hoping you step in one. A methodical hunter who controls space through fear.',
+    quote: 'Every square is a potential trap. Tread carefully.',
+    favoriteOpening: 'e4 — setting the snare from move one',
+    weaknesses: 'Opponents who avoid his traps and play quickly',
+    recommendedTime: '10+0',
+    accentColor: '#8B0000',
+    chatPools: {
+      win: ['Snap! You walked right into it.', 'The trap is sprung. Checkmate.', 'I set this position up three moves ago.'],
+      lose: ['You avoided every snare. Impressive.', 'My traps were useless against you.', 'You outplayed the hunter.'],
+      capture: ['Caught in the steel jaws!', 'Another piece snared.', 'Walk into my domain.'],
+      blunder: ['How did I spring my own trap?', 'A miscalculation. The hunter is hunted.', 'I fell into my own snare.']
+    }
+  },
+  {
+    id: 'dbd-wraith',
+    name: 'The Wraith',
+    avatar: './avatars/dbd_wraith.png',
+    isImageAvatar: true,
+    emoji: '👻',
+    title: 'Killer',
+    elo: 700,
+    skillLevel: 3,
+    uciElo: 700,
+    tier: 'Killers',
+    style: ['Tricky', 'Chaotic'],
+    bio: 'The Wraith vanishes and reappears in unexpected squares. You will never know where his pieces are coming from.',
+    quote: 'You cannot stop what you cannot see.',
+    favoriteOpening: 'Nimzo-Indian — appearing from the shadows',
+    weaknesses: 'Patient opponents who track his movements',
+    recommendedTime: '5+0',
+    accentColor: '#4B0082',
+    chatPools: {
+      win: ['From the shadows — checkmate!', 'You could not see me coming.', 'The invisible strike lands!'],
+      lose: ['You pierced my cloak. Well done.', 'Visible at last — and defeated.', 'The light revealed my weakness.'],
+      capture: ['Striking from invisibility!', 'You did not see that coming.', 'A ghost-like capture.'],
+      blunder: ['My cloaking failed at the worst moment.', 'I materialized in the wrong square.', 'A spectral error.']
+    }
+  },
+  {
+    id: 'dbd-hillbilly',
+    name: 'The Hillbilly',
+    avatar: './avatars/dbd_hillbilly.png',
+    isImageAvatar: true,
+    emoji: '⛏️',
+    title: 'Killer',
+    elo: 800,
+    skillLevel: 4,
+    uciElo: 800,
+    tier: 'Killers',
+    style: ['Aggressive', 'Chaotic'],
+    bio: 'The Hillbilly charges across the board at full sprint, chainsaw revving. Fast, loud, and surprisingly dangerous.',
+    quote: 'Full throttle. No brakes. No regrets.',
+    favoriteOpening: "King's Gambit — charge from the start",
+    weaknesses: 'Opponents who step aside and let him run off the board',
+    recommendedTime: '3+0',
+    accentColor: '#B8860B',
+    chatPools: {
+      win: ['VROOOOM! Chainsaw checkmate!', 'Too fast for you! I ran right through your defense!', 'Full charge — no stopping me!'],
+      lose: ['Hit a tree on my charge...', 'You sidestepped the chainsaw. Clever.', 'I overextended. Fatal mistake.'],
+      capture: ['Revving up and charging through!', 'CHAINSAW SWEEP! Piece taken!', 'Nothing can stop the charge!'],
+      blunder: ['Overcharged! Ran past the target.', 'The chainsaw hit my own piece.', 'Too much speed, not enough aim.']
+    }
+  },
+  {
+    id: 'dbd-nurse',
+    name: 'The Nurse',
+    avatar: './avatars/dbd_nurse.png',
+    isImageAvatar: true,
+    emoji: '🏥',
+    title: 'Killer',
+    elo: 1200,
+    skillLevel: 8,
+    uciElo: 1200,
+    tier: 'Killers',
+    style: ['Tricky', 'Tactical'],
+    bio: 'The Nurse blinks through walls and teleports across the board with supernatural precision. A terrifying tactical threat.',
+    quote: 'There is no distance I cannot cross.',
+    favoriteOpening: 'Sicilian — striking through any barrier',
+    weaknesses: 'Opponents who force long-range positional battles',
+    recommendedTime: '5+3',
+    accentColor: '#E0E0E0',
+    chatPools: {
+      win: ['Blink. Blink. Checkmate.', 'No wall protects your king from me.', 'I teleported past all your defenses.'],
+      lose: ['You kept me at range. Smart.', 'Fatigue took over. A rare defeat.', 'You read my blinks perfectly.'],
+      capture: ['Blinking right through your guard!', 'Surprise teleport capture!', 'No piece is safe from a blink.'],
+      blunder: ['A missed blink. A terrible mistake.', 'I blinked into the wrong square.', 'Exhausted. The teleport failed.']
+    }
+  },
+  {
+    id: 'dbd-shape',
+    name: 'The Shape',
+    avatar: './avatars/dbd_shape.png',
+    isImageAvatar: true,
+    emoji: '🎃',
+    title: 'Killer',
+    elo: 1100,
+    skillLevel: 7,
+    uciElo: 1100,
+    tier: 'Killers',
+    style: ['Solid', 'Positional'],
+    bio: 'The Shape — Michael Myers — stalks the board in silence. He grows stronger with every move he observes, reaching Tier III before striking.',
+    quote: 'I have been watching you since the opening.',
+    favoriteOpening: "Caro-Kann — silent, methodical defense",
+    weaknesses: 'Opponents who attack before he reaches Tier III',
+    recommendedTime: '10+0',
+    accentColor: '#2C2C2C',
+    chatPools: {
+      win: ['...', 'I have been waiting for this moment since move one.', '🔪'],
+      lose: ['I waited too long.', 'You struck before Tier III. Clever.', '...fine.'],
+      capture: ['Watching. Taking.', 'A silent, precise capture.', '...'],
+      blunder: ['An error in the stalk.', 'I revealed myself too soon.', 'The mask slipped.']
+    }
+  },
+  {
+    id: 'dbd-hag',
+    name: 'The Hag',
+    avatar: './avatars/dbd_hag.png',
+    isImageAvatar: true,
+    emoji: '🧟‍♀️',
+    title: 'Killer',
+    elo: 950,
+    skillLevel: 5,
+    uciElo: 950,
+    tier: 'Killers',
+    style: ['Tricky', 'Defensive'],
+    bio: 'The Hag plants hex totems across the board — tripwires that trigger devastating counterattacks the moment you step near them.',
+    quote: 'Every hex you disturb is a mistake you will not live to repeat.',
+    favoriteOpening: "Dutch Defense — hex from the shadows",
+    weaknesses: 'Opponents who identify and avoid her totems',
+    recommendedTime: '10+0',
+    accentColor: '#556B2F',
+    chatPools: {
+      win: ['The hex triggers! Checkmate from the ashes!', 'You disturbed the wrong totem.', 'My curses cover every file and rank.'],
+      lose: ['You cleansed every hex. Remarkable.', 'The board was scrubbed clean. I am powerless.', 'My totems failed me.'],
+      capture: ['The tripwire triggers!', 'A hex-powered capture!', 'My curse claimed another piece.'],
+      blunder: ['A totem backfired! Impossible!', 'The hex cleansed itself. Dreadful.', 'I cursed the wrong square.']
+    }
+  },
+  {
+    id: 'dbd-doctor',
+    name: 'The Doctor',
+    avatar: './avatars/dbd_doctor.png',
+    isImageAvatar: true,
+    emoji: '⚡',
+    title: 'Killer',
+    elo: 1050,
+    skillLevel: 6,
+    uciElo: 1050,
+    tier: 'Killers',
+    style: ['Chaotic', 'Tactical'],
+    bio: 'The Doctor sends electrical shocks through your mind, causing hallucinations and chaos on the board. You will start seeing pieces that are not there.',
+    quote: 'STATIC BLAST! Your sanity is now my weapon.',
+    favoriteOpening: "Alekhine's Defense — induced madness",
+    weaknesses: 'Opponents who maintain sanity and calm calculation',
+    recommendedTime: '5+0',
+    accentColor: '#7B68EE',
+    chatPools: {
+      win: ['STATIC BLAST! CHECKMATE! Ha ha ha ha!', 'Your sanity crumbled. The board is mine!', 'Every hallucination led you here.'],
+      lose: ['You maintained perfect clarity. Impressive.', 'My static could not break your concentration.', 'You resisted the madness. Remarkable.'],
+      capture: ['STATIC! Piece captured in the chaos!', 'Hallucination complete — piece taken!', 'ZAP! Another falls to the madness!'],
+      blunder: ['The static backfired! My own madness!', 'I shocked myself. An error.', 'Hallucinated the wrong move.']
+    }
+  },
+  {
+    id: 'dbd-huntress',
+    name: 'The Huntress',
+    avatar: './avatars/dbd_huntress.png',
+    isImageAvatar: true,
+    emoji: '🪓',
+    title: 'Killer',
+    elo: 1300,
+    skillLevel: 9,
+    uciElo: 1300,
+    tier: 'Killers',
+    style: ['Tactical', 'Aggressive'],
+    bio: 'The Huntress hurls hatchets from long range, controlling the board at distance. A precise, methodical killer with perfect aim.',
+    quote: 'La la la la... the hatchet always finds its mark.',
+    favoriteOpening: "Queen's Gambit — ranged control from the start",
+    weaknesses: 'Close-quarters tactical melees',
+    recommendedTime: '5+3',
+    accentColor: '#CD853F',
+    chatPools: {
+      win: ['Hatchet thrown. Checkmate confirmed. La la la.', 'Long range dominance. Every move calculated.', 'The hatchet never misses. Neither do I.'],
+      lose: ['You closed the distance. My hatchets were useless.', 'Outplayed in close range. I concede.', 'The hunt ends here. Well played.'],
+      capture: ['Hatchet from long range!', 'La la la — piece taken from a distance!', 'Precise throw. Piece removed.'],
+      blunder: ['A missed hatchet! Embarrassing.', 'La la... I miscalculated the range.', 'The axe hit a tree instead.']
+    }
+  },
+  {
+    id: 'dbd-ghost-face',
+    name: 'Ghost Face',
+    avatar: './avatars/dbd_ghost_face.png',
+    isImageAvatar: true,
+    emoji: '🔪',
+    title: 'Killer',
+    elo: 1400,
+    skillLevel: 10,
+    uciElo: 1400,
+    tier: 'Killers',
+    style: ['Tricky', 'Aggressive'],
+    bio: 'Ghost Face crouches in the shadows and stalks prey. He marks you for death from behind cover — and you will not even notice.',
+    quote: "What's your favorite scary opening?",
+    favoriteOpening: 'Scandinavian — surprising from the shadows',
+    weaknesses: 'Exposed positions where he cannot crouch',
+    recommendedTime: '3+2',
+    accentColor: '#1C1C1C',
+    chatPools: {
+      win: ["What's your favorite scary opening? Mine is checkmate.", 'You never saw me coming. Classic.', 'Marked. Stalked. Mated.'],
+      lose: ['You spotted me in the shadows. Impressive.', 'The light exposed my position.', 'You broke my stalk. Well played.'],
+      capture: ['Crouching capture from cover!', 'You never saw that coming.', 'Marked and taken.'],
+      blunder: ['I stumbled out of the shadows.', 'You spotted my crouch. A critical error.', 'Ghost Face trips over his own robe.']
+    }
+  },
+  {
+    id: 'dbd-pig',
+    name: 'The Pig',
+    avatar: './avatars/dbd_pig.png',
+    isImageAvatar: true,
+    emoji: '🐷',
+    title: 'Killer',
+    elo: 1150,
+    skillLevel: 7,
+    uciElo: 1150,
+    tier: 'Killers',
+    style: ['Tricky', 'Solid'],
+    bio: 'Amanda Young — the Pig — places reverse bear traps on your pieces. If you do not defuse them in time, you lose the piece. Jigsaw would be proud.',
+    quote: 'I want to play a game. Do you want to play a game?',
+    favoriteOpening: 'Trompowsky — a trap from the very start',
+    weaknesses: 'Opponents who defuse her traps calmly',
+    recommendedTime: '10+0',
+    accentColor: '#DC143C',
+    chatPools: {
+      win: ['Game over. The trap has closed.', 'I want to play a game. You lost.', 'The jigsaw is complete. Checkmate.'],
+      lose: ['You solved every puzzle. I am impressed.', 'The trap was defused. How?', 'You won your freedom. Well played.'],
+      capture: ['Reverse bear trap activated!', 'The game continues — your move.', 'Tick tock. The trap is set.'],
+      blunder: ['I forgot my own trap! Impossible.', 'The puzzle backfired.', 'Even Jigsaw makes mistakes.']
     }
   }
 ];

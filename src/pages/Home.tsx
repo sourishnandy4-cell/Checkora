@@ -233,10 +233,10 @@ export const Home: React.FC = () => {
               </div>
 
               <button
-                onClick={() => navigate('/campaign')}
+                onClick={() => navigate('/puzzles')}
                 className="premium-btn py-3 px-8 text-xs uppercase font-mono-clock z-10 shrink-0 w-full sm:w-auto text-center"
               >
-                Enter Map <ArrowRight size={16} className="inline ml-1" />
+                Solve Puzzle <ArrowRight size={16} className="inline ml-1" />
               </button>
             </div>
           </div>

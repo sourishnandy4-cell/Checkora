@@ -123,12 +123,13 @@ function handleIncomingMessage(data: MultiplayerMessage) {
       const gs = useGameStore.getState();
       if (!gs.isGameActive || gs.gameResult) return;
 
-      const opponentColor = gs.playerColor === 'white' ? 'b' : 'w';
+      // The LOCAL player wins: if we are white → result is 'w'; if black → 'b'
+      const localWinResult = gs.playerColor === 'white' ? 'w' : 'b';
       gs.sendChatMessage('System', 'Opponent resigned. You win!');
 
       useGameStore.setState({
         isGameActive: false,
-        gameResult: opponentColor === 'b' ? 'b' : 'w',
+        gameResult: localWinResult,
         gameOverReason: 'resignation'
       });
       return;
@@ -197,7 +198,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       });
 
       conn.on('data', (data: any) => {
-        handleIncomingMessage(data);
+        const msg = normalizeAndValidateIncoming(data);
+        if (msg) handleIncomingMessage(msg);
       });
 
       conn.on('close', () => {
@@ -246,7 +248,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
         useGameStore.getState().startNewGame(null, tc, 'black', undefined, undefined, undefined, 'multiplayer');
 
         conn.on('data', (data: any) => {
-          handleIncomingMessage(data);
+          const msg = normalizeAndValidateIncoming(data);
+          if (msg) handleIncomingMessage(msg);
         });
 
         conn.on('close', () => {

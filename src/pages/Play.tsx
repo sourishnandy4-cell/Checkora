@@ -22,6 +22,78 @@ import { BOTS, BotDefinition } from '../data/bots';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
 import { useChessOptions } from '../utils/useChessOptions';
+const TIER_STYLE_MAP: Record<string, { active: string; inactive: string; emoji: string }> = {
+  All: {
+    active: 'bg-cyan-500 text-bg-void border-cyan-500 font-bold shadow-[0_0_15px_rgba(6,182,212,0.5)]',
+    inactive: 'bg-cyan-500/10 border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/20 hover:shadow-[0_0_8px_rgba(6,182,212,0.3)]',
+    emoji: '🌐'
+  },
+  Celebrity: {
+    active: 'bg-amber-400 text-bg-void border-amber-400 font-bold shadow-[0_0_15px_rgba(251,191,36,0.5)]',
+    inactive: 'bg-amber-400/10 border-amber-400/40 text-amber-400 hover:bg-amber-400/20 hover:shadow-[0_0_8px_rgba(251,191,36,0.3)]',
+    emoji: '⭐'
+  },
+  Creators: {
+    active: 'bg-pink-500 text-bg-void border-pink-500 font-bold shadow-[0_0_15px_rgba(236,72,153,0.5)]',
+    inactive: 'bg-pink-500/10 border-pink-500/40 text-pink-400 hover:bg-pink-500/20 hover:shadow-[0_0_8px_rgba(236,72,153,0.3)]',
+    emoji: '🎥'
+  },
+  CEOs: {
+    active: 'bg-sky-400 text-bg-void border-sky-400 font-bold shadow-[0_0_15px_rgba(56,189,248,0.5)]',
+    inactive: 'bg-sky-400/10 border-sky-400/40 text-sky-400 hover:bg-sky-400/20 hover:shadow-[0_0_8px_rgba(56,189,248,0.3)]',
+    emoji: '💼'
+  },
+  Leaders: {
+    active: 'bg-violet-500 text-bg-void border-violet-500 font-bold shadow-[0_0_15px_rgba(139,92,246,0.5)]',
+    inactive: 'bg-violet-500/10 border-violet-500/40 text-violet-400 hover:bg-violet-500/20 hover:shadow-[0_0_8px_rgba(139,92,246,0.3)]',
+    emoji: '👑'
+  },
+  Luminaries: {
+    active: 'bg-indigo-500 text-bg-void border-indigo-500 font-bold shadow-[0_0_15px_rgba(99,102,241,0.5)]',
+    inactive: 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/20 hover:shadow-[0_0_8px_rgba(99,102,241,0.3)]',
+    emoji: '✨'
+  },
+  Killers: {
+    active: 'bg-red-700 text-white border-red-700 font-bold shadow-[0_0_15px_rgba(185,28,28,0.6)]',
+    inactive: 'bg-red-900/20 border-red-700/40 text-red-400 hover:bg-red-900/30 hover:shadow-[0_0_8px_rgba(185,28,28,0.4)]',
+    emoji: '💀'
+  },
+  Beginner: {
+    active: 'bg-emerald-500 text-bg-void border-emerald-500 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.5)]',
+    inactive: 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/20 hover:shadow-[0_0_8px_rgba(16,185,129,0.3)]',
+    emoji: '🌱'
+  },
+  Casual: {
+    active: 'bg-teal-500 text-bg-void border-teal-500 font-semibold shadow-[0_0_15px_rgba(20,184,166,0.5)]',
+    inactive: 'bg-teal-500/10 border-teal-500/40 text-teal-400 hover:bg-teal-500/20 hover:shadow-[0_0_8px_rgba(20,184,166,0.3)]',
+    emoji: '🎮'
+  },
+  Intermediate: {
+    active: 'bg-lime-500 text-bg-void border-lime-500 font-semibold shadow-[0_0_15px_rgba(132,204,22,0.5)]',
+    inactive: 'bg-lime-500/10 border-lime-500/40 text-lime-400 hover:bg-lime-500/20 hover:shadow-[0_0_8px_rgba(132,204,22,0.3)]',
+    emoji: '⚔️'
+  },
+  Advanced: {
+    active: 'bg-orange-500 text-bg-void border-orange-500 font-semibold shadow-[0_0_15px_rgba(249,115,22,0.5)]',
+    inactive: 'bg-orange-500/10 border-orange-500/40 text-orange-400 hover:bg-orange-500/20 hover:shadow-[0_0_8px_rgba(249,115,22,0.3)]',
+    emoji: '🔥'
+  },
+  Expert: {
+    active: 'bg-rose-500 text-bg-void border-rose-500 font-semibold shadow-[0_0_15px_rgba(244,63,94,0.5)]',
+    inactive: 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 hover:shadow-[0_0_8px_rgba(244,63,94,0.3)]',
+    emoji: '⚡'
+  },
+  Master: {
+    active: 'bg-fuchsia-500 text-bg-void border-fuchsia-500 font-semibold shadow-[0_0_15px_rgba(217,70,239,0.5)]',
+    inactive: 'bg-fuchsia-500/10 border-fuchsia-500/40 text-fuchsia-400 hover:bg-fuchsia-500/20 hover:shadow-[0_0_8px_rgba(217,70,239,0.3)]',
+    emoji: '🔮'
+  },
+  Legend: {
+    active: 'bg-purple-600 text-white border-purple-600 font-semibold shadow-[0_0_15px_rgba(147,51,234,0.6)]',
+    inactive: 'bg-purple-900/20 border-purple-600/40 text-purple-400 hover:bg-purple-900/30 hover:shadow-[0_0_8px_rgba(147,51,234,0.4)]',
+    emoji: '🌟'
+  }
+};
 
 export const Play: React.FC = () => {
   const navigate = useNavigate();
@@ -205,7 +277,7 @@ export const Play: React.FC = () => {
       clearOptions();
       setRightClickedSquares({});
     }
-  }, [isGameActive]);
+  }, [isGameActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle low-time clock pulses (Synthesize heartbeat thuds under 10 seconds)
   useEffect(() => {
@@ -958,7 +1030,7 @@ export const Play: React.FC = () => {
   }
 
   // PRE-GAME BOT PICKER SCREEN
-  const botTiers = ['All', 'Celebrity', 'Creators', 'CEOs', 'Leaders', 'Luminaries', 'Beginner', 'Casual', 'Intermediate', 'Advanced', 'Expert', 'Master', 'Legend'];
+  const botTiers = ['All', 'Celebrity', 'Creators', 'CEOs', 'Leaders', 'Luminaries', 'Killers', 'Beginner', 'Casual', 'Intermediate', 'Advanced', 'Expert', 'Master', 'Legend'];
 
   return (
     <div className="w-full h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
@@ -984,31 +1056,22 @@ export const Play: React.FC = () => {
 
       {/* Tier Filter Tags */}
       <div className="flex flex-wrap gap-1.5 mb-6">
-        {botTiers.map((tier) => (
-          <button
-            key={tier}
-            onClick={() => setActiveTier(tier)}
-            className={`px-3 py-1.5 border rounded-sm text-xs font-mono-clock uppercase transition-all duration-150 cursor-pointer ${
-              tier === 'Celebrity'
-                ? activeTier === tier
-                  ? 'bg-amber-400 text-bg-void border-amber-400 font-bold shadow-lg shadow-amber-400/20'
-                  : 'bg-amber-400/10 border-amber-400/40 text-amber-400 hover:bg-amber-400/20'
-                : tier === 'Creators'
-                ? activeTier === tier
-                  ? 'bg-pink-500 text-bg-void border-pink-500 font-bold shadow-lg shadow-pink-500/20'
-                  : 'bg-pink-500/10 border-pink-500/40 text-pink-400 hover:bg-pink-500/20'
-                : tier === 'CEOs'
-                ? activeTier === tier
-                  ? 'bg-sky-400 text-bg-void border-sky-400 font-bold shadow-lg shadow-sky-400/20'
-                  : 'bg-sky-400/10 border-sky-400/40 text-sky-400 hover:bg-sky-400/20'
-                : activeTier === tier 
-                  ? 'bg-text-primary text-bg-void border-text-primary font-semibold' 
-                  : 'bg-bg-surface border-bg-border text-text-secondary hover:text-text-primary hover:bg-bg-elevated'
-            }`}
-          >
-            {tier === 'Celebrity' ? '⭐ Celebrity' : tier === 'Creators' ? '🎥 Creators' : tier === 'CEOs' ? '💼 CEOs' : tier}
-          </button>
-        ))}
+        {botTiers.map((tier) => {
+          const style = TIER_STYLE_MAP[tier];
+          return (
+            <button
+              key={tier}
+              onClick={() => setActiveTier(tier)}
+              className={`px-3 py-1.5 border rounded-sm text-xs font-mono-clock uppercase transition-all duration-150 cursor-pointer ${
+                activeTier === tier
+                  ? style?.active || 'bg-text-primary text-bg-void border-text-primary font-semibold shadow-[0_0_15px_rgba(255,255,255,0.4)]'
+                  : style?.inactive || 'bg-bg-surface border-bg-border text-text-secondary hover:text-text-primary hover:bg-bg-elevated'
+              }`}
+            >
+              {style ? `${style.emoji} ${tier}` : tier}
+            </button>
+          );
+        })}
       </div>
 
       {/* Bot Grid */}

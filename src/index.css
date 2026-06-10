@@ -527,3 +527,386 @@ button, a, [role="button"] {
 .ios .no-drag {
   display: none;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   STORY MODE / CAMPAIGN UPGRADE STYLES
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes fire-flow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 200%;
+  }
+}
+
+@keyframes fire-pulse {
+  0%, 100% {
+    box-shadow: 0 0 6px #ef4444, 0 0 12px #f97316, 0 0 20px #f59e0b;
+  }
+  50% {
+    box-shadow: 0 0 14px #ef4444, 0 0 28px #f97316, 0 0 40px #f59e0b;
+  }
+}
+
+@keyframes fireball-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 10px #f59e0b, 0 0 20px #f97316, 0 0 30px #ef4444;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.25);
+    box-shadow: 0 0 16px #f59e0b, 0 0 30px #f97316, 0 0 45px #ef4444;
+  }
+}
+
+@keyframes active-boss-glow {
+  0%, 100% {
+    border-color: rgba(249, 115, 22, 0.4);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.15), inset 0 0 10px rgba(249, 115, 22, 0.05);
+  }
+  50% {
+    border-color: rgba(239, 68, 68, 0.95);
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.5), inset 0 0 15px rgba(239, 68, 68, 0.15);
+  }
+}
+
+.fire-line-running {
+  background: linear-gradient(
+    to bottom,
+    #ef4444,
+    #f97316,
+    #f59e0b,
+    #ef4444
+  );
+  background-size: 100% 200%;
+  animation: fire-flow 2s linear infinite, fire-pulse 1.5s ease-in-out infinite alternate;
+}
+
+.active-boss-card {
+  animation: active-boss-glow-0 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BURNING COLUMN / FLOWING FIRE LINE CSS ANIMATION
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes fire-flow-vertical {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% -200%;
+  }
+}
+
+.fire-line-flow {
+  background: linear-gradient(
+    to bottom,
+    #f97316,
+    #ef4444,
+    #f59e0b,
+    #f97316
+  );
+  background-size: 100% 200%;
+  animation: fire-flow-vertical 1.5s linear infinite;
+}
+
+.fire-line-flow-0 {
+  background: linear-gradient(to bottom, #f97316, #ef4444, #f59e0b, #f97316);
+  background-size: 100% 200%;
+  animation: fire-flow-vertical 1.5s linear infinite;
+}
+
+.fire-line-flow-1 {
+  background: linear-gradient(to bottom, #06b6d4, #2563eb, #99f6e4, #06b6d4);
+  background-size: 100% 200%;
+  animation: fire-flow-vertical 1.5s linear infinite;
+}
+
+.fire-line-flow-2 {
+  background: linear-gradient(to bottom, #10b981, #059669, #a7f3d0, #10b981);
+  background-size: 100% 200%;
+  animation: fire-flow-vertical 1.5s linear infinite;
+}
+
+.fire-line-flow-3 {
+  background: linear-gradient(to bottom, #2563eb, #1d4ed8, #93c5fd, #2563eb);
+  background-size: 100% 200%;
+  animation: fire-flow-vertical 1.5s linear infinite;
+}
+
+.fire-line-flow-4 {
+  background: linear-gradient(to bottom, #8b5cf6, #db2777, #f5d0fe, #8b5cf6);
+  background-size: 100% 200%;
+  animation: fire-flow-vertical 1.5s linear infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ERA HEADER BOX GLOW ANIMATION
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes era-header-glow-orange {
+  0%, 100% {
+    border-color: rgba(249, 115, 22, 0.45);
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.25), inset 0 0 8px rgba(249, 115, 22, 0.1);
+  }
+  50% {
+    border-color: rgba(245, 158, 11, 0.9);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.55), inset 0 0 12px rgba(245, 158, 11, 0.2);
+  }
+}
+.era-glow-orange {
+  animation: era-header-glow-orange 3s ease-in-out infinite;
+}
+
+@keyframes era-header-glow-cyan {
+  0%, 100% {
+    border-color: rgba(6, 182, 212, 0.45);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.25), inset 0 0 8px rgba(6, 182, 212, 0.1);
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.9);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.55), inset 0 0 12px rgba(59, 130, 246, 0.2);
+  }
+}
+.era-glow-cyan {
+  animation: era-header-glow-cyan 3s ease-in-out infinite;
+}
+
+@keyframes era-header-glow-green {
+  0%, 100% {
+    border-color: rgba(16, 185, 129, 0.45);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.25), inset 0 0 8px rgba(16, 185, 129, 0.1);
+  }
+  50% {
+    border-color: rgba(5, 150, 105, 0.9);
+    box-shadow: 0 0 25px rgba(5, 150, 105, 0.55), inset 0 0 12px rgba(5, 150, 105, 0.2);
+  }
+}
+.era-glow-green {
+  animation: era-header-glow-green 3s ease-in-out infinite;
+}
+
+@keyframes era-header-glow-blue {
+  0%, 100% {
+    border-color: rgba(37, 99, 235, 0.45);
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.25), inset 0 0 8px rgba(37, 99, 235, 0.1);
+  }
+  50% {
+    border-color: rgba(29, 78, 216, 0.9);
+    box-shadow: 0 0 25px rgba(29, 78, 216, 0.55), inset 0 0 12px rgba(29, 78, 216, 0.2);
+  }
+}
+.era-glow-blue {
+  animation: era-header-glow-blue 3s ease-in-out infinite;
+}
+
+@keyframes era-header-glow-purple {
+  0%, 100% {
+    border-color: rgba(139, 92, 246, 0.45);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.25), inset 0 0 8px rgba(139, 92, 246, 0.1);
+  }
+  50% {
+    border-color: rgba(219, 39, 119, 0.9);
+    box-shadow: 0 0 25px rgba(219, 39, 119, 0.55), inset 0 0 12px rgba(219, 39, 119, 0.2);
+  }
+}
+.era-glow-purple {
+  animation: era-header-glow-purple 3s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FIRE SEGMENT GLOW PULSINGS
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes fire-pulse-slow-0 {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 10px #ea580c, 0 0 18px #dc2626;
+  }
+  50% {
+    opacity: 0.98;
+    box-shadow: 0 0 14px #ea580c, 0 0 26px #dc2626;
+  }
+}
+.fire-line-glow-0 {
+  animation: fire-pulse-slow-0 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes fire-pulse-slow-1 {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 10px #0891b2, 0 0 18px #2563eb;
+  }
+  50% {
+    opacity: 0.98;
+    box-shadow: 0 0 14px #0891b2, 0 0 26px #2563eb;
+  }
+}
+.fire-line-glow-1 {
+  animation: fire-pulse-slow-1 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes fire-pulse-slow-2 {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 10px #059669, 0 0 18px #16a34a;
+  }
+  50% {
+    opacity: 0.98;
+    box-shadow: 0 0 14px #059669, 0 0 26px #16a34a;
+  }
+}
+.fire-line-glow-2 {
+  animation: fire-pulse-slow-2 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes fire-pulse-slow-3 {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 10px #2563eb, 0 0 18px #1d4ed8;
+  }
+  50% {
+    opacity: 0.98;
+    box-shadow: 0 0 14px #2563eb, 0 0 26px #1d4ed8;
+  }
+}
+.fire-line-glow-3 {
+  animation: fire-pulse-slow-3 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes fire-pulse-slow-4 {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 10px #7c3aed, 0 0 18px #db2777;
+  }
+  50% {
+    opacity: 0.98;
+    box-shadow: 0 0 14px #7c3aed, 0 0 26px #db2777;
+  }
+}
+.fire-line-glow-4 {
+  animation: fire-pulse-slow-4 2.5s ease-in-out infinite alternate;
+}
+
+.fire-line-glow {
+  animation: fire-pulse-slow-0 2.5s ease-in-out infinite alternate;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ACTIVE BOSS CARD PULSING GLOWS
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes active-boss-glow-0 {
+  0%, 100% {
+    border-color: rgba(249, 115, 22, 0.4);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.15), inset 0 0 10px rgba(249, 115, 22, 0.05);
+  }
+  50% {
+    border-color: rgba(239, 68, 68, 0.95);
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.5), inset 0 0 15px rgba(239, 68, 68, 0.15);
+  }
+}
+.active-boss-card-0 {
+  animation: active-boss-glow-0 2.5s ease-in-out infinite;
+}
+
+@keyframes active-boss-glow-1 {
+  0%, 100% {
+    border-color: rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.15), inset 0 0 10px rgba(6, 182, 212, 0.05);
+  }
+  50% {
+    border-color: rgba(37, 99, 235, 0.95);
+    box-shadow: 0 0 22px rgba(37, 99, 235, 0.5), inset 0 0 15px rgba(37, 99, 235, 0.15);
+  }
+}
+.active-boss-card-1 {
+  animation: active-boss-glow-1 2.5s ease-in-out infinite;
+}
+
+@keyframes active-boss-glow-2 {
+  0%, 100% {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.15), inset 0 0 10px rgba(16, 185, 129, 0.05);
+  }
+  50% {
+    border-color: rgba(5, 150, 105, 0.95);
+    box-shadow: 0 0 22px rgba(5, 150, 105, 0.5), inset 0 0 15px rgba(5, 150, 105, 0.15);
+  }
+}
+.active-boss-card-2 {
+  animation: active-boss-glow-2 2.5s ease-in-out infinite;
+}
+
+@keyframes active-boss-glow-3 {
+  0%, 100% {
+    border-color: rgba(37, 99, 235, 0.4);
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.15), inset 0 0 10px rgba(37, 99, 235, 0.05);
+  }
+  50% {
+    border-color: rgba(29, 78, 216, 0.95);
+    box-shadow: 0 0 22px rgba(29, 78, 216, 0.5), inset 0 0 15px rgba(29, 78, 216, 0.15);
+  }
+}
+.active-boss-card-3 {
+  animation: active-boss-glow-3 2.5s ease-in-out infinite;
+}
+
+@keyframes active-boss-glow-4 {
+  0%, 100% {
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.15), inset 0 0 10px rgba(139, 92, 246, 0.05);
+  }
+  50% {
+    border-color: rgba(219, 39, 119, 0.95);
+    box-shadow: 0 0 22px rgba(219, 39, 119, 0.5), inset 0 0 15px rgba(219, 39, 119, 0.15);
+  }
+}
+.active-boss-card-4 {
+  animation: active-boss-glow-4 2.5s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FIREBALL SPARK PULSING LEADING EDGE
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes fireball-pulse-scale {
+  0%, 100% {
+    transform: translate(-50%, 50%) scale(0.9);
+  }
+  50% {
+    transform: translate(-50%, 50%) scale(1.35);
+  }
+}
+.fireball-spark {
+  animation: fireball-pulse-scale 1.6s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CINEMATIC SCANLINES AND PANNING FOR STORY BRIEFING VIDEO
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes ken-burns {
+  0% {
+    transform: scale(1.0) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.15) translate(-1%, -1%);
+  }
+}
+
+.bg-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.4) 50%
+  );
+  background-size: 100% 4px;
+}
+
+
+
+
+

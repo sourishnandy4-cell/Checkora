@@ -169,7 +169,7 @@ export const Analysis: React.FC = () => {
   useEffect(() => {
     clearOptions();
     setRightClickedSquares({});
-  }, [fen]);
+  }, [fen]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
 

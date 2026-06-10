@@ -381,36 +381,70 @@ export const useGameStore = create<GameState>()(
         set({ whiteTime: nextTime });
 
         if (nextTime === 0) {
-          // White timeout
+          // White timeout — black wins
+          const { playerColor: pc, activeBot, playMode, timeControl, gameHistory,
+                  userEloRapid, userEloBlitz, userEloBullet, campaignNodeId } = get();
+
+          const histResult: 'W' | 'L' | 'D' = pc === 'black' ? 'W' : 'L';
+          const oppName = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
+          const oppElo  = activeBot ? activeBot.elo : 1500;
+          const tcCat   = getTcCategory(timeControl);
+          const curElo  = tcCat === 'rapid' ? userEloRapid : tcCat === 'blitz' ? userEloBlitz : userEloBullet;
+          const change  = calculateEloChange(curElo, oppElo, histResult, gameHistory.length);
+
+          const entry: GameHistoryEntry = {
+            id: Date.now().toString(),
+            date: new Date().toISOString().split('T')[0],
+            opponent: oppName, opponentElo: oppElo,
+            timeControl, playerColor: pc, result: histResult, ratingChange: change
+          };
+
           set({
             isGameActive: false,
             gameResult: 'b',
-            gameOverReason: 'timeout'
+            gameOverReason: 'timeout',
+            gameHistory: [entry, ...gameHistory],
+            userEloRapid:  tcCat === 'rapid'  ? Math.max(100, userEloRapid  + change) : userEloRapid,
+            userEloBlitz:  tcCat === 'blitz'  ? Math.max(100, userEloBlitz  + change) : userEloBlitz,
+            userEloBullet: tcCat === 'bullet' ? Math.max(100, userEloBullet + change) : userEloBullet,
           });
           get().sendChatMessage('System', 'Game Over: Black wins on time.');
-          // Save campaign progress if player (black) won on time
-          const nodeIdBlack = get().campaignNodeId;
-          if (get().playerColor === 'black' && nodeIdBlack) {
-            useCampaignStore.getState().completeNode(nodeIdBlack);
-          }
+          if (pc === 'black' && campaignNodeId) useCampaignStore.getState().completeNode(campaignNodeId);
         }
       } else {
         const nextTime = Math.max(0, blackTime - 1);
         set({ blackTime: nextTime });
 
         if (nextTime === 0) {
-          // Black timeout
+          // Black timeout — white wins
+          const { playerColor: pc, activeBot, playMode, timeControl, gameHistory,
+                  userEloRapid, userEloBlitz, userEloBullet, campaignNodeId } = get();
+
+          const histResult: 'W' | 'L' | 'D' = pc === 'white' ? 'W' : 'L';
+          const oppName = playMode === 'multiplayer' ? 'Opponent' : (activeBot ? activeBot.name : 'Chess Engine');
+          const oppElo  = activeBot ? activeBot.elo : 1500;
+          const tcCat   = getTcCategory(timeControl);
+          const curElo  = tcCat === 'rapid' ? userEloRapid : tcCat === 'blitz' ? userEloBlitz : userEloBullet;
+          const change  = calculateEloChange(curElo, oppElo, histResult, gameHistory.length);
+
+          const entry: GameHistoryEntry = {
+            id: Date.now().toString(),
+            date: new Date().toISOString().split('T')[0],
+            opponent: oppName, opponentElo: oppElo,
+            timeControl, playerColor: pc, result: histResult, ratingChange: change
+          };
+
           set({
             isGameActive: false,
             gameResult: 'w',
-            gameOverReason: 'timeout'
+            gameOverReason: 'timeout',
+            gameHistory: [entry, ...gameHistory],
+            userEloRapid:  tcCat === 'rapid'  ? Math.max(100, userEloRapid  + change) : userEloRapid,
+            userEloBlitz:  tcCat === 'blitz'  ? Math.max(100, userEloBlitz  + change) : userEloBlitz,
+            userEloBullet: tcCat === 'bullet' ? Math.max(100, userEloBullet + change) : userEloBullet,
           });
           get().sendChatMessage('System', 'Game Over: White wins on time.');
-          // Save campaign progress if player (white) won on time
-          const nodeIdWhite = get().campaignNodeId;
-          if (get().playerColor === 'white' && nodeIdWhite) {
-            useCampaignStore.getState().completeNode(nodeIdWhite);
-          }
+          if (pc === 'white' && campaignNodeId) useCampaignStore.getState().completeNode(campaignNodeId);
         }
       }
     },

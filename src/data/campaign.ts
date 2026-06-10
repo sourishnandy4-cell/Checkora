@@ -46,11 +46,18 @@ export const CAMPAIGN_ERAS: CampaignEra[] = [
     ]
   },
   {
-    name: 'Tech & Masters',
-    description: 'The final frontier. Innovators and Grandmasters.',
+    name: 'Tech & Innovators',
+    description: 'Challenge the visionaries who built the modern digital age.',
     nodes: [
       { id: 'elon-musk', prerequisite: 'narendra-modi' },
-      { id: 'gotham-chess', prerequisite: 'elon-musk' },
+      { id: 'larry-page', prerequisite: 'elon-musk' },
+    ]
+  },
+  {
+    name: 'Chess Masters',
+    description: 'The final frontier. Face the ultimate Grandmasters and content creators.',
+    nodes: [
+      { id: 'gotham-chess', prerequisite: 'larry-page' },
       { id: 'pragg', prerequisite: 'gotham-chess' },
       { id: 'magnus', prerequisite: 'pragg' },
     ]

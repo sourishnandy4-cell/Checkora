@@ -58,9 +58,11 @@ export class StockfishEngine {
   }
 
   evaluatePosition(fen: string, depth: number, onEval: (evaluation: EngineEvaluation) => void) {
-    // Stop any in-flight search before starting a new one
+    // Clear both callbacks BEFORE stop so the bestmove response from the
+    // old search doesn't fire either callback.
+    this.onBestMoveCallback = null;
+    this.onEvalCallback = null;
     this.send('stop');
-    this.onBestMoveCallback = null; // clear so it doesn't fire spuriously
     this.onEvalCallback = onEval;
     this.lastEvalEmittedAtMs = 0;
     this.send(`position fen ${fen}`);
@@ -68,9 +70,11 @@ export class StockfishEngine {
   }
 
   getBestMove(fen: string, depth: number, skillLevel: number, elo: number, onBestMove: (bestMove: string) => void) {
-    // Stop any in-flight search before starting a new one
+    // Clear both callbacks BEFORE stop so the bestmove response from the
+    // old search doesn't fire the new callback with a stale move.
+    this.onBestMoveCallback = null;
+    this.onEvalCallback = null;
     this.send('stop');
-    this.onEvalCallback = null; // clear eval listener during bot thinking
     this.onBestMoveCallback = onBestMove;
     this.lastEvalEmittedAtMs = 0;
     this.setDifficulty(skillLevel, elo);

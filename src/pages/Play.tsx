@@ -118,6 +118,8 @@ export const Play: React.FC = () => {
     resignGame,
     offerDraw,
     sendChatMessage,
+    setDrawOfferReceived,
+    acceptDraw,
     timeControl,
     userEloBlitz,
     userEloRapid,
@@ -629,8 +631,9 @@ export const Play: React.FC = () => {
     const activeUserElo = getActiveUserElo();
 
     const { playMode } = useGameStore.getState();
-    const remoteName = useMultiplayerStore.getState().remotePlayerName || 'Opponent';
-    const remoteAvatar = useMultiplayerStore.getState().remotePlayerAvatar || '👤';
+    const remoteName = useMultiplayerStore(s => s.remotePlayerName) || 'Guest';
+    const remoteAvatar = useMultiplayerStore(s => s.remotePlayerAvatar) || '👤';
+    const drawOfferReceived = useGameStore(s => s.drawOfferReceived);
 
     const blackPlayerName = playerColor === 'black' 
       ? playerName 
@@ -867,6 +870,42 @@ export const Play: React.FC = () => {
                         >
                           Review Game
                         </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Draw Offer Popup */}
+                  {drawOfferReceived && !gameResult && (
+                    <div className="absolute inset-0 bg-void/85 flex items-center justify-center z-30">
+                      <div className="bg-bg-surface border border-accent-amber/50 rounded-md p-6 max-w-xs w-full shadow-2xl text-center">
+                        <span className="text-2xl block mb-2">🤝</span>
+                        <h3 className="font-serif-header text-md font-bold mb-1">Draw Offered</h3>
+                        <p className="text-xs text-text-secondary mb-5">Your opponent is offering a draw. Do you accept?</p>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              acceptDraw();
+                              if (playMode === 'multiplayer') {
+                                useMultiplayerStore.getState().sendMessage({ type: 'draw_accept' });
+                              }
+                            }}
+                            className="flex-1 py-2 bg-accent-green/20 border border-accent-green text-xs uppercase font-mono-clock text-accent-green hover:bg-accent-green/30 rounded-sm"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDrawOfferReceived(false);
+                              if (playMode === 'multiplayer') {
+                                useMultiplayerStore.getState().sendMessage({ type: 'draw_decline' });
+                                sendChatMessage('System', 'Draw offer declined.');
+                              }
+                            }}
+                            className="flex-1 py-2 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red/30 rounded-sm"
+                          >
+                            Decline
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}

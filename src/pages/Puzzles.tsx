@@ -6,7 +6,7 @@ import { useGameStore } from '../store/gameStore';
 import { playSound } from '../utils/audio';
 import { useChessOptions } from '../utils/useChessOptions';
 
-import { TacticalPuzzle, LOCAL_PUZZLES } from '../data/puzzles';
+import { TacticalPuzzle, ALL_PUZZLES, getDailyPuzzles, getThemeCounts } from '../data/puzzles';
 
 export const Puzzles: React.FC = () => {
   const { 
@@ -27,9 +27,9 @@ export const Puzzles: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'daily' | 'rush' | 'themes'>('daily');
 
   // Interactive Chess Engine states for puzzles
-  const [puzzleChess, setPuzzleChess] = useState<Chess>(new Chess(LOCAL_PUZZLES[0].fen));
+  const [puzzleChess, setPuzzleChess] = useState<Chess>(new Chess(ALL_PUZZLES[0].fen));
   const [puzzleIndex, setPuzzleIndex] = useState(0);
-  const [puzzleFen, setPuzzleFen] = useState(LOCAL_PUZZLES[0].fen);
+  const [puzzleFen, setPuzzleFen] = useState(ALL_PUZZLES[0].fen);
   const [puzzleStatus, setPuzzleStatus] = useState<'solving' | 'correct' | 'wrong'>('solving');
   const [hintActive, setHintActive] = useState(false);
 
@@ -78,7 +78,7 @@ export const Puzzles: React.FC = () => {
   }, [activeTab, puzzleRushActive]);
 
   // Initialize active puzzle
-  const currentPuzzle = LOCAL_PUZZLES[puzzleIndex];
+  const currentPuzzle = ALL_PUZZLES[puzzleIndex];
 
   useEffect(() => {
     setPuzzleChess(new Chess(currentPuzzle.fen));
@@ -146,7 +146,7 @@ export const Puzzles: React.FC = () => {
             submitPuzzleAnswer(true);
             // Load next puzzle quickly in rush mode
             setTimeout(() => {
-              const nextIdx = (puzzleIndex + 1) % LOCAL_PUZZLES.length;
+              const nextIdx = (puzzleIndex + 1) % ALL_PUZZLES.length;
               setPuzzleIndex(nextIdx);
             }, 1000);
           }
@@ -158,7 +158,7 @@ export const Puzzles: React.FC = () => {
             submitPuzzleAnswer(false);
             // Even if wrong, slide to next in rush to keep speed high
             setTimeout(() => {
-              const nextIdx = (puzzleIndex + 1) % LOCAL_PUZZLES.length;
+              const nextIdx = (puzzleIndex + 1) % ALL_PUZZLES.length;
               setPuzzleIndex(nextIdx);
             }, 1200);
           }
@@ -180,17 +180,17 @@ export const Puzzles: React.FC = () => {
 
   const handleNextPuzzle = () => {
     // Adaptive difficulty: find next unsolved puzzle with >= difficulty
-    const unsolved = LOCAL_PUZZLES.filter(p => !solvedPuzzles.includes(p.id) && p.id !== currentPuzzle.id);
+    const unsolved = ALL_PUZZLES.filter(p => !solvedPuzzles.includes(p.id) && p.id !== currentPuzzle.id);
     let nextPuzzle = unsolved.find(p => p.difficulty >= currentPuzzle.difficulty);
     
     if (!nextPuzzle) {
       nextPuzzle = unsolved[0]; // fallback to any unsolved
     }
     if (!nextPuzzle) {
-      nextPuzzle = LOCAL_PUZZLES[(puzzleIndex + 1) % LOCAL_PUZZLES.length]; // fallback loop if all solved
+      nextPuzzle = ALL_PUZZLES[(puzzleIndex + 1) % ALL_PUZZLES.length]; // fallback loop if all solved
     }
     
-    setPuzzleIndex(LOCAL_PUZZLES.findIndex(p => p.id === nextPuzzle.id));
+    setPuzzleIndex(ALL_PUZZLES.findIndex(p => p.id === nextPuzzle.id));
   };
 
   const handleRetryPuzzle = () => {
@@ -450,43 +450,47 @@ export const Puzzles: React.FC = () => {
       {/* Tab 3: BROWSE THEMES */}
       {activeTab === 'themes' && !puzzleRushActive && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { tag: 'Checkmate', desc: 'Find the critical forcing moves to deliver absolute checkmate.', icon: '👑', count: 12 },
-            { tag: 'Pin', desc: 'Exploit pinned pieces that cannot move without dropping massive material.', icon: '📎', count: 8 },
-            { tag: 'Fork', desc: 'Double attacks targeting two vulnerable enemy pieces simultaneously.', icon: '🍴', count: 15 },
-            { tag: 'Sacrifice', desc: 'Give away material temporarily to break defensive coordinates.', icon: '🎁', count: 9 },
-            { tag: 'Escape', desc: 'Find safe cells to escape threats and evade mate lines.', icon: '🚪', count: 6 },
-            { tag: 'Skewer', desc: 'Force high-value targets to move, exposing undefended units behind.', icon: '🗡️', count: 11 }
-          ].map((theme) => (
-            <div
-              key={theme.tag}
-              onClick={() => {
-                const idx = LOCAL_PUZZLES.findIndex(p => p.theme === theme.tag);
-                if (idx !== -1) setPuzzleIndex(idx);
-                setActiveTab('daily');
-              }}
-              className="bg-bg-surface border border-bg-border p-5 rounded-sm hover:bg-bg-elevated cursor-pointer group flex flex-col justify-between transition-colors duration-150"
-            >
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-2xl">{theme.icon}</span>
-                  <span className="text-[9px] font-mono-clock bg-bg-void text-text-muted border border-bg-border px-1.5 py-0.5 rounded-sm">
-                    {theme.count} PUZZLES
-                  </span>
+          {(() => {
+            const themeCounts = getThemeCounts();
+            const themes = [
+              { tag: 'Checkmate', desc: 'Find the critical forcing moves to deliver absolute checkmate.', icon: '👑' },
+              { tag: 'Pin', desc: 'Exploit pinned pieces that cannot move without dropping massive material.', icon: '📎' },
+              { tag: 'Fork', desc: 'Double attacks targeting two vulnerable enemy pieces simultaneously.', icon: '🍴' },
+              { tag: 'Sacrifice', desc: 'Give away material temporarily to break defensive coordinates.', icon: '🎁' },
+              { tag: 'Escape', desc: 'Find safe cells to escape threats and evade mate lines.', icon: '🚪' },
+              { tag: 'Skewer', desc: 'Force high-value targets to move, exposing undefended units behind.', icon: '🗡️' }
+            ];
+            return themes.map((theme) => (
+              <div
+                key={theme.tag}
+                onClick={() => {
+                  const idx = ALL_PUZZLES.findIndex(p => p.theme === theme.tag);
+                  if (idx !== -1) setPuzzleIndex(idx);
+                  setActiveTab('daily');
+                }}
+                className="bg-bg-surface border border-bg-border p-5 rounded-sm hover:bg-bg-elevated cursor-pointer group flex flex-col justify-between transition-colors duration-150"
+              >
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-2xl">{theme.icon}</span>
+                    <span className="text-[9px] font-mono-clock bg-bg-void text-text-muted border border-bg-border px-1.5 py-0.5 rounded-sm">
+                      {themeCounts[theme.tag] || 0} PUZZLES
+                    </span>
+                  </div>
+                  <h3 className="font-serif-header text-md font-bold tracking-tight text-text-primary group-hover:text-accent-primary">
+                    {theme.tag}
+                  </h3>
+                  <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                    {theme.desc}
+                  </p>
                 </div>
-                <h3 className="font-serif-header text-md font-bold tracking-tight text-text-primary group-hover:text-accent-primary">
-                  {theme.tag}
-                </h3>
-                <p className="text-xs text-text-secondary mt-1 leading-relaxed">
-                  {theme.desc}
-                </p>
-              </div>
 
-              <button className="premium-btn py-1.5 px-3 mt-4 text-[10px] uppercase font-mono-clock self-start flex items-center gap-1">
-                Explore <ArrowRight size={10} />
-              </button>
-            </div>
-          ))}
+                <button className="premium-btn py-1.5 px-3 mt-4 text-[10px] uppercase font-mono-clock self-start flex items-center gap-1">
+                  Explore <ArrowRight size={10} />
+                </button>
+              </div>
+            ));
+          })()}
         </div>
       )}
     </div>

@@ -822,7 +822,7 @@ export const Campaign: React.FC = () => {
       <AnimatePresence>
         {activeStoryBot && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-bg-void/98 overflow-hidden select-none"
+            className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 md:p-6 bg-bg-void/98 overflow-y-auto select-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -850,11 +850,19 @@ export const Campaign: React.FC = () => {
               }}
             />
 
+            {/* Mobile close button at top */}
+            <button
+              onClick={() => setActiveStoryBot(null)}
+              className="fixed top-4 right-4 z-50 w-10 h-10 rounded-full bg-bg-surface/80 border border-bg-border flex items-center justify-center text-text-secondary hover:text-text-primary backdrop-blur-sm md:hidden"
+            >
+              <X size={18} />
+            </button>
+
             {/* Inner Content Dashboard */}
-            <div className="relative z-10 max-w-5xl w-full grid grid-cols-1 md:grid-cols-12 gap-8 px-6 items-center">
+            <div className="relative z-10 max-w-5xl w-full grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 px-2 md:px-6 items-start md:items-center my-8 md:my-0">
               
               {/* LEFT COLUMN: simulated video player and stats */}
-              <div className="md:col-span-5 flex flex-col gap-6 w-full">
+              <div className="md:col-span-5 flex flex-col gap-4 md:gap-6 w-full">
                 
                 {/* Widescreen Boss Image */}
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-bg-border shadow-2xl bg-black">
@@ -905,7 +913,7 @@ export const Campaign: React.FC = () => {
               </div>
 
               {/* RIGHT COLUMN: name, description, quote and controls */}
-              <div className="md:col-span-7 flex flex-col gap-6 text-left">
+              <div className="md:col-span-7 flex flex-col gap-4 md:gap-6 text-left">
                 
                 {/* Era tag */}
                 <div className="flex items-center gap-2">
@@ -917,7 +925,7 @@ export const Campaign: React.FC = () => {
 
                 {/* Name */}
                 <div>
-                  <h2 className="font-serif-header text-4xl md:text-5xl font-bold tracking-tight text-white">
+                  <h2 className="font-serif-header text-3xl md:text-5xl font-bold tracking-tight text-white">
                     {activeStoryBot.name}
                   </h2>
                 </div>
@@ -955,7 +963,7 @@ export const Campaign: React.FC = () => {
                 </div>
 
                 {/* Control Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full mt-4 pb-8 md:pb-0">
                   <button
                     onClick={() => setActiveStoryBot(null)}
                     className="flex-1 py-3 px-6 bg-bg-void/40 border border-bg-border text-zinc-300 text-xs uppercase font-mono-clock rounded hover:bg-bg-elevated hover:text-white transition-all cursor-pointer text-center"

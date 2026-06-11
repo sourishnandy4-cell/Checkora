@@ -18,6 +18,7 @@ import {
 import { useGameStore, TimeControl, getTcCategory } from '../store/gameStore';
 import { useNavigate } from 'react-router-dom';
 import { useSettingsStore } from '../store/settingsStore';
+import { useMultiplayerStore } from '../store/multiplayerStore';
 import { BOTS, BotDefinition } from '../data/bots';
 import { StockfishEngine, EngineEvaluation } from '../engine/stockfish';
 import { playSound } from '../utils/audio';
@@ -462,6 +463,12 @@ export const Play: React.FC = () => {
 
         const success = makeMove(sourceSquare, targetSquare);
         if (success) {
+          if (useGameStore.getState().playMode === 'multiplayer') {
+            useMultiplayerStore.getState().sendMessage({
+              type: 'move',
+              payload: { from: sourceSquare, to: targetSquare }
+            });
+          }
           handlePostMoveSoundAndGameEnding(isCapture);
           return true;
         }
@@ -510,6 +517,12 @@ export const Play: React.FC = () => {
 
     const success = makeMove(pendingMove.from, pendingMove.to, pendingMove.promotion);
     if (success) {
+      if (useGameStore.getState().playMode === 'multiplayer') {
+        useMultiplayerStore.getState().sendMessage({
+          type: 'move',
+          payload: { from: pendingMove.from, to: pendingMove.to, promotion: pendingMove.promotion }
+        });
+      }
       handlePostMoveSoundAndGameEnding(isCapture);
     }
     setPendingMove(null);
@@ -536,6 +549,15 @@ export const Play: React.FC = () => {
     sendChatMessage('You', chatInput);
     const userText = chatInput;
     setChatInput('');
+
+    // Send chat to opponent in multiplayer
+    const { playMode } = useGameStore.getState();
+    if (playMode === 'multiplayer') {
+      useMultiplayerStore.getState().sendMessage({
+        type: 'chat',
+        payload: { text: userText }
+      });
+    }
 
     // Trigger responsive bot replies!
     if (activeBot && isGameActive && !gameResult) {
@@ -606,9 +628,17 @@ export const Play: React.FC = () => {
     };
     const activeUserElo = getActiveUserElo();
 
-    const blackPlayerName = playerColor === 'black' ? playerName : (activeBot ? activeBot.name : 'Stockfish Bot');
+    const { playMode } = useGameStore.getState();
+    const remoteName = useMultiplayerStore.getState().remotePlayerName || 'Opponent';
+    const remoteAvatar = useMultiplayerStore.getState().remotePlayerAvatar || '👤';
+
+    const blackPlayerName = playerColor === 'black' 
+      ? playerName 
+      : (playMode === 'multiplayer' ? remoteName : (activeBot ? activeBot.name : 'Stockfish Bot'));
     const blackPlayerElo = playerColor === 'black' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
-    const whitePlayerName = playerColor === 'white' ? playerName : (activeBot ? activeBot.name : 'Stockfish Bot');
+    const whitePlayerName = playerColor === 'white' 
+      ? playerName 
+      : (playMode === 'multiplayer' ? remoteName : (activeBot ? activeBot.name : 'Stockfish Bot'));
     const whitePlayerElo = playerColor === 'white' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
 
     const isWhiteActive = turn === 'w';
@@ -655,6 +685,10 @@ export const Play: React.FC = () => {
                     <div className="flex items-center gap-3">
                       {activeBot && activeBot.isImageAvatar ? (
                         <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                      ) : playMode === 'multiplayer' ? (
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 border-accent-cyan">
+                          {remoteAvatar}
+                        </div>
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
                           {activeBot ? activeBot.avatar : '🤖'}
@@ -686,6 +720,10 @@ export const Play: React.FC = () => {
                     <div className="flex items-center gap-3">
                       {activeBot && activeBot.isImageAvatar ? (
                         <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                      ) : playMode === 'multiplayer' ? (
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 border-accent-cyan">
+                          {remoteAvatar}
+                        </div>
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
                           {activeBot ? activeBot.avatar : '🤖'}
@@ -747,6 +785,12 @@ export const Play: React.FC = () => {
 
                           const success = makeMove(promoMove.from, promoMove.to, selectedPromo);
                           if (success) {
+                            if (useGameStore.getState().playMode === 'multiplayer') {
+                              useMultiplayerStore.getState().sendMessage({
+                                type: 'move',
+                                payload: { from: promoMove.from, to: promoMove.to, promotion: selectedPromo }
+                              });
+                            }
                             handlePostMoveSoundAndGameEnding(isCapture);
                           }
                         }
@@ -902,14 +946,27 @@ export const Play: React.FC = () => {
             ) : (
               <div className="flex gap-2 w-full mt-1">
                 <button
-                  onClick={offerDraw}
+                  onClick={() => {
+                    const { playMode } = useGameStore.getState();
+                    if (playMode === 'multiplayer') {
+                      useMultiplayerStore.getState().sendMessage({ type: 'draw_offer' });
+                      sendChatMessage('System', 'Draw offer sent.');
+                    }
+                    offerDraw();
+                  }}
                   disabled={!!gameResult}
                   className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
                 >
                   <Handshake size={14} /> Offer Draw
                 </button>
                 <button
-                  onClick={resignGame}
+                  onClick={() => {
+                    const { playMode } = useGameStore.getState();
+                    if (playMode === 'multiplayer') {
+                      useMultiplayerStore.getState().sendMessage({ type: 'resign' });
+                    }
+                    resignGame();
+                  }}
                   disabled={!!gameResult}
                   className="flex-1 py-2 bg-bg-surface border border-bg-border text-xs uppercase font-mono-clock text-text-secondary hover:text-accent-red disabled:opacity-50 flex items-center justify-center gap-1.5 premium-btn"
                 >

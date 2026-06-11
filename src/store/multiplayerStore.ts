@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import Peer, { DataConnection } from 'peerjs';
 import { useGameStore } from './gameStore';
+import { useSettingsStore } from './settingsStore';
 
-type MultiplayerMessageType = 'move' | 'chat' | 'resign' | 'draw_offer' | 'draw_accept' | 'draw_decline' | 'ping';
+type MultiplayerMessageType = 'move' | 'chat' | 'resign' | 'draw_offer' | 'draw_accept' | 'draw_decline' | 'ping' | 'identity';
 
 interface MultiplayerMessage {
   type: MultiplayerMessageType;
@@ -16,6 +17,8 @@ interface MultiplayerState {
   isHost: boolean;
   isConnected: boolean;
   isConnecting: boolean;
+  remotePlayerName: string;
+  remotePlayerAvatar: string;
   initPeer: () => void;
   hostGame: () => Promise<string>;
   joinGame: (hostId: string) => Promise<boolean>;
@@ -39,7 +42,8 @@ function normalizeAndValidateIncoming(raw: unknown): MultiplayerMessage | null {
     'draw_offer',
     'draw_accept',
     'draw_decline',
-    'ping'
+    'ping',
+    'identity'
   ]);
 
   if (typeof type !== 'string' || !allowedTypes.has(type)) return null;
@@ -91,6 +95,16 @@ function normalizeAndValidateIncoming(raw: unknown): MultiplayerMessage | null {
       if (payload !== undefined && !isRecord(payload)) return null;
       msg.payload = payload;
       return msg;
+
+    case 'identity': {
+      if (!isRecord(payload)) return null;
+      const name = payload.name;
+      const avatar = payload.avatar;
+      if (typeof name !== 'string' || name.length > 50) return null;
+      if (avatar !== undefined && typeof avatar !== 'string') return null;
+      msg.payload = { name, avatar: avatar || '👤' };
+      return msg;
+    }
 
     default:
       return null;
@@ -161,6 +175,16 @@ function handleIncomingMessage(data: MultiplayerMessage) {
     case 'ping':
       // keeping connection alive
       return;
+
+    case 'identity': {
+      const payload = data.payload as any;
+      if (!payload || typeof payload.name !== 'string') return;
+      useMultiplayerStore.setState({
+        remotePlayerName: payload.name,
+        remotePlayerAvatar: payload.avatar || '👤'
+      });
+      return;
+    }
   }
 }
 
@@ -172,6 +196,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   isConnected: false,
   isConnecting: false,
   showModal: false,
+  remotePlayerName: '',
+  remotePlayerAvatar: '👤',
 
   setShowModal: (show) => set({ showModal: show }),
 
@@ -190,6 +216,10 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       // Incoming connection (we are the host)
       conn.on('open', () => {
         set({ connection: conn, isConnected: true, isHost: true });
+
+        // Send our identity to the joiner
+        const { playerName, playerAvatar } = useSettingsStore.getState();
+        conn.send({ type: 'identity', payload: { name: playerName, avatar: playerAvatar || '👤' } });
 
         // Host starts as White; time control is whatever the host selected in the UI.
         // Use the current gameStore timeControl so it honours the host's picker choice.
@@ -243,6 +273,10 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       conn.on('open', () => {
         set({ connection: conn, isConnected: true, isHost: false, isConnecting: false });
 
+        // Send our identity to the host
+        const { playerName, playerAvatar } = useSettingsStore.getState();
+        conn.send({ type: 'identity', payload: { name: playerName, avatar: playerAvatar || '👤' } });
+
         // Joiner is Black; use same time control as host (already set by host's startNewGame)
         const tc = (useGameStore.getState().timeControl as any) || '10+0';
         useGameStore.getState().startNewGame(null, tc, 'black', undefined, undefined, undefined, 'multiplayer');
@@ -278,6 +312,6 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     const { connection, peer } = get();
     if (connection) connection.close();
     if (peer) peer.destroy();
-    set({ connection: null, peer: null, peerId: null, isConnected: false, isHost: false });
+    set({ connection: null, peer: null, peerId: null, isConnected: false, isHost: false, remotePlayerName: '', remotePlayerAvatar: '👤' });
   }
 }));

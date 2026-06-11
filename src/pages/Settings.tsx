@@ -8,6 +8,7 @@ import {
   Info,
   Check
 } from 'lucide-react';
+import { speechSynth } from '../utils/speech';
 
 const THEMES = [
   { id: 'mono',    name: 'Mono',    preview: ['#000000', '#E8E8E8', '#1E1E1E', '#E8E8E8'] },
@@ -146,11 +147,8 @@ export const Settings: React.FC = () => {
                   onChange={() => {
                     const nextEnabled = !isVoiceEnabled;
                     toggleVoiceEnabled();
-                    if (nextEnabled && 'speechSynthesis' in window) {
-                      try {
-                        window.speechSynthesis.cancel();
-                        window.speechSynthesis.speak(new SpeechSynthesisUtterance('Voice enabled'));
-                      } catch (e) {}
+                    if (nextEnabled) {
+                      speechSynth.speak('Voice enabled');
                     }
                   }}
                   className="w-4 h-4 rounded border-bg-border bg-bg-void focus:ring-0 text-text-primary accent-accent-primary"
@@ -171,11 +169,8 @@ export const Settings: React.FC = () => {
                     disabled={!isVoiceEnabled}
                     onClick={() => {
                       setVoiceGender('female');
-                      if (isVoiceEnabled && 'speechSynthesis' in window) {
-                        try {
-                          window.speechSynthesis.cancel();
-                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Female voice selected'));
-                        } catch (e) {}
+                      if (isVoiceEnabled) {
+                        speechSynth.speak('Female voice selected');
                       }
                     }}
                     className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'female' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}
@@ -186,11 +181,8 @@ export const Settings: React.FC = () => {
                     disabled={!isVoiceEnabled}
                     onClick={() => {
                       setVoiceGender('male');
-                      if (isVoiceEnabled && 'speechSynthesis' in window) {
-                        try {
-                          window.speechSynthesis.cancel();
-                          window.speechSynthesis.speak(new SpeechSynthesisUtterance('Male voice selected'));
-                        } catch (e) {}
+                      if (isVoiceEnabled) {
+                        speechSynth.speak('Male voice selected');
                       }
                     }}
                     className={`px-3 py-1 text-[10px] uppercase font-mono-clock rounded cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${voiceGender === 'male' && isVoiceEnabled ? 'bg-accent-primary text-void font-bold' : 'text-text-secondary hover:text-text-primary'}`}

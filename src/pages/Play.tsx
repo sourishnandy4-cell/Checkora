@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { 
-  Search, 
-  User, 
-  FlipHorizontal, 
-  Flag, 
-  Handshake, 
-  Send, 
-  Volume2, 
+import {
+  Search,
+  User,
+  FlipHorizontal,
+  Flag,
+  Handshake,
+  Send,
+  Volume2,
   ArrowLeft,
   X,
   Play as PlayIcon,
@@ -99,20 +99,20 @@ const TIER_STYLE_MAP: Record<string, { active: string; inactive: string; emoji: 
 export const Play: React.FC = () => {
   const navigate = useNavigate();
   // Navigation & Screen Control
-  const { 
+  const {
     chess,
-    fen, 
-    turn, 
-    history, 
-    whiteTime, 
-    blackTime, 
-    playerColor, 
-    activeBot, 
-    gameResult, 
+    fen,
+    turn,
+    history,
+    whiteTime,
+    blackTime,
+    playerColor,
+    activeBot,
+    gameResult,
     gameOverReason,
     isGameActive,
     chatMessages,
-    startNewGame, 
+    startNewGame,
     makeMove,
     tickClocks,
     resignGame,
@@ -127,9 +127,9 @@ export const Play: React.FC = () => {
     undoMove
   } = useGameStore();
 
-  const { 
-    showCoordinates, 
-    showLegalMoves, 
+  const {
+    showCoordinates,
+    showLegalMoves,
     playerName,
     confirmMoves,
     autoPromoteToQueen,
@@ -307,7 +307,7 @@ export const Play: React.FC = () => {
 
     if (isBotTurn && !botThinkingRef.current) {
       botThinkingRef.current = true;
-      
+
       // Determine depth based on ELO to simulate different strengths
       const depth = Math.min(22, Math.max(1, Math.floor(activeBot.elo / 150)));
 
@@ -328,23 +328,23 @@ export const Play: React.FC = () => {
         }
 
         engineRef.current.getBestMove(
-          fen, 
-          depth, 
-          activeBot.skillLevel, 
-          activeBot.elo, 
+          fen,
+          depth,
+          activeBot.skillLevel,
+          activeBot.elo,
           (bestMove) => {
             const from = bestMove.slice(0, 2);
             const to = bestMove.slice(2, 4);
             const promo = bestMove.slice(4, 5) || undefined;
-            
+
             // Execute move
             const success = makeMove(from, to, promo);
-            
+
             if (success) {
               // Trigger move/capture sound
               const isCapture = chess.history({ verbose: true }).pop()?.captured;
               const isCheck = chess.inCheck();
-              
+
               if (isCheck) {
                 playSound.play('check');
               } else if (isCapture) {
@@ -371,7 +371,7 @@ export const Play: React.FC = () => {
   // Helper sound & bot speech dispatcher
   const handlePostMoveSoundAndGameEnding = (isCapture: boolean) => {
     const isCheck = chess.inCheck();
-    
+
     if (isCheck) {
       playSound.play('check');
     } else if (isCapture) {
@@ -383,12 +383,12 @@ export const Play: React.FC = () => {
     if (chess.isGameOver()) {
       const checkResult = chess.turn() === 'w' ? 'b' : 'w';
       const isBotWinner = (checkResult === 'w' && playerColor === 'black') || (checkResult === 'b' && playerColor === 'white');
-      
+
       setTimeout(() => {
         if (activeBot) {
           const comment = isBotWinner ? activeBot.chatPools.win[0] : activeBot.chatPools.lose[0];
           sendChatMessage(activeBot.name, comment);
-          
+
           // Win/Lose arpeggios
           if (isBotWinner) {
             playSound.play('lose');
@@ -424,7 +424,7 @@ export const Play: React.FC = () => {
   const onPieceDrop = (sourceSquare: string, targetSquare: string): boolean => {
     clearOptions();
     if (!isGameActive || gameResult) return false;
-    
+
     // Check if it's the player's turn
     const isPlayerTurn = (turn === 'w' && playerColor === 'white') || (turn === 'b' && playerColor === 'black');
     if (!isPlayerTurn || botThinkingRef.current) return false;
@@ -582,10 +582,10 @@ export const Play: React.FC = () => {
   // Bot Filtering
   const filteredBots = BOTS.filter(bot => {
     const matchesTier = activeTier === 'All' || bot.tier === activeTier;
-    const matchesSearch = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          bot.style.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                          bot.tier.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (bot.title || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bot.style.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      bot.tier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (bot.title || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTier && matchesSearch;
   });
 
@@ -600,7 +600,7 @@ export const Play: React.FC = () => {
     if (!selectedBot) return;
     startNewGame(selectedBot, timePreset, pickedColor, customMin, customInc);
     setShowConfigModal(false);
-    
+
     // Play transition swoosh
     playSound.play('move');
   };
@@ -616,8 +616,8 @@ export const Play: React.FC = () => {
     const isBotTurn = (turn === 'w' && playerColor === 'black') || (turn === 'b' && playerColor === 'white');
 
     const canUndo = !!activeBot && (
-      playerColor === 'white' 
-        ? history.length > 0 
+      playerColor === 'white'
+        ? history.length > 0
         : (history.length > 1 || (history.length === 1 && history[0].black !== undefined))
     );
 
@@ -633,14 +633,15 @@ export const Play: React.FC = () => {
     const { playMode } = useGameStore.getState();
     const remoteName = useMultiplayerStore(s => s.remotePlayerName) || 'Guest';
     const remoteAvatar = useMultiplayerStore(s => s.remotePlayerAvatar) || '👤';
+    const isConnected = useMultiplayerStore(s => s.isConnected);
     const drawOfferReceived = useGameStore(s => s.drawOfferReceived);
 
-    const blackPlayerName = playerColor === 'black' 
-      ? playerName 
+    const blackPlayerName = playerColor === 'black'
+      ? playerName
       : (playMode === 'multiplayer' ? remoteName : (activeBot ? activeBot.name : 'Stockfish Bot'));
     const blackPlayerElo = playerColor === 'black' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
-    const whitePlayerName = playerColor === 'white' 
-      ? playerName 
+    const whitePlayerName = playerColor === 'white'
+      ? playerName
       : (playMode === 'multiplayer' ? remoteName : (activeBot ? activeBot.name : 'Stockfish Bot'));
     const whitePlayerElo = playerColor === 'white' ? activeUserElo : (activeBot ? activeBot.elo : 1500);
 
@@ -653,7 +654,7 @@ export const Play: React.FC = () => {
         <div className="w-full flex-none lg:flex-1 flex flex-col items-center p-4 lg:p-6 lg:overflow-y-auto">
           {/* Back button */}
           <div className="w-full max-w-[540px] flex items-center justify-start mb-2">
-            <button 
+            <button
               onClick={() => useGameStore.getState().resetAll()}
               className="text-xs uppercase font-mono-clock text-text-secondary hover:text-text-primary flex items-center gap-1 cursor-pointer"
             >
@@ -668,9 +669,9 @@ export const Play: React.FC = () => {
               {/* EVAL BAR */}
               <div className="w-4 lg:w-6 rounded-sm bg-bg-surface border border-bg-border relative flex flex-col items-center justify-center select-none shrink-0 overflow-hidden shadow-xl hidden md:flex">
                 <div className="absolute inset-0 bg-zinc-900" />
-                <div 
+                <div
                   style={{ height: `${whitePercent}%` }}
-                  className="absolute bottom-0 left-0 right-0 bg-zinc-100 transition-all duration-500 ease-out" 
+                  className="absolute bottom-0 left-0 right-0 bg-zinc-100 transition-all duration-500 ease-out"
                 />
                 <span className="z-10 font-mono-clock text-[9px] font-bold px-1 py-0.5 rounded-sm mix-blend-difference text-white absolute top-2">
                   {formatEvalText()}
@@ -682,25 +683,30 @@ export const Play: React.FC = () => {
                 {/* TOP PLAYER BAR - opponent is always at top */}
                 {playerColor === 'black' ? (
                   /* When playing black, WHITE BAR (opponent) goes on top */
-                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                    isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-                  }`}>
-                    <div className="flex items-center gap-3">
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                    }`}>
+                    <div className="flex items-center gap-3 min-w-0 overflow-hidden">
                       {activeBot && activeBot.isImageAvatar ? (
-                        <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                        <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2 shrink-0" style={{ borderColor: activeBot.accentColor + '80' }} />
                       ) : playMode === 'multiplayer' ? (
-                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 border-accent-cyan">
-                          {remoteAvatar}
-                        </div>
+                        remoteAvatar && (remoteAvatar.startsWith('./') || remoteAvatar.startsWith('data:') || remoteAvatar.startsWith('http')) ? (
+                          <img src={remoteAvatar} alt={remoteName} className="w-8 h-8 rounded-full object-cover border-2 border-accent-cyan shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 border-accent-cyan shrink-0">
+                            {remoteAvatar}
+                          </div>
+                        )
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 shrink-0" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
                           {activeBot ? activeBot.avatar : '🤖'}
                         </div>
                       )}
-                      <div>
-                        <div className="text-xs font-semibold flex items-center gap-1.5">
-                          {whitePlayerName}
-                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
+                          <span className="min-w-0 truncate" title={whitePlayerName}>
+                            {whitePlayerName}
+                          </span>
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
                             {whitePlayerElo}
                           </span>
                         </div>
@@ -709,33 +715,37 @@ export const Play: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                      whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                    } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                      } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
                       {formatTime(whiteTime)}
                     </div>
                   </div>
                 ) : (
                   /* When playing white, BLACK BAR (opponent) goes on top */
-                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                    isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-                  }`}>
-                    <div className="flex items-center gap-3">
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                    }`}>
+                    <div className="flex items-center gap-3 min-w-0 overflow-hidden">
                       {activeBot && activeBot.isImageAvatar ? (
-                        <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: activeBot.accentColor + '80' }} />
+                        <img src={activeBot.avatar} alt={activeBot.name} className="w-8 h-8 rounded-full object-cover border-2 shrink-0" style={{ borderColor: activeBot.accentColor + '80' }} />
                       ) : playMode === 'multiplayer' ? (
-                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 border-accent-cyan">
-                          {remoteAvatar}
-                        </div>
+                        remoteAvatar && (remoteAvatar.startsWith('./') || remoteAvatar.startsWith('data:') || remoteAvatar.startsWith('http')) ? (
+                          <img src={remoteAvatar} alt={remoteName} className="w-8 h-8 rounded-full object-cover border-2 border-accent-cyan shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 border-accent-cyan shrink-0">
+                            {remoteAvatar}
+                          </div>
+                        )
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-sm border-2 shrink-0" style={{ borderColor: activeBot ? activeBot.accentColor + '80' : 'var(--bg-border)' }}>
                           {activeBot ? activeBot.avatar : '🤖'}
                         </div>
                       )}
-                      <div>
-                        <div className="text-xs font-semibold flex items-center gap-1.5">
-                          {blackPlayerName}
-                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
+                          <span className="min-w-0 truncate" title={blackPlayerName}>
+                            {blackPlayerName}
+                          </span>
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
                             {blackPlayerElo}
                           </span>
                         </div>
@@ -744,9 +754,8 @@ export const Play: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                      blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                    } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                      } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
                       {formatTime(blackTime)}
                     </div>
                   </div>
@@ -803,14 +812,14 @@ export const Play: React.FC = () => {
                       return true;
                     }}
                     customSquareStyles={{
-                      ...(chess.inCheck() 
+                      ...(chess.inCheck()
                         ? {
-                            // Soft red overlay on checked king
-                            [chess.history({ verbose: true }).pop()?.color === 'w' 
-                              ? (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'b')?.square || '')
-                              : (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
-                            ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
-                          }
+                          // Soft red overlay on checked king
+                          [chess.history({ verbose: true }).pop()?.color === 'w'
+                            ? (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'b')?.square || '')
+                            : (chess.board().flatMap(b => b).find(p => p?.type === 'k' && p?.color === 'w')?.square || '')
+                          ]: { backgroundColor: 'rgba(248, 113, 113, 0.45)' }
+                        }
                         : {}),
                       ...optionSquares,
                       ...rightClickedSquares
@@ -821,8 +830,8 @@ export const Play: React.FC = () => {
                   {gameResult && (
                     <div className="absolute inset-0 bg-void/90 flex flex-col items-center justify-center p-6 text-center z-25">
                       <span className="font-serif-header text-3xl font-bold mb-2">
-                        {gameResult === 'd' 
-                          ? 'Match Drawn' 
+                        {gameResult === 'd'
+                          ? 'Match Drawn'
                           : (gameResult === 'w' && playerColor === 'white') || (gameResult === 'b' && playerColor === 'black')
                             ? 'Victory'
                             : 'Defeat'}
@@ -914,51 +923,51 @@ export const Play: React.FC = () => {
                 {/* BOTTOM PLAYER BAR - player is always at bottom */}
                 {playerColor === 'black' ? (
                   /* When playing black, BLACK BAR (player) goes on bottom */
-                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                    isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-                  }`}>
-                    <div className="flex items-center gap-3">
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${isBlackActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                    }`}>
+                    <div className="flex items-center gap-3 min-w-0 overflow-hidden">
                       {playerAvatar
-                        ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
-                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                        ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary shrink-0" />
+                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border shrink-0">👤</div>
                       }
-                      <div>
-                        <div className="text-xs font-semibold flex items-center gap-1.5">
-                          {blackPlayerName}
-                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
+                          <span className="min-w-0 truncate" title={blackPlayerName}>
+                            {blackPlayerName}
+                          </span>
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
                             {blackPlayerElo}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                      blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                    } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${blackTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                      } ${isBlackActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
                       {formatTime(blackTime)}
                     </div>
                   </div>
                 ) : (
                   /* When playing white, WHITE BAR (player) goes on bottom */
-                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${
-                    isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
-                  }`}>
-                    <div className="flex items-center gap-3">
+                  <div className={`w-full p-3 bg-bg-surface border border-bg-border rounded-sm flex items-center justify-between transition-all duration-300 ${isWhiteActive ? 'border-accent-primary ring-1 ring-accent-primary/20' : ''
+                    }`}>
+                    <div className="flex items-center gap-3 min-w-0 overflow-hidden">
                       {playerAvatar
-                        ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary" />
-                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border">👤</div>
+                        ? <img src={playerAvatar} alt={playerName} className="w-8 h-8 rounded-full object-cover border border-accent-primary shrink-0" />
+                        : <div className="w-8 h-8 rounded-sm bg-bg-elevated flex items-center justify-center text-sm border border-bg-border shrink-0">👤</div>
                       }
-                      <div>
-                        <div className="text-xs font-semibold flex items-center gap-1.5">
-                          {whitePlayerName}
-                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm">
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
+                          <span className="min-w-0 truncate" title={whitePlayerName}>
+                            {whitePlayerName}
+                          </span>
+                          <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
                             {whitePlayerElo}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${
-                      whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
-                    } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
+                    <div className={`font-mono-clock text-xl font-bold tracking-tight px-3 py-1 bg-bg-void rounded-sm border ${whiteTime <= 10 ? 'text-accent-amber border-accent-amber animate-pulse' : 'text-text-primary border-bg-border'
+                      } ${isWhiteActive ? 'bg-bg-elevated' : 'opacity-70'}`}>
                       {formatTime(whiteTime)}
                     </div>
                   </div>
@@ -1039,24 +1048,51 @@ export const Play: React.FC = () => {
         {/* RIGHT COLUMN: Sidebar (Move log, Chat) (320px width) */}
         <div className="w-full lg:w-80 lg:flex-none border-t lg:border-t-0 lg:border-l border-bg-border flex flex-col bg-bg-surface lg:overflow-y-auto">
           {/* Active Opponent Info */}
-          {activeBot && (
-            <div className="p-4 border-b border-bg-border flex items-center gap-3">
-              {activeBot.isImageAvatar ? (
-                <img src={activeBot.avatar} alt={activeBot.name} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }} />
+          {playMode === 'multiplayer' ? (
+            <div className="p-4 border-b border-bg-border flex items-center gap-3 min-w-0">
+              {remoteAvatar && (remoteAvatar.startsWith('./') || remoteAvatar.startsWith('data:') || remoteAvatar.startsWith('http')) ? (
+                <img src={remoteAvatar} alt={remoteName} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0 border-accent-cyan" />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-bg-elevated border-2 flex items-center justify-center text-lg flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }}>
-                  <span className="filter drop-shadow">{activeBot.avatar}</span>
+                <div className="w-10 h-10 rounded-full bg-bg-elevated border-2 flex items-center justify-center text-sm flex-shrink-0 border-accent-cyan">
+                  <span className="filter drop-shadow">{remoteAvatar}</span>
                 </div>
               )}
-              <div>
-                <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5">
-                  {activeBot.name}
-                  {activeBot.title && <span className="text-[9px] px-1 py-0.5 rounded-sm font-mono-clock" style={{ color: activeBot.accentColor, backgroundColor: activeBot.accentColor + '20', border: `1px solid ${activeBot.accentColor}40` }}>{activeBot.title}</span>}
-                  {activeBot.country && <span className="text-[12px]">{activeBot.country}</span>}
+              <div className="min-w-0">
+                <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5 min-w-0">
+                  <span className="min-w-0 truncate" title={remoteName}>
+                    {remoteName}
+                  </span>
+                  <span className="text-[9px] px-1 py-0.5 rounded-sm font-mono-clock text-text-muted bg-bg-border shrink-0">
+                    {playerColor === 'white' ? whitePlayerElo : blackPlayerElo}
+                  </span>
                 </h3>
-                <p className="text-[10px] text-text-secondary italic">"{activeBot.quote}"</p>
+                <p className="text-[10px] text-text-secondary italic">
+                  {isConnected ? 'Connected' : 'Connecting\u2026'}
+                </p>
               </div>
             </div>
+          ) : (
+            activeBot && (
+              <div className="p-4 border-b border-bg-border flex items-center gap-3 min-w-0">
+                {activeBot.isImageAvatar ? (
+                  <img src={activeBot.avatar} alt={activeBot.name} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }} />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-bg-elevated border-2 flex items-center justify-center text-lg flex-shrink-0" style={{ borderColor: activeBot.accentColor + '80' }}>
+                    <span className="filter drop-shadow">{activeBot.avatar}</span>
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5 min-w-0">
+                    <span className="min-w-0 truncate" title={activeBot.name}>
+                      {activeBot.name}
+                    </span>
+                    {activeBot.title && <span className="text-[9px] px-1 py-0.5 rounded-sm font-mono-clock shrink-0" style={{ color: activeBot.accentColor, backgroundColor: activeBot.accentColor + '20', border: `1px solid ${activeBot.accentColor}40` }}>{activeBot.title}</span>}
+                    {activeBot.country && <span className="text-[12px] shrink-0">{activeBot.country}</span>}
+                  </h3>
+                  <p className="text-[10px] text-text-secondary italic">"{activeBot.quote}"</p>
+                </div>
+              </div>
+            )
           )}
 
           {/* Move Log pane */}
@@ -1158,11 +1194,10 @@ export const Play: React.FC = () => {
             <button
               key={tier}
               onClick={() => setActiveTier(tier)}
-              className={`px-3 py-1.5 border rounded-sm text-xs font-mono-clock uppercase transition-all duration-150 cursor-pointer ${
-                activeTier === tier
+              className={`px-3 py-1.5 border rounded-sm text-xs font-mono-clock uppercase transition-all duration-150 cursor-pointer ${activeTier === tier
                   ? style?.active || 'bg-text-primary text-bg-void border-text-primary font-semibold shadow-[0_0_15px_rgba(255,255,255,0.4)]'
                   : style?.inactive || 'bg-bg-surface border-bg-border text-text-secondary hover:text-text-primary hover:bg-bg-elevated'
-              }`}
+                }`}
             >
               {style ? `${style.emoji} ${tier}` : tier}
             </button>
@@ -1195,7 +1230,7 @@ export const Play: React.FC = () => {
                       {bot.country && <span className="mr-1">{bot.country}</span>}{bot.title}
                     </span>
                   )}
-                  <span 
+                  <span
                     style={{ color: bot.accentColor, backgroundColor: bot.accentColor + '10', borderColor: bot.accentColor + '30' }}
                     className="text-[9px] font-mono-clock uppercase px-1.5 py-0.5 border rounded-sm"
                   >
@@ -1252,7 +1287,7 @@ export const Play: React.FC = () => {
       {showConfigModal && selectedBot && (
         <div className="fixed inset-0 bg-void/85 flex items-center justify-center z-50 p-4">
           <div className="bg-bg-surface border border-bg-border p-6 rounded-md max-w-md w-full relative shadow-2xl">
-            <button 
+            <button
               onClick={() => setShowConfigModal(false)}
               className="absolute right-4 top-4 text-text-secondary hover:text-text-primary"
             >
@@ -1290,11 +1325,11 @@ export const Play: React.FC = () => {
                     { id: '10+0', name: 'Rapid 10m' },
                     { id: '15+10', name: 'Rapid 15+10' }
                   ];
-                  
+
                   // Check if recommended time is standard
                   const recommended = selectedBot.recommendedTime || '10+0';
                   const isStandard = standardPresets.some(p => p.id === recommended);
-                  
+
                   const presetsToRender = [...standardPresets];
                   if (!isStandard && recommended !== 'custom') {
                     const parts = recommended.split('+');
@@ -1303,24 +1338,23 @@ export const Play: React.FC = () => {
                     let cat = 'Blitz';
                     if (min < 3) cat = 'Bullet';
                     else if (min >= 10) cat = 'Rapid';
-                    
+
                     presetsToRender.push({
                       id: recommended,
                       name: `Rec: ${cat} ${min}+${inc}`
                     });
                   }
-                  
+
                   presetsToRender.push({ id: 'custom', name: 'Custom' });
-                  
+
                   return presetsToRender.map(tc => (
                     <button
                       key={tc.id}
                       onClick={() => setTimePreset(tc.id as any)}
-                      className={`py-2 px-3 border rounded-sm text-xs font-mono-clock uppercase transition-all ${
-                        timePreset === tc.id
+                      className={`py-2 px-3 border rounded-sm text-xs font-mono-clock uppercase transition-all ${timePreset === tc.id
                           ? 'bg-text-primary text-bg-void border-text-primary font-bold'
                           : 'bg-bg-void border-bg-border text-text-secondary hover:text-text-primary'
-                      }`}
+                        }`}
                     >
                       {tc.name}
                     </button>
@@ -1369,11 +1403,10 @@ export const Play: React.FC = () => {
                   <button
                     key={col.id}
                     onClick={() => setPickedColor(col.id as any)}
-                    className={`py-2 px-3 border rounded-sm text-xs font-mono-clock uppercase transition-all ${
-                      pickedColor === col.id
+                    className={`py-2 px-3 border rounded-sm text-xs font-mono-clock uppercase transition-all ${pickedColor === col.id
                         ? 'bg-text-primary text-bg-void border-text-primary font-bold'
                         : 'bg-bg-void border-bg-border text-text-secondary hover:text-text-primary'
-                    }`}
+                      }`}
                   >
                     {col.name}
                   </button>

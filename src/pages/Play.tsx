@@ -124,7 +124,8 @@ export const Play: React.FC = () => {
     userEloBlitz,
     userEloRapid,
     userEloBullet,
-    undoMove
+    undoMove,
+    playMode
   } = useGameStore();
 
   const {
@@ -465,7 +466,7 @@ export const Play: React.FC = () => {
 
         const success = makeMove(sourceSquare, targetSquare);
         if (success) {
-          if (useGameStore.getState().playMode === 'multiplayer') {
+          if (playMode === 'multiplayer') {
             useMultiplayerStore.getState().sendMessage({
               type: 'move',
               payload: { from: sourceSquare, to: targetSquare }
@@ -519,7 +520,7 @@ export const Play: React.FC = () => {
 
     const success = makeMove(pendingMove.from, pendingMove.to, pendingMove.promotion);
     if (success) {
-      if (useGameStore.getState().playMode === 'multiplayer') {
+      if (playMode === 'multiplayer') {
         useMultiplayerStore.getState().sendMessage({
           type: 'move',
           payload: { from: pendingMove.from, to: pendingMove.to, promotion: pendingMove.promotion }
@@ -553,7 +554,6 @@ export const Play: React.FC = () => {
     setChatInput('');
 
     // Send chat to opponent in multiplayer
-    const { playMode } = useGameStore.getState();
     if (playMode === 'multiplayer') {
       useMultiplayerStore.getState().sendMessage({
         type: 'chat',
@@ -630,7 +630,6 @@ export const Play: React.FC = () => {
     };
     const activeUserElo = getActiveUserElo();
 
-    const { playMode } = useGameStore.getState();
     const remoteName = useMultiplayerStore(s => s.remotePlayerName) || 'Guest';
     const remoteAvatar = useMultiplayerStore(s => s.remotePlayerAvatar) || '👤';
     const isConnected = useMultiplayerStore(s => s.isConnected);
@@ -703,7 +702,7 @@ export const Play: React.FC = () => {
                       )}
                       <div className="min-w-0">
                         <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
-                          <span className="min-w-0 truncate" title={whitePlayerName}>
+                          <span className="block truncate min-w-0 flex-1" title={whitePlayerName}>
                             {whitePlayerName}
                           </span>
                           <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
@@ -742,7 +741,7 @@ export const Play: React.FC = () => {
                       )}
                       <div className="min-w-0">
                         <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
-                          <span className="min-w-0 truncate" title={blackPlayerName}>
+                          <span className="block truncate min-w-0 flex-1" title={blackPlayerName}>
                             {blackPlayerName}
                           </span>
                           <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
@@ -932,7 +931,7 @@ export const Play: React.FC = () => {
                       }
                       <div className="min-w-0">
                         <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
-                          <span className="min-w-0 truncate" title={blackPlayerName}>
+                          <span className="block truncate min-w-0 flex-1" title={blackPlayerName}>
                             {blackPlayerName}
                           </span>
                           <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
@@ -957,7 +956,7 @@ export const Play: React.FC = () => {
                       }
                       <div className="min-w-0">
                         <div className="text-xs font-semibold flex items-center gap-1.5 min-w-0">
-                          <span className="min-w-0 truncate" title={whitePlayerName}>
+                          <span className="block truncate min-w-0 flex-1" title={whitePlayerName}>
                             {whitePlayerName}
                           </span>
                           <span className="text-[9px] font-mono-clock bg-bg-border text-text-muted px-1 rounded-sm shrink-0">
@@ -995,7 +994,6 @@ export const Play: React.FC = () => {
               <div className="flex gap-2 w-full mt-1">
                 <button
                   onClick={() => {
-                    const { playMode } = useGameStore.getState();
                     if (playMode === 'multiplayer') {
                       useMultiplayerStore.getState().sendMessage({ type: 'draw_offer' });
                       sendChatMessage('System', 'Draw offer sent.');
@@ -1009,7 +1007,6 @@ export const Play: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    const { playMode } = useGameStore.getState();
                     if (playMode === 'multiplayer') {
                       useMultiplayerStore.getState().sendMessage({ type: 'resign' });
                     }
@@ -1059,11 +1056,11 @@ export const Play: React.FC = () => {
               )}
               <div className="min-w-0">
                 <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5 min-w-0">
-                  <span className="min-w-0 truncate" title={remoteName}>
+                  <span className="block truncate min-w-0 flex-1" title={remoteName}>
                     {remoteName}
                   </span>
                   <span className="text-[9px] px-1 py-0.5 rounded-sm font-mono-clock text-text-muted bg-bg-border shrink-0">
-                    {playerColor === 'white' ? whitePlayerElo : blackPlayerElo}
+                    {playerColor === 'white' ? blackPlayerElo : whitePlayerElo}
                   </span>
                 </h3>
                 <p className="text-[10px] text-text-secondary italic">
@@ -1083,7 +1080,7 @@ export const Play: React.FC = () => {
                 )}
                 <div className="min-w-0">
                   <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5 min-w-0">
-                    <span className="min-w-0 truncate" title={activeBot.name}>
+                    <span className="block truncate min-w-0 flex-1" title={activeBot.name}>
                       {activeBot.name}
                     </span>
                     {activeBot.title && <span className="text-[9px] px-1 py-0.5 rounded-sm font-mono-clock shrink-0" style={{ color: activeBot.accentColor, backgroundColor: activeBot.accentColor + '20', border: `1px solid ${activeBot.accentColor}40` }}>{activeBot.title}</span>}

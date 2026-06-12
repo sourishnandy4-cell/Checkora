@@ -492,6 +492,14 @@ export const Play: React.FC = () => {
     showLegalMoves
   );
 
+  // Multiplayer selectors (MUST be at top level — Rules of Hooks)
+  const remoteName = useMultiplayerStore(s => s.remotePlayerName) || 'Guest';
+  const remoteAvatar = useMultiplayerStore(s => s.remotePlayerAvatar) || '👤';
+  const isConnected = useMultiplayerStore(s => s.isConnected);
+  const drawOfferReceived = useGameStore(s => s.drawOfferReceived);
+  const playAgainReceived = useMultiplayerStore(s => s.playAgainReceived);
+  const playAgainSent = useMultiplayerStore(s => s.playAgainSent);
+
   const onSquareClick = (square: string) => {
     setRightClickedSquares({});
     defaultSquareClick(square);
@@ -630,10 +638,7 @@ export const Play: React.FC = () => {
     };
     const activeUserElo = getActiveUserElo();
 
-    const remoteName = useMultiplayerStore(s => s.remotePlayerName) || 'Guest';
-    const remoteAvatar = useMultiplayerStore(s => s.remotePlayerAvatar) || '👤';
-    const isConnected = useMultiplayerStore(s => s.isConnected);
-    const drawOfferReceived = useGameStore(s => s.drawOfferReceived);
+    // remoteName, remoteAvatar, isConnected, drawOfferReceived are now top-level hooks
 
     const blackPlayerName = playerColor === 'black'
       ? playerName
@@ -854,19 +859,29 @@ export const Play: React.FC = () => {
                         )}
                         <button
                           onClick={() => {
-                            if (activeBot) startNewGame(activeBot, timeControl as any, playerColor);
+                            if (activeBot) {
+                              startNewGame(activeBot, timeControl as any, playerColor);
+                            } else if (playMode === 'multiplayer' && isConnected) {
+                              useMultiplayerStore.getState().sendMessage({ type: 'play_again_request' });
+                              useMultiplayerStore.setState({ playAgainSent: true });
+                              sendChatMessage('System', 'Rematch request sent.');
+                            }
                           }}
-                          className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
+                          disabled={playMode === 'multiplayer' && playAgainSent}
+                          className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase disabled:opacity-50"
                         >
-                          Rematch
+                          {playMode === 'multiplayer' && playAgainSent ? 'Waiting...' : 'Rematch'}
                         </button>
                         <button
                           onClick={() => {
+                            if (playMode === 'multiplayer') {
+                              useMultiplayerStore.getState().disconnect();
+                            }
                             useGameStore.getState().resetAll();
                           }}
                           className="premium-btn py-2 px-5 text-xs font-mono-clock uppercase"
                         >
-                          Play Again
+                          {playMode === 'multiplayer' ? 'Leave Game' : 'Play Again'}
                         </button>
                         <button
                           onClick={() => {
@@ -908,6 +923,42 @@ export const Play: React.FC = () => {
                                 useMultiplayerStore.getState().sendMessage({ type: 'draw_decline' });
                                 sendChatMessage('System', 'Draw offer declined.');
                               }
+                            }}
+                            className="flex-1 py-2 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red/30 rounded-sm"
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Play Again Request Popup */}
+                  {playAgainReceived && !gameResult && (
+                    <div className="absolute inset-0 bg-void/85 flex items-center justify-center z-30">
+                      <div className="bg-bg-surface border border-accent-cyan/50 rounded-md p-6 max-w-xs w-full shadow-2xl text-center">
+                        <span className="text-2xl block mb-2">🔄</span>
+                        <h3 className="font-serif-header text-md font-bold mb-1">Rematch?</h3>
+                        <p className="text-xs text-text-secondary mb-5">Your opponent wants a rematch. Do you accept?</p>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              useMultiplayerStore.getState().sendMessage({ type: 'play_again_accept' });
+                              useMultiplayerStore.setState({ playAgainReceived: false });
+                              const tc = (timeControl as any) || '10+0';
+                              const newColor = playerColor === 'white' ? 'black' : 'white';
+                              startNewGame(null, tc, newColor, undefined, undefined, undefined, 'multiplayer');
+                              sendChatMessage('System', 'Rematch accepted! Good luck!');
+                            }}
+                            className="flex-1 py-2 bg-accent-green/20 border border-accent-green text-xs uppercase font-mono-clock text-accent-green hover:bg-accent-green/30 rounded-sm"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => {
+                              useMultiplayerStore.getState().sendMessage({ type: 'play_again_decline' });
+                              useMultiplayerStore.setState({ playAgainReceived: false });
+                              sendChatMessage('System', 'Rematch declined.');
                             }}
                             className="flex-1 py-2 bg-accent-red/20 border border-accent-red text-xs uppercase font-mono-clock text-accent-red hover:bg-accent-red/30 rounded-sm"
                           >

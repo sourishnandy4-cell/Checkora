@@ -3,7 +3,7 @@ import Peer, { DataConnection } from 'peerjs';
 import { useGameStore } from './gameStore';
 import { useSettingsStore } from './settingsStore';
 
-type MultiplayerMessageType = 'move' | 'chat' | 'resign' | 'draw_offer' | 'draw_accept' | 'draw_decline' | 'ping' | 'identity';
+type MultiplayerMessageType = 'move' | 'chat' | 'resign' | 'draw_offer' | 'draw_accept' | 'draw_decline' | 'ping' | 'identity' | 'play_again_request' | 'play_again_accept' | 'play_again_decline';
 
 interface MultiplayerMessage {
   type: MultiplayerMessageType;
@@ -19,6 +19,8 @@ interface MultiplayerState {
   isConnecting: boolean;
   remotePlayerName: string;
   remotePlayerAvatar: string;
+  playAgainReceived: boolean;
+  playAgainSent: boolean;
   initPeer: () => void;
   hostGame: () => Promise<string>;
   joinGame: (hostId: string) => Promise<boolean>;
@@ -43,7 +45,10 @@ function normalizeAndValidateIncoming(raw: unknown): MultiplayerMessage | null {
     'draw_accept',
     'draw_decline',
     'ping',
-    'identity'
+    'identity',
+    'play_again_request',
+    'play_again_accept',
+    'play_again_decline'
   ]);
 
   if (typeof type !== 'string' || !allowedTypes.has(type)) return null;
@@ -91,6 +96,9 @@ function normalizeAndValidateIncoming(raw: unknown): MultiplayerMessage | null {
     case 'draw_accept':
     case 'draw_decline':
     case 'ping':
+    case 'play_again_request':
+    case 'play_again_accept':
+    case 'play_again_decline':
       // these are control messages; payload must be absent or a harmless object
       if (payload !== undefined && !isRecord(payload)) return null;
       msg.payload = payload;
@@ -185,6 +193,31 @@ function handleIncomingMessage(data: MultiplayerMessage) {
       });
       return;
     }
+
+    case 'play_again_request': {
+      const gs = useGameStore.getState();
+      gs.sendChatMessage('System', 'Opponent wants a rematch! Accept or decline below.');
+      useMultiplayerStore.setState({ playAgainReceived: true });
+      return;
+    }
+
+    case 'play_again_accept': {
+      useMultiplayerStore.setState({ playAgainSent: false, playAgainReceived: false });
+      const gs = useGameStore.getState();
+      const tc = (gs.timeControl as any) || '10+0';
+      // Swap colors: requester keeps their color preference, accepter gets the opposite
+      const newColor = gs.playerColor === 'white' ? 'black' : 'white';
+      gs.startNewGame(null, tc, newColor, undefined, undefined, undefined, 'multiplayer');
+      gs.sendChatMessage('System', 'Rematch started! Good luck!');
+      return;
+    }
+
+    case 'play_again_decline': {
+      useMultiplayerStore.setState({ playAgainSent: false });
+      const gs = useGameStore.getState();
+      gs.sendChatMessage('System', 'Opponent declined the rematch.');
+      return;
+    }
   }
 }
 
@@ -198,6 +231,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   showModal: false,
   remotePlayerName: '',
   remotePlayerAvatar: '👤',
+  playAgainReceived: false,
+  playAgainSent: false,
 
   setShowModal: (show) => set({ showModal: show }),
 
@@ -312,6 +347,6 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     const { connection, peer } = get();
     if (connection) connection.close();
     if (peer) peer.destroy();
-    set({ connection: null, peer: null, peerId: null, isConnected: false, isHost: false, remotePlayerName: '', remotePlayerAvatar: '👤' });
+    set({ connection: null, peer: null, peerId: null, isConnected: false, isHost: false, remotePlayerName: '', remotePlayerAvatar: '👤', playAgainReceived: false, playAgainSent: false });
   }
 }));
